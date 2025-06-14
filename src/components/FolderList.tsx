@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Folder, Note } from '@/types';
-import { Folder as FolderIcon, Trash2 } from 'lucide-react';
+import { Folder as FolderIcon, Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -22,9 +21,10 @@ interface FolderListProps {
   onSelectFolder: (folderId: string) => void;
   onNavigateUp: () => void;
   onDeleteFolder: (folderId: string) => void;
+  onRenameFolder: (folderId: string) => void;
 }
 
-const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId, onSelectFolder, onNavigateUp, onDeleteFolder }) => {
+const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId, onSelectFolder, onNavigateUp, onDeleteFolder, onRenameFolder }) => {
   const notesInFolderCount = (folderId: string) => {
     return notes.filter(note => note.folderId === folderId).length;
   }
@@ -57,6 +57,18 @@ const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId
               {folder.name}
             </div>
             <span className="text-sm text-muted-foreground mr-2">{notesInFolderCount(folder.id)}</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity h-8 w-8"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRenameFolder(folder.id);
+              }}
+              title={`Rename "${folder.name}"`}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button

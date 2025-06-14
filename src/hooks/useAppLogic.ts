@@ -6,8 +6,8 @@ import { useFolders } from '@/hooks/useFolders';
 import Fuse from 'fuse.js';
 
 export const useAppLogic = () => {
-  const { notes, saveNote, deleteNote, deleteNotesByFolderIds } = useNotes();
-  const { folders, createFolder, deleteFolderAndDescendants } = useFolders();
+  const { notes, saveNote, deleteNote, deleteNotesByFolderIds, deleteMultipleNotes } = useNotes();
+  const { folders, createFolder, deleteFolderAndDescendants, renameFolder } = useFolders();
 
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
@@ -15,21 +15,55 @@ export const useAppLogic = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [searchQuery, setSearchQuery] = useState('');
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
+  const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]);
+
+  const handleToggleNoteSelection = (noteId: string) => {
+    setSelectedNoteIds(prev =>
+      prev.includes(noteId)
+        ? prev.filter(id => id !== noteId)
+        : [...prev, noteId]
+    );
+  };
+
+  const handleBulkDeleteNotes = async () => {
+    if (selectedNoteIds.length === 0) return;
+    if (window.confirm(`Are you sure you want to delete ${selectedNoteIds.length} selected note(s)?`)) {
+      await deleteMultipleNotes(selectedNoteIds);
+      setSelectedNoteIds([]);
+    }
+  };
+
+  const handleRenameFolder = (folderId: string) => {
+    const folder = folders.find(f => f.id === folderId);
+    if (!folder) return;
+    const newName = prompt("Enter new folder name:", folder.name);
+    if (newName && newName.trim() && newName.trim() !== folder.name) {
+      renameFolder(folderId, newName.trim());
+    }
+  };
+
+  const handleSelectFolder = (folderId: string | null) => {
+    setCurrentFolderId(folderId);
+    setSelectedNoteIds([]);
+  };
 
   const handleNewNote = useCallback(() => {
     setSelectedNote(null);
     setViewMode('edit');
+    setSelectedNoteIds([]);
   }, []);
 
   const handleBackToList = useCallback(() => {
     setViewMode('list');
     setSelectedNote(null);
+    setSelectedNoteIds([]);
   }, []);
 
   const handleNavigateUp = useCallback(() => {
     if (!currentFolderId) return;
     const currentFolder = folders.find(f => f.id === currentFolderId);
     setCurrentFolderId(currentFolder?.parentId || null);
+    setSelectedNoteIds([]);
   }, [currentFolderId, folders]);
 
   useEffect(() => {
@@ -77,6 +111,7 @@ export const useAppLogic = () => {
   const handleSelectNote = (note: Note) => {
     setSelectedNote(note);
     setViewMode('preview');
+    setSelectedNoteIds([]);
   };
 
   const handleDeleteNote = (noteId: string) => {
@@ -93,7 +128,7 @@ export const useAppLogic = () => {
       createFolder(folderName.trim(), currentFolderId);
     }
   }, [createFolder, currentFolderId]);
-  
+
   const handleDeleteFolder = async (folderId: string) => {
     const folderToDelete = folders.find(f => f.id === folderId);
     const parentId = folderToDelete?.parentId || null;
@@ -121,6 +156,7 @@ export const useAppLogic = () => {
     setViewMode('list');
     setSelectedNote(null);
     setSearchQuery('');
+    setSelectedNoteIds([]);
   };
 
   const fuse = useMemo(() => new Fuse(notes, {
@@ -172,6 +208,14 @@ export const useAppLogic = () => {
     });
   }, [notes, currentFolderId, sortOrder, searchQuery, searchResults]);
 
+  const handleSelectAll = () => {
+    if (selectedNoteIds.length === filteredNotes.length) {
+      setSelectedNoteIds([]);
+    } else {
+      setSelectedNoteIds(filteredNotes.map(n => n.id));
+    }
+  };
+
   return {
     notes,
     folders,
@@ -182,6 +226,7 @@ export const useAppLogic = () => {
     searchQuery,
     commandMenuOpen,
     setCommandMenuOpen,
+    selectedNoteIds,
     handleNewNote,
     handleBackToList,
     handleSaveNote,
@@ -189,7 +234,7 @@ export const useAppLogic = () => {
     handleDeleteNote,
     handleCreateFolder,
     handleDeleteFolder,
-    setCurrentFolderId,
+    handleSelectFolder,
     handleNavigateUp,
     setSortOrder,
     setSearchQuery,
@@ -197,5 +242,9 @@ export const useAppLogic = () => {
     handleSelectFolderFromCommandMenu,
     filteredFolders,
     filteredNotes,
+    handleToggleNoteSelection,
+    handleBulkDeleteNotes,
+    handleRenameFolder,
+    handleSelectAll,
   };
 };

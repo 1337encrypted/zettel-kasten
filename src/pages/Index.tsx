@@ -20,13 +20,14 @@ const Index = () => {
     searchQuery,
     commandMenuOpen,
     setCommandMenuOpen,
+    selectedNoteIds,
     handleNewNote,
     handleSaveNote,
     handleSelectNote,
     handleDeleteNote,
     handleCreateFolder,
     handleDeleteFolder,
-    setCurrentFolderId,
+    handleSelectFolder,
     handleNavigateUp,
     setSortOrder,
     setSearchQuery,
@@ -35,12 +36,16 @@ const Index = () => {
     handleSelectFolderFromCommandMenu,
     filteredFolders,
     filteredNotes,
+    handleToggleNoteSelection,
+    handleBulkDeleteNotes,
+    handleRenameFolder,
+    handleSelectAll,
   } = useAppLogic();
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
       <AppHeader />
-      
+
       <main className="flex-grow flex flex-col">
         {viewMode === 'list' ? (
           <ListView
@@ -51,7 +56,7 @@ const Index = () => {
             selectedNoteId={selectedNote?.id}
             onNewNote={handleNewNote}
             onCreateFolder={handleCreateFolder}
-            onSelectFolder={setCurrentFolderId}
+            onSelectFolder={handleSelectFolder}
             onNavigateUp={handleNavigateUp}
             onSelectNote={handleSelectNote}
             onDeleteNote={handleDeleteNote}
@@ -60,6 +65,11 @@ const Index = () => {
             onSortOrderChange={setSortOrder}
             searchQuery={searchQuery}
             onSearchQueryChange={setSearchQuery}
+            onRenameFolder={handleRenameFolder}
+            selectedNoteIds={selectedNoteIds}
+            onToggleNoteSelection={handleToggleNoteSelection}
+            onBulkDeleteNotes={handleBulkDeleteNotes}
+            onSelectAll={handleSelectAll}
           />
         ) : (
           <DetailView 
@@ -74,7 +84,7 @@ const Index = () => {
           />
         )}
       </main>
-      
+
       <AppFooter />
       <Toaster />
       <CommandMenu

@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Folder } from '@/types';
 import { toast } from "@/components/ui/sonner";
@@ -69,6 +68,38 @@ export const useFolders = () => {
     },
   });
 
+  const renameFolderMutation = useMutation({
+    mutationFn: async ({ folderId, newName }: { folderId: string; newName: string }) => {
+      const trimmedName = newName.trim();
+      if (!trimmedName) {
+        toast.error("Folder name cannot be empty.");
+        throw new Error("Folder name cannot be empty.");
+      }
+
+      const { data, error } = await supabase
+        .from('folders')
+        .update({ name: trimmedName })
+        .eq('id', folderId)
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code === '23505') { // unique constraint violation
+          toast.error(`A folder with the name "${trimmedName}" already exists here.`);
+        } else {
+          toast.error(error.message);
+        }
+        throw new Error(error.message);
+      }
+
+      toast.success(`Folder renamed to "${trimmedName}"!`);
+      return fromFolderDb(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['folders'] });
+    },
+  });
+
   const deleteFolderMutation = useMutation({
     mutationFn: async (folderId: string): Promise<string[]> => {
         const folderToDelete = folders.find(f => f.id === folderId);
@@ -101,10 +132,11 @@ export const useFolders = () => {
     }
   });
 
-  return { 
-      folders, 
-      isLoading,
-      createFolder: (folderName: string, parentId: string | null) => createFolderMutation.mutate({ folderName, parentId }),
-      deleteFolderAndDescendants: deleteFolderMutation.mutateAsync,
-   };
+  return {
+    folders,
+    isLoading,
+    createFolder: (folderName: string, parentId: string | null) => createFolderMutation.mutate({ folderName, parentId }),
+    renameFolder: (folderId: string, newName: string) => renameFolderMutation.mutate({ folderId, newName }),
+    deleteFolderAndDescendants: deleteFolderMutation.mutateAsync,
+  };
 };

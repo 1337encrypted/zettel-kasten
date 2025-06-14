@@ -139,6 +139,36 @@ export const useNotes = () => {
       }
   });
 
+  const deleteMultipleNotesMutation = useMutation({
+    mutationFn: async (noteIds: string[]) => {
+      if (noteIds.length === 0) return 0;
+
+      const notesToDelete = notes.filter(note => noteIds.includes(note.id));
+
+      const allFilePaths = notesToDelete.flatMap(note => getFilePathsFromContent(note.content));
+
+      if (allFilePaths.length > 0) {
+          const { error: imageError } = await supabase.storage.from('note-images').remove(allFilePaths);
+          if (imageError) {
+              toast.error(`Failed to delete images: ${imageError.message}`);
+          }
+      }
+
+      const { error } = await supabase.from('notes').delete().in('id', noteIds);
+      if (error) {
+          toast.error(error.message);
+          throw error;
+      }
+      return noteIds.length;
+    },
+    onSuccess: (count) => {
+        if (count > 0) {
+          toast.success(`${count} note${count > 1 ? 's' : ''} deleted.`);
+        }
+        queryClient.invalidateQueries({ queryKey: ['notes'] });
+    }
+  });
+
   const deleteNotesByFolderIdsMutation = useMutation({
       mutationFn: async (folderIds: string[]) => {
         const { data: notesToDelete, error: fetchError } = await supabase
@@ -174,11 +204,12 @@ export const useNotes = () => {
       }
   });
 
-  return { 
+  return {
     notes,
     isLoading,
-    saveNote: saveNoteMutation.mutateAsync, 
-    deleteNote: deleteNoteMutation.mutate, 
-    deleteNotesByFolderIds: deleteNotesByFolderIdsMutation.mutateAsync 
+    saveNote: saveNoteMutation.mutateAsync,
+    deleteNote: deleteNoteMutation.mutate,
+    deleteMultipleNotes: deleteMultipleNotesMutation.mutateAsync,
+    deleteNotesByFolderIds: deleteNotesByFolderIdsMutation.mutateAsync
   };
 };

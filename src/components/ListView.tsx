@@ -2,7 +2,7 @@
 import React from 'react';
 import { Folder, Note } from '@/types';
 import { Button } from '@/components/ui/button';
-import { FolderPlus, File, FilePlus, ArrowUpAZ, ArrowDownAZ, Search } from 'lucide-react';
+import { FolderPlus, File, FilePlus, ArrowUpAZ, ArrowDownAZ, Search, Trash2 } from 'lucide-react';
 import FolderList from '@/components/FolderList';
 import NoteList from '@/components/NoteList';
 import ReactMarkdown from 'react-markdown';
@@ -10,6 +10,7 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { Input } from '@/components/ui/input';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Checkbox } from './ui/checkbox';
 
 interface ListViewProps {
   filteredFolders: Folder[];
@@ -28,6 +29,11 @@ interface ListViewProps {
   onSortOrderChange: (order: 'asc' | 'desc') => void;
   searchQuery: string;
   onSearchQueryChange: (query: string) => void;
+  onRenameFolder: (folderId: string) => void;
+  selectedNoteIds: string[];
+  onToggleNoteSelection: (noteId: string) => void;
+  onBulkDeleteNotes: () => void;
+  onSelectAll: () => void;
 }
 
 export const ListView: React.FC<ListViewProps> = ({
@@ -47,10 +53,18 @@ export const ListView: React.FC<ListViewProps> = ({
   onSortOrderChange,
   searchQuery,
   onSearchQueryChange,
+  onRenameFolder,
+  selectedNoteIds,
+  onToggleNoteSelection,
+  onBulkDeleteNotes,
+  onSelectAll,
 }) => {
   const isMobile = useIsMobile();
   const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme');
   const isSearching = !!searchQuery.trim();
+
+  const numSelected = selectedNoteIds.length;
+  const allNotesSelected = numSelected > 0 && numSelected === filteredNotes.length;
 
   return (
     <div className="space-y-6">
@@ -92,12 +106,31 @@ export const ListView: React.FC<ListViewProps> = ({
         currentFolderId={currentFolderId}
         onNavigateUp={onNavigateUp}
         onDeleteFolder={onDeleteFolder}
+        onRenameFolder={onRenameFolder}
       />
+      {numSelected > 0 && (
+        <div className="flex items-center justify-between p-2 px-4 border rounded-lg bg-secondary/30 font-mono">
+          <div className="flex items-center gap-4">
+            <Checkbox
+              checked={allNotesSelected}
+              onCheckedChange={onSelectAll}
+              aria-label="Select all notes"
+            />
+            <span className="text-sm text-muted-foreground">{numSelected} selected</span>
+          </div>
+          <Button variant="destructive" size="sm" onClick={onBulkDeleteNotes}>
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </Button>
+        </div>
+      )}
       <NoteList
-        notes={filteredNotes}
+        notes={filteredNotes.filter(n => n.title.toLowerCase() !== 'readme')}
         onSelectNote={onSelectNote}
         selectedNoteId={selectedNoteId}
         onDeleteNote={onDeleteNote}
+        selectedNoteIds={selectedNoteIds}
+        onToggleNoteSelection={onToggleNoteSelection}
       />
       {readmeNote && !isSearching && (
         <div className="mt-6 p-4 border rounded-lg prose dark:prose-invert max-w-none bg-card text-card-foreground shadow">

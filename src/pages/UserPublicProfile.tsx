@@ -1,6 +1,5 @@
-
 import React, { useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppHeader } from '@/components/AppHeader';
@@ -57,6 +56,7 @@ const fetchUserProfileData = async (userId: string) => {
 
 const UserPublicProfile = () => {
   const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
 
   const [viewMode, setViewMode] = useState<'list' | 'preview'>('list');
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
@@ -116,6 +116,8 @@ const UserPublicProfile = () => {
       handleBackToList();
     } else if (currentFolderId) {
       handleNavigateUp();
+    } else {
+      navigate('/');
     }
   };
 

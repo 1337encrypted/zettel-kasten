@@ -39,7 +39,6 @@ export const ListView: React.FC<ListViewProps> = ({
   onDeleteFolder,
 }) => {
   const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme.md');
-  const notesWithoutReadme = filteredNotes.filter(note => note.title.toLowerCase() !== 'readme.md');
 
   return (
     <div className="space-y-6">
@@ -60,7 +59,7 @@ export const ListView: React.FC<ListViewProps> = ({
         onDeleteFolder={onDeleteFolder}
       />
       <NoteList
-        notes={notesWithoutReadme}
+        notes={filteredNotes}
         onSelectNote={onSelectNote}
         selectedNoteId={selectedNoteId}
         onDeleteNote={onDeleteNote}

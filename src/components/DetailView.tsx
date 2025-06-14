@@ -51,10 +51,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
           />
         )}
       </div>
-      <div className="flex items-center justify-between mt-4 p-2 border-t sticky bottom-0 bg-background">
-        <Button variant="outline" onClick={onBackToList} size="icon" title="Back to List">
-          <ArrowLeft />
-        </Button>
+      <div className="flex items-center justify-end mt-4 p-2 border-t sticky bottom-0 bg-background">
         {selectedNote && (
           <div className="flex items-center gap-2">
             {viewMode === 'preview' && (

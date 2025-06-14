@@ -1,17 +1,14 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/context/AuthContext';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { AppHeader } from '@/components/AppHeader';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
 import { useNavigationShortcuts } from '@/hooks/useNavigationShortcuts';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
 
 const AuthPage = () => {
   const { user } = useAuth();
@@ -132,57 +129,49 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <div className="absolute top-4 left-4">
-        <Button asChild variant="outline" size="icon" aria-label="Go back to homepage">
-          <Link to="/">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-      <h1 className="text-5xl font-bold text-primary tracking-wide mb-8">Zet</h1>
-      {view === 'tabs' ? (
-        <Tabs defaultValue="login" className="w-full max-w-sm" onValueChange={() => { setPassword(''); setUsername(''); }}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
-          <TabsContent value="login">
-            <LoginForm
-              handleLogin={handleLogin}
-              loading={loading}
-              email={email}
-              setEmail={setEmail}
-              password={password}
-              setPassword={setPassword}
-              onForgotPassword={() => setView('forgotPassword')}
-            />
-          </TabsContent>
-          <TabsContent value="signup">
-            <SignupForm
-              handleSignup={handleSignup}
-              loading={loading}
-              email={email}
-              setEmail={setEmail}
-              password={password}
-              setPassword={setPassword}
-              username={username}
-              setUsername={setUsername}
-            />
-          </TabsContent>
-        </Tabs>
-      ) : (
-        <ForgotPasswordForm
-          handleForgotPassword={handleForgotPassword}
-          loading={loading}
-          email={email}
-          setEmail={setEmail}
-          onBackToLogin={() => setView('tabs')}
-        />
-      )}
+    <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
+      <AppHeader showTitleOnly={true} />
+      <main className="flex-grow flex flex-col items-center justify-center">
+        {view === 'tabs' ? (
+          <Tabs defaultValue="login" className="w-full max-w-sm" onValueChange={() => { setPassword(''); setUsername(''); }}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            </TabsList>
+            <TabsContent value="login">
+              <LoginForm
+                handleLogin={handleLogin}
+                loading={loading}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                onForgotPassword={() => setView('forgotPassword')}
+              />
+            </TabsContent>
+            <TabsContent value="signup">
+              <SignupForm
+                handleSignup={handleSignup}
+                loading={loading}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                username={username}
+                setUsername={setUsername}
+              />
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <ForgotPasswordForm
+            handleForgotPassword={handleForgotPassword}
+            loading={loading}
+            email={email}
+            setEmail={setEmail}
+            onBackToLogin={() => setView('tabs')}
+          />
+        )}
+      </main>
     </div>
   );
 };

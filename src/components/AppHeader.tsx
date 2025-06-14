@@ -2,7 +2,7 @@
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Trash2, Archive } from 'lucide-react';
+import { LogOut, Trash2, Archive, ArrowLeft } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,11 +24,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-export const AppHeader = ({ onExportAllNotes, showLogo = true, showTitleOnly = false }: { onExportAllNotes?: () => void; showLogo?: boolean, showTitleOnly?: boolean }) => {
+export const AppHeader = ({
+  onExportAllNotes,
+  showLogo = true,
+  showTitleOnly = false,
+  viewMode,
+  onBackToList
+}: {
+  onExportAllNotes?: () => void;
+  showLogo?: boolean;
+  showTitleOnly?: boolean;
+  viewMode?: 'list' | 'edit' | 'preview';
+  onBackToList?: () => void;
+}) => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleDeleteAccount = async () => {
     try {
@@ -41,9 +54,20 @@ export const AppHeader = ({ onExportAllNotes, showLogo = true, showTitleOnly = f
     }
   };
 
+  const showNavBackButton = location.pathname !== '/';
+
   return (
     <header className="mb-8 flex items-center justify-between relative h-10">
       <div className="w-1/3 flex items-center gap-2">
+        {viewMode && viewMode !== 'list' && onBackToList ? (
+          <Button onClick={onBackToList} variant="outline" size="icon" aria-label="Back to list">
+            <ArrowLeft />
+          </Button>
+        ) : showNavBackButton && (
+          <Button onClick={() => navigate(-1)} variant="outline" size="icon" aria-label="Go back">
+            <ArrowLeft />
+          </Button>
+        )}
         {user ? (
           <>
             <AlertDialog>
@@ -94,9 +118,11 @@ export const AppHeader = ({ onExportAllNotes, showLogo = true, showTitleOnly = f
             )}
           </>
         ) : (
-           <Button asChild variant="outline">
-            <Link to="/auth">Login</Link>
-          </Button>
+           location.pathname !== '/auth' && (
+             <Button asChild variant="outline">
+              <Link to="/auth">Login</Link>
+            </Button>
+           )
         )}
       </div>
       

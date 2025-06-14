@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { TextareaWithLineNumbers } from '@/components/ui/TextareaWithLineNumbers';
 import { Label } from '@/components/ui/label';
 import { Note } from '@/types';
 import { ImagePlus } from 'lucide-react';
@@ -159,13 +159,13 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
               Add Image
           </Button>
         </div>
-        <Textarea
+        <TextareaWithLineNumbers
           id="note-content"
           ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Enter note content in Markdown..."
-          className="mt-1 flex-grow min-h-[200px]"
+          className="mt-1 flex-grow min-h-[400px]"
         />
         <input
           type="file"

@@ -26,8 +26,8 @@ export const LoginForm = ({ handleLogin, loading, email, setEmail, password, set
       <CardContent>
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email-login">Email</Label>
-            <Input id="email-login" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <Label htmlFor="login-identifier">Email or Username</Label>
+            <Input id="login-identifier" type="text" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="your@email.com or username" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password-login">Password</Label>

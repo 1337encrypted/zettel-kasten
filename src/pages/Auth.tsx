@@ -28,14 +28,34 @@ const AuthPage = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success('Logged in successfully!');
-      navigate('/dashboard');
+    try {
+      const { data, error: functionError } = await supabase.functions.invoke('get-login-email', {
+        body: { identifier: email },
+      });
+
+      if (functionError) {
+        const errorBody = await functionError.context?.json();
+        throw new Error(errorBody?.error || functionError.message);
+      }
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      const loginEmail = data.email;
+
+      const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Logged in successfully!');
+        navigate('/dashboard');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'An error occurred during login.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleSignup = async (e: React.FormEvent) => {

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Note } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from './ui/checkbox';
@@ -15,6 +15,33 @@ interface NoteListProps {
 }
 
 const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId, onDeleteNote, selectedNoteIds, onToggleNoteSelection }) => {
+  const longPressTimer = useRef<number>();
+  const isLongPress = useRef(false);
+
+  const handlePointerDown = (noteId: string) => {
+    isLongPress.current = false;
+    longPressTimer.current = window.setTimeout(() => {
+      onToggleNoteSelection(noteId);
+      isLongPress.current = true;
+    }, 500);
+  };
+
+  const handlePointerUp = () => {
+    clearTimeout(longPressTimer.current);
+  };
+
+  const handleClick = (note: Note) => {
+    if (isLongPress.current) {
+      return;
+    }
+    
+    if (selectedNoteIds.length > 0) {
+      onToggleNoteSelection(note.id);
+    } else {
+      onSelectNote(note);
+    }
+  };
+
   if (notes.length === 0) {
     return <p className="text-muted-foreground font-mono"># Empty</p>;
   }
@@ -25,25 +52,33 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
         {notes.map((note) => (
           <li
             key={note.id}
-            className={`p-2 rounded-md transition-colors flex justify-between items-center group ${
+            className={`p-2 rounded-md transition-colors flex justify-between items-center group cursor-pointer ${
               selectedNoteIds.includes(note.id)
                 ? 'bg-primary/20'
-                : note.id === selectedNoteId
+                : note.id === selectedNoteId && selectedNoteIds.length === 0
                 ? 'bg-primary/20'
                 : 'hover:bg-accent hover:text-accent-foreground'
             }`}
+            onPointerDown={() => handlePointerDown(note.id)}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+            onClick={() => handleClick(note)}
           >
             <div className="flex items-center gap-4 flex-grow">
-              <Checkbox
-                checked={selectedNoteIds.includes(note.id)}
-                onCheckedChange={() => onToggleNoteSelection(note.id)}
-                aria-label={`Select note ${note.title}`}
-              />
+              <div className="w-4 h-4 shrink-0 flex items-center justify-center">
+                {selectedNoteIds.length > 0 ? (
+                  <Checkbox
+                    checked={selectedNoteIds.includes(note.id)}
+                    aria-label={`Select note ${note.title}`}
+                    className="pointer-events-none"
+                  />
+                ) : (
+                  <File className="text-primary h-4 w-4 shrink-0" />
+                )}
+              </div>
               <span
-                className="font-medium flex items-center cursor-pointer"
-                onClick={() => onSelectNote(note)}
+                className="font-medium"
               >
-                <File className="text-primary mr-2 h-4 w-4 shrink-0" />
                 {note.title}
               </span>
             </div>

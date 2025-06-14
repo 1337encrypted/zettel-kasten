@@ -109,21 +109,23 @@ export const ListView: React.FC<ListViewProps> = ({
         onDeleteFolder={onDeleteFolder}
         onRenameFolder={onRenameFolder}
       />
-      <div className="flex items-center justify-between p-2 px-4 border rounded-lg bg-secondary/30 font-mono">
-        <div className="flex items-center gap-4">
-          <Checkbox
-            checked={allNotesSelected}
-            onCheckedChange={onSelectAll}
-            aria-label="Select all notes"
-            disabled={selectableNotes.length === 0}
-          />
-          <span className="text-sm text-muted-foreground">{numSelected} selected</span>
+      {selectedNoteIds.length > 0 && (
+        <div className="flex items-center justify-between p-2 px-4 border rounded-lg bg-secondary/30 font-mono">
+          <div className="flex items-center gap-4">
+            <Checkbox
+              checked={allNotesSelected}
+              onCheckedChange={onSelectAll}
+              aria-label="Select all notes"
+              disabled={selectableNotes.length === 0}
+            />
+            <span className="text-sm text-muted-foreground">{numSelected} selected</span>
+          </div>
+          <Button variant="destructive" size="sm" onClick={onBulkDeleteNotes} disabled={numSelected === 0}>
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </Button>
         </div>
-        <Button variant="destructive" size="sm" onClick={onBulkDeleteNotes} disabled={numSelected === 0}>
-          <Trash2 className="h-4 w-4 mr-2" />
-          Delete
-        </Button>
-      </div>
+      )}
       <NoteList
         notes={selectableNotes}
         onSelectNote={onSelectNote}

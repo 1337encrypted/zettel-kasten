@@ -90,6 +90,7 @@ export const useAppLogic = () => {
       onNewNote: handleNewNote,
       onToggleCommandMenu: () => setCommandMenuOpen(open => !open),
       onEscape: handleEscape,
+      onSelectAll: handleSelectAll,
   });
 
   const handleToggleView = () => {

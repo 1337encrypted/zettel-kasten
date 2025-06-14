@@ -5,12 +5,14 @@ interface KeyboardShortcutProps {
   onNewNote: () => void;
   onToggleCommandMenu: () => void;
   onEscape: (e: KeyboardEvent) => void;
+  onSelectAll: () => void;
 }
 
 export const useKeyboardShortcuts = ({
   onNewNote,
   onToggleCommandMenu,
   onEscape,
+  onSelectAll,
 }: KeyboardShortcutProps) => {
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -23,10 +25,15 @@ export const useKeyboardShortcuts = ({
       onNewNote();
     }
 
+    if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      onSelectAll();
+    }
+
     if (e.key === 'Escape') {
       onEscape(e);
     }
-  }, [onNewNote, onToggleCommandMenu, onEscape]);
+  }, [onNewNote, onToggleCommandMenu, onEscape, onSelectAll]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);

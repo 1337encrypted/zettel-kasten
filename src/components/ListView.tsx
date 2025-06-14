@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Folder, Note } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -124,7 +125,7 @@ export const ListView: React.FC<ListViewProps> = ({
         </div>
       )}
       <NoteList
-        notes={selectableNotes}
+        notes={filteredNotes}
         onSelectNote={onSelectNote}
         selectedNoteId={selectedNoteId}
         selectedNoteIds={selectedNoteIds}

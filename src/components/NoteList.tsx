@@ -16,10 +16,12 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
   const longPressTimer = useRef<number>();
   const isLongPress = useRef(false);
 
-  const handlePointerDown = (noteId: string) => {
+  const handlePointerDown = (note: Note) => {
+    if (note.title.toLowerCase() === 'readme') return;
+
     isLongPress.current = false;
     longPressTimer.current = window.setTimeout(() => {
-      onToggleNoteSelection(noteId);
+      onToggleNoteSelection(note.id);
       isLongPress.current = true;
     }, 500);
   };
@@ -34,7 +36,9 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
     }
     
     if (selectedNoteIds.length > 0) {
-      onToggleNoteSelection(note.id);
+      if (note.title.toLowerCase() !== 'readme') {
+        onToggleNoteSelection(note.id);
+      }
     } else {
       onSelectNote(note);
     }
@@ -57,7 +61,7 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
                 ? 'bg-primary/20'
                 : 'hover:bg-accent hover:text-accent-foreground'
             }`}
-            onPointerDown={() => handlePointerDown(note.id)}
+            onPointerDown={() => handlePointerDown(note)}
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerUp}
             onClick={() => handleClick(note)}

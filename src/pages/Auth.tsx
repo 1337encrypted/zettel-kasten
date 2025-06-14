@@ -41,6 +41,18 @@ const AuthPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      const { data: validationData, error: validationError } = await supabase.functions.invoke('validate-email', {
+        body: { email },
+      });
+
+      if (validationError) throw validationError;
+      if (validationData.error) throw new Error(validationData.error);
+
+      if (!validationData.isValid) {
+        toast.error(validationData.message || 'This email address does not seem to be valid.');
+        return;
+      }
+      
       const { data, error: functionError } = await supabase.functions.invoke('check-user-exists', {
         body: { email },
       });

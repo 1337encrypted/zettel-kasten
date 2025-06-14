@@ -2,24 +2,21 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Eye, EyeOff } from 'lucide-react';
+import { LoginForm } from '@/components/auth/LoginForm';
+import { SignupForm } from '@/components/auth/SignupForm';
+import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
+import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
 
 const AuthPage = () => {
   const { user, isPasswordRecovery, setIsPasswordRecovery } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
-  const [showNewPassword, setShowNewPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<'tabs' | 'forgotPassword'>('tabs');
 
@@ -106,7 +103,6 @@ const AuthPage = () => {
       toast.success('Password updated successfully! Please log in.');
       setNewPassword('');
       setIsPasswordRecovery(false);
-      setShowNewPassword(false);
     }
     setLoading(false);
   };
@@ -118,28 +114,12 @@ const AuthPage = () => {
           <ThemeToggle />
         </div>
         <img src="/lovable-uploads/3d4105c3-8713-4c19-b696-105b36d2928e.png" alt="Zet Logo" className="w-32 h-32 mb-8" />
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>Reset Password</CardTitle>
-            <CardDescription>Enter your new password.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handlePasswordUpdate} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <div className="relative">
-                  <Input id="new-password" type={showNewPassword ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className="pr-10" />
-                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
-                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Updating...' : 'Update Password'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+        <ResetPasswordForm
+          handlePasswordUpdate={handlePasswordUpdate}
+          loading={loading}
+          newPassword={newPassword}
+          setNewPassword={setNewPassword}
+        />
       </div>
     );
   }
@@ -151,96 +131,41 @@ const AuthPage = () => {
       </div>
       <img src="/lovable-uploads/3d4105c3-8713-4c19-b696-105b36d2928e.png" alt="Zet Logo" className="w-32 h-32 mb-8" />
       {view === 'tabs' ? (
-        <Tabs defaultValue="login" className="w-full max-w-sm" onValueChange={() => { setPassword(''); setShowPassword(false); }}>
+        <Tabs defaultValue="login" className="w-full max-w-sm" onValueChange={() => { setPassword(''); }}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
-            <Card>
-              <CardHeader>
-                <CardTitle>Login</CardTitle>
-                <CardDescription>Enter your credentials to access your account.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email-login">Email</Label>
-                    <Input id="email-login" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password-login">Password</Label>
-                    <div className="relative">
-                      <Input id="password-login" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required className="pr-10" />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                  </Button>
-                </form>
-                <div className="mt-4 text-center text-sm">
-                  <Button variant="link" onClick={() => setView('forgotPassword')}>
-                    Forgot Password?
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <LoginForm
+              handleLogin={handleLogin}
+              loading={loading}
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+              onForgotPassword={() => setView('forgotPassword')}
+            />
           </TabsContent>
           <TabsContent value="signup">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sign Up</CardTitle>
-                <CardDescription>Create a new account.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email-signup">Email</Label>
-                    <Input id="email-signup" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password-signup">Password</Label>
-                    <div className="relative">
-                      <Input id="password-signup" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required className="pr-10" />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground">
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? 'Signing up...' : 'Sign Up'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+            <SignupForm
+              handleSignup={handleSignup}
+              loading={loading}
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+            />
           </TabsContent>
         </Tabs>
       ) : (
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>Forgot Password</CardTitle>
-            <CardDescription>We'll send a recovery link to your email.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email-forgot">Email</Label>
-                <Input id="email-forgot" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Sending...' : 'Send Link'}
-              </Button>
-            </form>
-            <div className="mt-4 text-center text-sm">
-              <Button variant="link" onClick={() => setView('tabs')}>
-                Back to Login
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <ForgotPasswordForm
+          handleForgotPassword={handleForgotPassword}
+          loading={loading}
+          email={email}
+          setEmail={setEmail}
+          onBackToLogin={() => setView('tabs')}
+        />
       )}
     </div>
   );

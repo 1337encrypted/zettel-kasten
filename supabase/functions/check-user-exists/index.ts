@@ -23,19 +23,17 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     )
 
-    const { error } = await supabaseAdmin.auth.admin.getUserByEmail(email)
+    const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers({
+      query: email,
+    })
 
     if (error) {
-      if (error.message === 'User not found') {
-        return new Response(JSON.stringify({ exists: false }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        })
-      }
       throw error
     }
 
-    return new Response(JSON.stringify({ exists: true }), {
+    const userExists = users.some(user => user.email === email);
+
+    return new Response(JSON.stringify({ exists: userExists }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })

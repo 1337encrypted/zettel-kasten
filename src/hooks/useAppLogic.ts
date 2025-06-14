@@ -19,6 +19,7 @@ export const useAppLogic = () => {
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
+  const [cheatSheetOpen, setCheatSheetOpen] = useState(false);
 
   const {
     sortOrder,
@@ -117,7 +118,16 @@ export const useAppLogic = () => {
     resetSelection();
   }, [resetSelection]);
 
+  const handleOpenShortcuts = useCallback(() => {
+    setCheatSheetOpen(true);
+  }, []);
+
   const handleEscape = useCallback((e: KeyboardEvent) => {
+    if (cheatSheetOpen) {
+      e.preventDefault();
+      setCheatSheetOpen(false);
+      return;
+    }
     if (selectedNoteIds.length > 0) {
       e.preventDefault();
       resetSelection();
@@ -128,13 +138,14 @@ export const useAppLogic = () => {
       e.preventDefault();
       handleNavigateUp();
     }
-  }, [selectedNoteIds.length, viewMode, currentFolderId, resetSelection, handleBackToList, handleNavigateUp]);
+  }, [selectedNoteIds.length, viewMode, currentFolderId, resetSelection, handleBackToList, handleNavigateUp, cheatSheetOpen]);
 
   useKeyboardShortcuts({
       onNewNote: handleNewNote,
       onToggleCommandMenu: () => setCommandMenuOpen(open => !open),
       onEscape: handleEscape,
       onSelectAll: handleSelectAll,
+      onOpenShortcuts: handleOpenShortcuts,
   });
 
   const handleToggleView = () => {
@@ -159,6 +170,8 @@ export const useAppLogic = () => {
     searchQuery,
     commandMenuOpen,
     setCommandMenuOpen,
+    cheatSheetOpen,
+    setCheatSheetOpen,
     selectedNoteIds,
     handleNewNote,
     handleBackToList,
@@ -180,5 +193,6 @@ export const useAppLogic = () => {
     handleRenameFolder,
     handleSelectAll,
     handleExportAllNotes,
+    handleOpenShortcuts,
   };
 };

@@ -8,10 +8,12 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
+  CommandShortcut,
 } from '@/components/ui/command';
 import { Note, Folder } from '@/types';
-import { File, Folder as FolderIcon, Moon, Sun, FilePlus, FolderPlus, CheckSquare } from 'lucide-react';
+import { File, Folder as FolderIcon, Moon, Sun, FilePlus, FolderPlus, CheckSquare, Keyboard } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { shortcuts, Shortcut as ShortcutType, ShortcutAction } from '@/config/shortcuts';
 
 interface CommandMenuProps {
   open: boolean;
@@ -23,6 +25,7 @@ interface CommandMenuProps {
   onCreateFolder: () => void;
   onSelectFolder: (folderId: string) => void;
   onSelectAll: () => void;
+  onOpenShortcuts: () => void;
 }
 
 export const CommandMenu: React.FC<CommandMenuProps> = ({
@@ -35,12 +38,28 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
   onCreateFolder,
   onSelectFolder,
   onSelectAll,
+  onOpenShortcuts,
 }) => {
   const { setTheme } = useTheme();
 
   const runCommand = (command: () => void) => {
     onOpenChange(false);
     command();
+  };
+
+  const actions: { [key in ShortcutAction]?: () => void } = {
+    toggleCommandMenu: () => onOpenChange(false),
+    newNote: onNewNote,
+    selectAll: onSelectAll,
+    escape: () => onOpenChange(false),
+    openShortcuts: onOpenShortcuts,
+  };
+
+  const runShortcut = (shortcut: ShortcutType) => {
+    const action = actions[shortcut.actionName];
+    if (action) {
+      runCommand(action);
+    }
   };
 
   return (
@@ -69,6 +88,20 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
             <Moon className="mr-2 h-4 w-4" />
             <span>Dark Theme</span>
           </CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Shortcuts">
+          {shortcuts.map((shortcut) => (
+            <CommandItem
+              key={shortcut.id}
+              onSelect={() => runShortcut(shortcut)}
+              value={`Shortcut ${shortcut.command} ${shortcut.keys}`}
+            >
+              <Keyboard className="mr-2 h-4 w-4" />
+              <span>{shortcut.command}</span>
+              <CommandShortcut>{shortcut.keys}</CommandShortcut>
+            </CommandItem>
+          ))}
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Notes">

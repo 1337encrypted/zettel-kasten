@@ -6,6 +6,7 @@ interface KeyboardShortcutProps {
   onToggleCommandMenu: () => void;
   onEscape: (e: KeyboardEvent) => void;
   onSelectAll: () => void;
+  onOpenShortcuts: () => void;
 }
 
 export const useKeyboardShortcuts = ({
@@ -13,6 +14,7 @@ export const useKeyboardShortcuts = ({
   onToggleCommandMenu,
   onEscape,
   onSelectAll,
+  onOpenShortcuts,
 }: KeyboardShortcutProps) => {
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -30,6 +32,11 @@ export const useKeyboardShortcuts = ({
       onSelectAll();
     }
 
+    if (e.key === '/' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      onOpenShortcuts();
+    }
+
     if (e.key === 'Escape') {
       onEscape(e);
     }
@@ -41,7 +48,7 @@ export const useKeyboardShortcuts = ({
         onEscape(e);
       }
     }
-  }, [onNewNote, onToggleCommandMenu, onEscape, onSelectAll]);
+  }, [onNewNote, onToggleCommandMenu, onEscape, onSelectAll, onOpenShortcuts]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);

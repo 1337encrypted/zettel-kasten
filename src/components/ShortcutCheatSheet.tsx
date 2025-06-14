@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogContent,
@@ -14,14 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-
-const shortcuts = [
-  { command: 'Open command menu', keys: '⌘ K' },
-  { command: 'New note', keys: '⌘ N' },
-  { command: 'Select all notes', keys: '⌘ A' },
-  { command: 'Deselect / Go back', keys: 'Esc' },
-  { command: 'Open shortcuts', keys: '⌘ /' },
-];
+import { shortcuts } from "@/config/shortcuts";
 
 interface ShortcutCheatSheetProps {
   open: boolean;

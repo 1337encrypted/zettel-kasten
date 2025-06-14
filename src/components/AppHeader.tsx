@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
@@ -31,22 +30,26 @@ import { ShortcutCheatSheet } from './ShortcutCheatSheet';
 export const AppHeader = ({
   onExportAllNotes,
   viewMode,
-  onBackToList
+  onBackToList,
+  cheatSheetOpen,
+  onCheatSheetOpenChange
 }: {
   onExportAllNotes?: () => void;
   viewMode?: 'list' | 'edit' | 'preview';
   onBackToList?: () => void;
+  cheatSheetOpen?: boolean;
+  onCheatSheetOpenChange?: (open: boolean) => void;
 }) => {
   const { user, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [cheatSheetOpen, setCheatSheetOpen] = useState(false);
+  const [cheatSheetOpenState, setCheatSheetOpenState] = useState(cheatSheetOpen);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === '/' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setCheatSheetOpen(p => !p);
+        setCheatSheetOpenState(p => !p);
       }
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -94,7 +97,7 @@ export const AppHeader = ({
                       <span>My Profile</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setCheatSheetOpen(true)} className="cursor-pointer">
+                  <DropdownMenuItem onClick={() => onCheatSheetOpenChange?.(true)} className="cursor-pointer" disabled={!onCheatSheetOpenChange}>
                     <Keyboard className="mr-2 h-4 w-4" />
                     <span>Keyboard Shortcuts</span>
                   </DropdownMenuItem>
@@ -156,7 +159,7 @@ export const AppHeader = ({
       <div className="w-1/3 flex justify-end">
         <ThemeToggle />
       </div>
-      <ShortcutCheatSheet open={cheatSheetOpen} onOpenChange={setCheatSheetOpen} />
+      {onCheatSheetOpenChange && <ShortcutCheatSheet open={!!cheatSheetOpenState} onOpenChange={onCheatSheetOpenChange} />}
     </header>
   );
 };

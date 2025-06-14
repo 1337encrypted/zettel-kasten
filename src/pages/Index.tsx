@@ -8,6 +8,7 @@ import { Note } from '@/types';
 import { toast } from "@/components/ui/sonner";
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, Pencil } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Index = () => {
   const [notes, setNotes] = useState<Note[]>(() => {
@@ -85,10 +86,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
-      <header className="mb-8 text-center">
+      <header className="mb-8 relative text-center">
         <h1 className="text-4xl font-bold text-primary tracking-wide">
           Zettelkasten Notes
         </h1>
+        <div className="absolute top-0 right-0">
+          <ThemeToggle />
+        </div>
       </header>
       
       <main className="flex-grow flex flex-col">

@@ -10,7 +10,6 @@ interface DetailViewProps {
   viewMode: 'edit' | 'preview';
   selectedNote: Note | null;
   onSave: (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
-  onNewNote: () => void;
   onBackToList: () => void;
   onToggleView: () => void;
 }
@@ -19,7 +18,6 @@ export const DetailView: React.FC<DetailViewProps> = ({
   viewMode,
   selectedNote,
   onSave,
-  onNewNote,
   onBackToList,
   onToggleView,
 }) => {
@@ -30,7 +28,6 @@ export const DetailView: React.FC<DetailViewProps> = ({
           <NoteEditor 
             onSave={onSave} 
             selectedNote={selectedNote}
-            onNewNote={onNewNote}
           />
         ) : (
           <NoteView note={selectedNote} />

@@ -164,7 +164,6 @@ const Index = () => {
             viewMode={viewMode}
             selectedNote={selectedNote}
             onSave={handleSaveNote}
-            onNewNote={handleNewNote}
             onBackToList={handleBackToList}
             onToggleView={handleToggleView}
           />

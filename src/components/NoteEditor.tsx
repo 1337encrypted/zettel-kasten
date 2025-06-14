@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,10 +14,9 @@ import { v4 as uuidv4 } from 'uuid';
 interface NoteEditorProps {
   onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
   selectedNote: Note | null;
-  onNewNote: () => void;
 }
 
-const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote }) => {
+const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
@@ -35,6 +35,12 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
       setTags('');
     }
   }, [selectedNote]);
+
+  const handleClear = () => {
+    setTitle('');
+    setContent('');
+    setTags('');
+  };
 
   const handleSave = () => {
     if (title.trim() === '' || content.trim() === '') {
@@ -163,10 +169,10 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
         {selectedNote && (
           <Button 
             variant="outline" 
-            onClick={onNewNote} 
+            onClick={handleClear} 
             className="w-full sm:w-auto ml-2"
           >
-            Clear / New
+            Clear
           </Button>
         )}
       </div>

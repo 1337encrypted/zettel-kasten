@@ -38,7 +38,7 @@ const TextareaWithLineNumbers = React.forwardRef<
     >
       <div
         ref={lineNumbersRef}
-        className="font-mono text-sm text-right text-muted-foreground select-none py-2 pl-3 pr-2 overflow-y-hidden"
+        className="font-mono text-sm text-right text-muted-foreground select-none py-2 pl-3 pr-2 overflow-hidden"
         style={{ lineHeight: "1.5rem" }}
         aria-hidden="true"
       >

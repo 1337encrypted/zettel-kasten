@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/context/AuthContext';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const AuthPage = () => {
   const { user } = useAuth();
@@ -55,7 +56,10 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <img src="/lovable-uploads/3d4105c3-8713-4c19-b696-105b36d2928e.png" alt="Zet Logo" className="w-32 h-32 mb-8" />
       <Tabs defaultValue="login" className="w-full max-w-sm">
         <TabsList className="grid w-full grid-cols-2">

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Folder, Note } from '@/types';
 import { Button } from '@/components/ui/button';
-import { FolderPlus, File } from 'lucide-react';
+import { FolderPlus, File, FilePlus } from 'lucide-react';
 import FolderList from '@/components/FolderList';
 import NoteList from '@/components/NoteList';
 import ReactMarkdown from 'react-markdown';
@@ -43,8 +43,8 @@ export const ListView: React.FC<ListViewProps> = ({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <Button onClick={onNewNote} size="icon" title="Create New Note">
-          <File />
+        <Button onClick={onNewNote} variant="outline" size="icon" title="Create New Note">
+          <FilePlus />
         </Button>
         <Button onClick={onCreateFolder} variant="outline" size="icon" title="Create Folder">
           <FolderPlus />

@@ -151,7 +151,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
           className="mt-1"
         />
       </div>
-      <div className="flex-grow flex flex-col">
+      <div className="flex-grow flex flex-col min-h-0">
         <div className="flex justify-between items-center mb-1">
           <Label htmlFor="note-content" className="text-sm font-medium">Content (Markdown)</Label>
           <Button variant="ghost" size="sm" onClick={handleAddImageClick} type="button">
@@ -165,7 +165,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Enter note content in Markdown..."
-          className="mt-1 flex-grow min-h-[400px]"
+          className="mt-1 flex-grow"
         />
         <input
           type="file"
@@ -203,3 +203,4 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
 };
 
 export default NoteEditor;
+

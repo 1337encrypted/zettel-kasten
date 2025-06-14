@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import NoteEditor from '@/components/NoteEditor';
@@ -7,7 +6,7 @@ import NoteView from '@/components/NoteView';
 import { Folder, Note } from '@/types';
 import { toast } from "@/components/ui/sonner";
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Eye, Pencil, FolderPlus } from 'lucide-react';
+import { ArrowLeft, Eye, Pencil, FolderPlus, File } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import FolderList from '@/components/FolderList';
 
@@ -148,7 +147,7 @@ const Index = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-2">
               <Button onClick={handleNewNote} className="w-full sm:w-auto">
-                + Create New Note
+                <File /> Create New Note
               </Button>
               <Button onClick={handleCreateFolder} variant="outline" size="icon" title="Create Folder">
                 <FolderPlus />

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Note } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,7 @@ interface NoteListProps {
 
 const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId, onDeleteNote }) => {
   if (notes.length === 0) {
-    return <p className="text-muted-foreground font-mono">~/notes$ No notes yet. Create one!</p>;
+    return <p className="text-muted-foreground font-mono">~/notes$ # Empty</p>;
   }
 
   return (

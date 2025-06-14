@@ -13,9 +13,11 @@ interface SignupFormProps {
   setEmail: (email: string) => void;
   password: string;
   setPassword: (password: string) => void;
+  username: string;
+  setUsername: (username: string) => void;
 }
 
-export const SignupForm = ({ handleSignup, loading, email, setEmail, password, setPassword }: SignupFormProps) => {
+export const SignupForm = ({ handleSignup, loading, email, setEmail, password, setPassword, username, setUsername }: SignupFormProps) => {
   return (
     <Card>
       <CardHeader>
@@ -24,6 +26,19 @@ export const SignupForm = ({ handleSignup, loading, email, setEmail, password, s
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSignup} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="username-signup">Username</Label>
+            <Input
+              id="username-signup"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              minLength={3}
+              pattern="^[a-zA-Z0-9_]+$"
+              title="Username must be at least 3 characters and can only contain letters, numbers, and underscores."
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email-signup">Email</Label>
             <Input id="email-signup" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />

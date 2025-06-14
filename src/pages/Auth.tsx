@@ -15,6 +15,7 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<'tabs' | 'forgotPassword'>('tabs');
 
@@ -74,6 +75,9 @@ const AuthPage = () => {
         email,
         password,
         options: {
+          data: {
+            username: username,
+          },
           emailRedirectTo: `${window.location.origin}/confirm-email`,
         },
       });
@@ -110,7 +114,7 @@ const AuthPage = () => {
       </div>
       <h1 className="text-5xl font-bold text-primary tracking-wide mb-8">Zet</h1>
       {view === 'tabs' ? (
-        <Tabs defaultValue="login" className="w-full max-w-sm" onValueChange={() => { setPassword(''); }}>
+        <Tabs defaultValue="login" className="w-full max-w-sm" onValueChange={() => { setPassword(''); setUsername(''); }}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -134,6 +138,8 @@ const AuthPage = () => {
               setEmail={setEmail}
               password={password}
               setPassword={setPassword}
+              username={username}
+              setUsername={setUsername}
             />
           </TabsContent>
         </Tabs>

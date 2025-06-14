@@ -1,101 +1,120 @@
 
-import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Note } from '@/types';
 import { toast } from "@/components/ui/sonner";
+import { supabase } from '@/lib/supabase';
+
+const fromNoteDb = (dbNote: any): Note => ({
+    id: dbNote.id,
+    title: dbNote.title,
+    content: dbNote.content,
+    createdAt: new Date(dbNote.created_at),
+    updatedAt: new Date(dbNote.updated_at),
+    folderId: dbNote.folder_id,
+    tags: dbNote.tags || [],
+});
 
 export const useNotes = () => {
-  const [notes, setNotes] = useState<Note[]>(() => {
-    try {
-      const savedNotes = localStorage.getItem('zettelkasten-notes');
-      return savedNotes ? JSON.parse(savedNotes).map((note: any) => ({
-        ...note,
-        createdAt: new Date(note.createdAt),
-        updatedAt: new Date(note.updatedAt),
-      })) : [];
-    } catch (error) {
-      console.error("Failed to parse notes from localStorage", error);
-      return [];
+  const queryClient = useQueryClient();
+
+  const { data: notes = [], isLoading } = useQuery({
+    queryKey: ['notes'],
+    queryFn: async (): Promise<Note[]> => {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .order('updated_at', { ascending: false });
+
+      if (error) {
+        toast.error("Failed to load notes.");
+        throw new Error(error.message);
+      }
+      return data.map(fromNoteDb);
     }
   });
 
-  useEffect(() => {
-    localStorage.setItem('zettelkasten-notes', JSON.stringify(notes));
-  }, [notes]);
-
-  const saveNote = (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string, folderId?: string | null }): Note => {
-    if (noteData.id) {
-      const originalNote = notes.find(n => n.id === noteData.id);
-      if (!originalNote) {
-        throw new Error("Note to update not found");
-      }
-
-      if (noteData.title && noteData.title.toLowerCase() !== originalNote.title.toLowerCase()) {
-        const isDuplicate = notes.some(note =>
-          note.id !== noteData.id &&
-          (note.folderId || null) === (originalNote.folderId || null) &&
-          note.title.toLowerCase() === noteData.title!.toLowerCase()
-        );
-
-        if (isDuplicate) {
-          toast.error(`A note with the title "${noteData.title}" already exists in this folder.`);
-          throw new Error("Duplicate note title");
-        }
-      }
-
-      let updatedNote: Note | undefined;
-      setNotes(
-        notes.map((n) => {
-          if (n.id === noteData.id) {
-            updatedNote = { ...n, ...noteData, updatedAt: new Date() };
-            return updatedNote;
-          }
-          return n;
-        })
-      );
-      if (updatedNote) {
-        toast.success(`Note "${updatedNote.title}" updated!`);
-        return updatedNote;
-      }
-      throw new Error("Note to update not found");
-    } else {
-      const isDuplicate = notes.some(note =>
-        (note.folderId || null) === (noteData.folderId || null) &&
-        note.title.toLowerCase() === noteData.title.toLowerCase()
-      );
-
-      if (isDuplicate) {
-        toast.error(`A note with the title "${noteData.title}" already exists in this folder.`);
-        throw new Error("Duplicate note title");
-      }
-
-      const newNote: Note = {
-        id: uuidv4(),
+  const saveNoteMutation = useMutation({
+    mutationFn: async (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string, folderId?: string | null }): Promise<Note> => {
+      const noteToSave = {
         title: noteData.title,
         content: noteData.content,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        folderId: noteData.folderId || undefined,
         tags: noteData.tags || [],
+        folder_id: noteData.folderId,
+        updated_at: new Date().toISOString(),
       };
-      setNotes((prevNotes) => [newNote, ...prevNotes]);
-      toast.success(`Note "${newNote.title}" created!`);
-      return newNote;
+
+      if (noteData.id) {
+        const { data, error } = await supabase
+          .from('notes')
+          .update(noteToSave)
+          .eq('id', noteData.id)
+          .select()
+          .single();
+
+        if (error) { throw error; }
+        toast.success(`Note "${data.title}" updated!`);
+        return fromNoteDb(data);
+      } else {
+        const { data, error } = await supabase
+          .from('notes')
+          .insert(noteToSave)
+          .select()
+          .single();
+        
+        if (error) { throw error; }
+        toast.success(`Note "${data.title}" created!`);
+        return fromNoteDb(data);
+      }
+    },
+    onSuccess: (savedNote) => {
+        queryClient.invalidateQueries({ queryKey: ['notes'] });
+        queryClient.setQueryData(['notes', savedNote.id], savedNote);
+    },
+    onError: (error: any) => {
+        if (error.code === '23505') {
+            toast.error(`A note with that title already exists in this folder.`);
+        } else {
+            toast.error(error.message);
+        }
     }
-  };
+  });
 
-  const deleteNote = (noteId: string) => {
-    setNotes(notes.filter(note => note.id !== noteId));
-    toast.error("Note deleted.");
-  };
+  const deleteNoteMutation = useMutation({
+      mutationFn: async (noteId: string) => {
+        const { error } = await supabase.from('notes').delete().eq('id', noteId);
+        if (error) {
+            toast.error(error.message);
+            throw error;
+        }
+      },
+      onSuccess: () => {
+          toast.error("Note deleted.");
+          queryClient.invalidateQueries({ queryKey: ['notes'] });
+      }
+  });
 
-  const deleteNotesByFolderIds = (folderIds: string[]) => {
-    const notesToDeleteCount = notes.filter(note => note.folderId && folderIds.includes(note.folderId)).length;
-    setNotes(prevNotes => prevNotes.filter(note => !note.folderId || !folderIds.includes(note.folderId)));
-    if (notesToDeleteCount > 0) {
-      toast.error(`${notesToDeleteCount} note${notesToDeleteCount > 1 ? 's' : ''} deleted.`);
-    }
-  };
+  const deleteNotesByFolderIdsMutation = useMutation({
+      mutationFn: async (folderIds: string[]) => {
+        const { error } = await supabase.from('notes').delete().in('folder_id', folderIds);
+        if (error) {
+            toast.error(error.message);
+            throw error;
+        }
+        return folderIds.length;
+      },
+      onSuccess: (count) => {
+          if (count > 0) {
+            toast.error(`${count} note${count > 1 ? 's' : ''} deleted.`);
+          }
+          queryClient.invalidateQueries({ queryKey: ['notes'] });
+      }
+  });
 
-  return { notes, saveNote, deleteNote, deleteNotesByFolderIds };
+  return { 
+    notes,
+    isLoading,
+    saveNote: saveNoteMutation.mutateAsync, 
+    deleteNote: deleteNoteMutation.mutate, 
+    deleteNotesByFolderIds: deleteNotesByFolderIdsMutation.mutateAsync 
+  };
 };

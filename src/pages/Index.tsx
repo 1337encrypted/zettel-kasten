@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Note } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
@@ -9,6 +8,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { AppFooter } from '@/components/AppFooter';
 import { ListView } from '@/components/ListView';
 import { DetailView } from '@/components/DetailView';
+import { Toaster } from '@/components/ui/sonner';
 
 const Index = () => {
   const { notes, saveNote, deleteNote, deleteNotesByFolderIds } = useNotes();
@@ -20,17 +20,17 @@ const Index = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleSaveNote = (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => {
+  const handleSaveNote = async (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => {
     const payload = {
       ...noteData,
       ...(!noteData.id && { folderId: currentFolderId }),
     };
     try {
-      const saved = saveNote(payload);
+      const saved = await saveNote(payload);
       setSelectedNote(saved);
       setViewMode('preview');
     } catch (error) {
-      // The toast is already shown in useNotes hook, so we just log the error.
+      // The toast is already shown in useNotes hook
       console.error("Failed to save note:", error);
     }
   };
@@ -59,17 +59,21 @@ const Index = () => {
     }
   };
   
-  const handleDeleteFolder = (folderId: string) => {
+  const handleDeleteFolder = async (folderId: string) => {
     const folderToDelete = folders.find(f => f.id === folderId);
     const parentId = folderToDelete?.parentId || null;
 
-    const deletedFolderIds = deleteFolderAndDescendants(folderId);
-    if (deletedFolderIds.length > 0) {
-      deleteNotesByFolderIds(deletedFolderIds);
-    }
-    
-    if (currentFolderId && deletedFolderIds.includes(currentFolderId)) {
-        setCurrentFolderId(parentId);
+    try {
+      const deletedFolderIds = await deleteFolderAndDescendants(folderId);
+      if (deletedFolderIds && deletedFolderIds.length > 0) {
+        await deleteNotesByFolderIds(deletedFolderIds);
+      }
+      
+      if (currentFolderId && deletedFolderIds?.includes(currentFolderId)) {
+          setCurrentFolderId(parentId);
+      }
+    } catch (error) {
+      console.error("Failed to delete folder and its contents:", error);
     }
   };
 
@@ -168,6 +172,7 @@ const Index = () => {
       </main>
       
       <AppFooter />
+      <Toaster />
     </div>
   );
 };

@@ -146,8 +146,8 @@ const Index = () => {
         {viewMode === 'list' ? (
           <div className="space-y-6">
             <div className="flex items-center gap-2">
-              <Button onClick={handleNewNote} className="w-full sm:w-auto">
-                <File /> Create New Note
+              <Button onClick={handleNewNote} size="icon" title="Create New Note">
+                <File />
               </Button>
               <Button onClick={handleCreateFolder} variant="outline" size="icon" title="Create Folder">
                 <FolderPlus />

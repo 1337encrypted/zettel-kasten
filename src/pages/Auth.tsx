@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -72,6 +73,20 @@ const AuthPage = () => {
 
       if (!validationData.isValid) {
         toast.error(validationData.message || 'This email address does not seem to be valid.');
+        setLoading(false);
+        return;
+      }
+
+      const { data: usernameCheckData, error: usernameCheckError } = await supabase.functions.invoke('check-username-exists', {
+        body: { username },
+      });
+
+      if (usernameCheckError) throw usernameCheckError;
+      if (usernameCheckData.error) throw new Error(usernameCheckData.error);
+
+      if (usernameCheckData.exists) {
+        toast.error('This username is already taken. Please choose another one.');
+        setLoading(false);
         return;
       }
       
@@ -89,6 +104,7 @@ const AuthPage = () => {
 
       if (data.exists) {
         toast.error('An account with this email already exists.');
+        setLoading(false);
         return;
       }
 

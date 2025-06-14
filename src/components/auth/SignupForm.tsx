@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -38,6 +37,7 @@ export const SignupForm = ({ handleSignup, loading, email, setEmail, password, s
               pattern="^[a-zA-Z0-9_]+$"
               title="Username must be at least 3 characters and can only contain letters, numbers, and underscores."
             />
+            <p className="text-sm text-muted-foreground pt-1">Username cannot be changed after creation.</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email-signup">Email</Label>

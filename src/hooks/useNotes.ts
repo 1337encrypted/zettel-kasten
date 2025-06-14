@@ -1,7 +1,8 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Note } from '@/types';
 import { toast } from "@/components/ui/sonner";
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 
 const fromNoteDb = (dbNote: any): Note => ({
     id: dbNote.id,

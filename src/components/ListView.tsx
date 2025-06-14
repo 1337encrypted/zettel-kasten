@@ -53,8 +53,16 @@ export const ListView: React.FC<ListViewProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4">
-        <div className="relative w-full">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+            <Button onClick={onNewNote} variant="outline" size="icon" title="Create New Note">
+              <FilePlus />
+            </Button>
+            <Button onClick={onCreateFolder} variant="outline" size="icon" title="Create Folder">
+              <FolderPlus />
+            </Button>
+        </div>
+        <div className="relative flex-grow">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
                 type="text"
@@ -64,23 +72,15 @@ export const ListView: React.FC<ListViewProps> = ({
                 className="pl-10 w-full"
             />
         </div>
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-              <Button onClick={onNewNote} variant="outline" size="icon" title="Create New Note">
-                <FilePlus />
-              </Button>
-              <Button onClick={onCreateFolder} variant="outline" size="icon" title="Create Folder">
-                <FolderPlus />
-              </Button>
-          </div>
-          <ToggleGroup type="single" value={sortOrder} onValueChange={(value) => { if(value) onSortOrderChange(value as 'asc' | 'desc')}} aria-label="Sort notes" disabled={isSearching}>
-              <ToggleGroupItem value="asc" aria-label="Sort ascending" title="Sort ascending (A-Z)">
-                  <ArrowUpAZ className="h-4 w-4" />
-              </ToggleGroupItem>
-              <ToggleGroupItem value="desc" aria-label="Sort descending" title="Sort descending (Z-A)">
-                  <ArrowDownAZ className="h-4 w-4" />
-              </ToggleGroupItem>
-          </ToggleGroup>
+        <div className="flex items-center">
+            <ToggleGroup type="single" value={sortOrder} onValueChange={(value) => { if(value) onSortOrderChange(value as 'asc' | 'desc')}} aria-label="Sort notes" disabled={isSearching}>
+                <ToggleGroupItem value="asc" aria-label="Sort ascending" title="Sort ascending (A-Z)">
+                    <ArrowUpAZ className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="desc" aria-label="Sort descending" title="Sort descending (Z-A)">
+                    <ArrowDownAZ className="h-4 w-4" />
+                </ToggleGroupItem>
+            </ToggleGroup>
         </div>
       </div>
       <FolderList

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Note } from '@/types';
@@ -24,6 +25,24 @@ export const useNotes = () => {
 
   const saveNote = (noteData: Pick<Note, 'title' | 'content'> & { id?: string, folderId?: string | null }): Note => {
     if (noteData.id) {
+      const originalNote = notes.find(n => n.id === noteData.id);
+      if (!originalNote) {
+        throw new Error("Note to update not found");
+      }
+
+      if (noteData.title && noteData.title.toLowerCase() !== originalNote.title.toLowerCase()) {
+        const isDuplicate = notes.some(note =>
+          note.id !== noteData.id &&
+          (note.folderId || null) === (originalNote.folderId || null) &&
+          note.title.toLowerCase() === noteData.title!.toLowerCase()
+        );
+
+        if (isDuplicate) {
+          toast.error(`A note with the title "${noteData.title}" already exists in this folder.`);
+          throw new Error("Duplicate note title");
+        }
+      }
+
       let updatedNote: Note | undefined;
       setNotes(
         notes.map((n) => {
@@ -40,6 +59,16 @@ export const useNotes = () => {
       }
       throw new Error("Note to update not found");
     } else {
+      const isDuplicate = notes.some(note =>
+        (note.folderId || null) === (noteData.folderId || null) &&
+        note.title.toLowerCase() === noteData.title.toLowerCase()
+      );
+
+      if (isDuplicate) {
+        toast.error(`A note with the title "${noteData.title}" already exists in this folder.`);
+        throw new Error("Duplicate note title");
+      }
+
       const newNote: Note = {
         id: uuidv4(),
         title: noteData.title,

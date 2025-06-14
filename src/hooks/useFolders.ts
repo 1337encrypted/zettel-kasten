@@ -23,10 +23,21 @@ export const useFolders = () => {
   }, [folders]);
 
   const createFolder = (folderName: string, parentId: string | null) => {
-    if (folderName && folderName.trim()) {
+    const trimmedName = folderName.trim();
+    if (trimmedName) {
+      const isDuplicate = folders.some(folder =>
+        (folder.parentId || null) === parentId &&
+        folder.name.toLowerCase() === trimmedName.toLowerCase()
+      );
+
+      if (isDuplicate) {
+        toast.error(`A folder with the name "${trimmedName}" already exists here.`);
+        return;
+      }
+
       const newFolder: Folder = {
         id: uuidv4(),
-        name: folderName.trim(),
+        name: trimmedName,
         createdAt: new Date(),
         parentId: parentId,
       };

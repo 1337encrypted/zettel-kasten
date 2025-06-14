@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Note } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
@@ -22,9 +21,14 @@ const Index = () => {
       ...noteData,
       ...(!noteData.id && { folderId: currentFolderId }),
     };
-    const saved = saveNote(payload);
-    setSelectedNote(saved);
-    setViewMode('preview');
+    try {
+      const saved = saveNote(payload);
+      setSelectedNote(saved);
+      setViewMode('preview');
+    } catch (error) {
+      // The toast is already shown in useNotes hook, so we just log the error.
+      console.error("Failed to save note:", error);
+    }
   };
 
   const handleSelectNote = (note: Note) => {

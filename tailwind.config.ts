@@ -22,8 +22,30 @@ export default {
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
 				serif: ['Playfair Display', 'serif'],
-        mono: ['Source Code Pro', 'monospace'],
+        		mono: ['Source Code Pro', 'monospace'],
 			},
+			typography: {
+				DEFAULT: {
+				  css: {
+					'code::before': {
+					  content: '""',
+					},
+					'code::after': {
+					  content: '""',
+					},
+				  },
+				},
+				invert: {
+					css: {
+					  'code::before': {
+						content: '""',
+					  },
+					  'code::after': {
+						content: '""',
+					  },
+					},
+				},
+			  },
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',

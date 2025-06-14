@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Folder, Note } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { Input } from '@/components/ui/input';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ListViewProps {
   filteredFolders: Folder[];
@@ -46,6 +48,7 @@ export const ListView: React.FC<ListViewProps> = ({
   searchQuery,
   onSearchQueryChange,
 }) => {
+  const isMobile = useIsMobile();
   const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme');
   const isSearching = !!searchQuery.trim();
 
@@ -64,7 +67,7 @@ export const ListView: React.FC<ListViewProps> = ({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
                 type="text"
-                placeholder="Search notes by title or content..."
+                placeholder={isMobile ? "Search" : "Search notes by title or content..."}
                 value={searchQuery}
                 onChange={(e) => onSearchQueryChange(e.target.value)}
                 className="pl-10 w-full"

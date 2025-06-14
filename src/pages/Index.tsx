@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Note } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
@@ -94,15 +95,22 @@ const Index = () => {
   };
 
   const fuse = useMemo(() => new Fuse(notes, {
-    keys: ['title', 'content', 'tags'],
+    keys: ['title', 'content', 'tags', 'id'],
     includeScore: true,
     threshold: 0.4,
   }), [notes]);
 
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) return [];
+
+    // Prioritize exact ID match
+    const exactMatchById = notes.find(note => note.id === searchQuery.trim());
+    if (exactMatchById) {
+      return [exactMatchById];
+    }
+    
     return fuse.search(searchQuery).map(result => result.item);
-  }, [searchQuery, fuse]);
+  }, [searchQuery, fuse, notes]);
 
   const filteredFolders = useMemo(() => {
     if (searchQuery.trim()) return [];

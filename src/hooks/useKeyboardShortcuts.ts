@@ -33,6 +33,14 @@ export const useKeyboardShortcuts = ({
     if (e.key === 'Escape') {
       onEscape(e);
     }
+
+    if (e.key === 'Backspace') {
+      const target = e.target as HTMLElement;
+      const isEditing = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+      if (!isEditing) {
+        onEscape(e);
+      }
+    }
   }, [onNewNote, onToggleCommandMenu, onEscape, onSelectAll]);
 
   useEffect(() => {

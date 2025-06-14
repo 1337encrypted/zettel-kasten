@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -75,7 +74,7 @@ const UserPublicProfile = () => {
     if (!data) return { filteredFolders: [], filteredNotes: [], currentFolder: null };
     const folders = data.folders.filter(f => f.parentId === currentFolderId);
     const notes = data.notes
-      .filter(n => n.folderId === currentFolderId)
+      .filter(n => n.folderId === currentFolderId || (!n.folderId && currentFolderId === null))
       .sort((a, b) => a.title.localeCompare(b.title));
     const currentFolder = data.folders.find(f => f.id === currentFolderId) || null;
     return { filteredFolders: folders, filteredNotes: notes, currentFolder };

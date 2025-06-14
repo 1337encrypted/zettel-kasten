@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Note } from '@/types';
-import { ImagePlus } from 'lucide-react';
+import { ImagePlus, Minus, Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -21,6 +21,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
+  const [fontSize, setFontSize] = useState(14);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
@@ -154,10 +155,21 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
       <div className="flex-grow flex flex-col">
         <div className="flex justify-between items-center mb-1">
           <Label htmlFor="note-content" className="text-sm font-medium">Content (Markdown)</Label>
-          <Button variant="ghost" size="sm" onClick={handleAddImageClick} type="button">
-              <ImagePlus className="mr-2 h-4 w-4" />
-              Add Image
-          </Button>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setFontSize(s => Math.max(8, s - 1))} disabled={fontSize <= 8}>
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-mono w-12 text-center tabular-nums">{fontSize}px</span>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setFontSize(s => Math.min(32, s + 1))} disabled={fontSize >= 32}>
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleAddImageClick} type="button">
+                <ImagePlus className="mr-2 h-4 w-4" />
+                Add Image
+            </Button>
+          </div>
         </div>
         <Textarea
           id="note-content"
@@ -165,7 +177,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Enter note content in Markdown..."
-          className="mt-1 flex-grow min-h-[200px]"
+          className="mt-1 flex-grow min-h-[200px] resize-y"
+          style={{ fontSize: `${fontSize}px` }}
         />
         <input
           type="file"

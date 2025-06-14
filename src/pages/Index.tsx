@@ -59,7 +59,6 @@ const Index = () => {
             onSelectFolder={handleSelectFolder}
             onNavigateUp={handleNavigateUp}
             onSelectNote={handleSelectNote}
-            onDeleteNote={handleDeleteNote}
             onDeleteFolder={handleDeleteFolder}
             sortOrder={sortOrder}
             onSortOrderChange={setSortOrder}

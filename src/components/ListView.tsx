@@ -23,7 +23,6 @@ interface ListViewProps {
   onSelectFolder: (folderId: string) => void;
   onNavigateUp: () => void;
   onSelectNote: (note: Note) => void;
-  onDeleteNote: (noteId: string) => void;
   onDeleteFolder: (folderId: string) => void;
   sortOrder: 'asc' | 'desc';
   onSortOrderChange: (order: 'asc' | 'desc') => void;
@@ -47,7 +46,6 @@ export const ListView: React.FC<ListViewProps> = ({
   onSelectFolder,
   onNavigateUp,
   onSelectNote,
-  onDeleteNote,
   onDeleteFolder,
   sortOrder,
   onSortOrderChange,
@@ -130,7 +128,6 @@ export const ListView: React.FC<ListViewProps> = ({
         notes={selectableNotes}
         onSelectNote={onSelectNote}
         selectedNoteId={selectedNoteId}
-        onDeleteNote={onDeleteNote}
         selectedNoteIds={selectedNoteIds}
         onToggleNoteSelection={onToggleNoteSelection}
       />

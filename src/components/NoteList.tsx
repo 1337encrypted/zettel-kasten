@@ -1,7 +1,6 @@
 
 import React, { useRef } from 'react';
 import { Note } from '@/types';
-import { Button } from '@/components/ui/button';
 import { Checkbox } from './ui/checkbox';
 import { File } from 'lucide-react';
 
@@ -9,12 +8,11 @@ interface NoteListProps {
   notes: Note[];
   onSelectNote: (note: Note) => void;
   selectedNoteId?: string | null;
-  onDeleteNote: (noteId: string) => void;
   selectedNoteIds: string[];
   onToggleNoteSelection: (noteId: string) => void;
 }
 
-const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId, onDeleteNote, selectedNoteIds, onToggleNoteSelection }) => {
+const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId, selectedNoteIds, onToggleNoteSelection }) => {
   const longPressTimer = useRef<number>();
   const isLongPress = useRef(false);
 
@@ -52,7 +50,7 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
         {notes.map((note) => (
           <li
             key={note.id}
-            className={`p-2 rounded-md transition-colors flex justify-between items-center group cursor-pointer ${
+            className={`p-2 rounded-md transition-colors flex items-center cursor-pointer ${
               selectedNoteIds.includes(note.id)
                 ? 'bg-primary/20'
                 : note.id === selectedNoteId && selectedNoteIds.length === 0
@@ -82,17 +80,6 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
                 {note.title}
               </span>
             </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent li onClick from firing
-                onDeleteNote(note.id);
-              }}
-            >
-              Delete
-            </Button>
           </li>
         ))}
       </ul>

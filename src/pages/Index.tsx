@@ -1,74 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+
+import React, { useState, useMemo } from 'react';
 import NoteEditor from '@/components/NoteEditor';
 import NoteList from '@/components/NoteList';
 import NoteView from '@/components/NoteView';
-import { Folder, Note } from '@/types';
-import { toast } from "@/components/ui/sonner";
+import { Note } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Eye, Pencil, FolderPlus, File } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import FolderList from '@/components/FolderList';
+import { useNotes } from '@/hooks/useNotes';
+import { useFolders } from '@/hooks/useFolders';
 
 const Index = () => {
-  const [notes, setNotes] = useState<Note[]>(() => {
-    const savedNotes = localStorage.getItem('zettelkasten-notes');
-    return savedNotes ? JSON.parse(savedNotes).map((note: any) => ({
-      ...note,
-      createdAt: new Date(note.createdAt),
-      updatedAt: new Date(note.updatedAt),
-    })) : [];
-  });
-  const [folders, setFolders] = useState<Folder[]>(() => {
-    const savedFolders = localStorage.getItem('zettelkasten-folders');
-    return savedFolders ? JSON.parse(savedFolders).map((folder: any) => ({
-      ...folder,
-      createdAt: new Date(folder.createdAt),
-    })) : [];
-  });
+  const { notes, saveNote, deleteNote } = useNotes();
+  const { folders, createFolder } = useFolders();
+
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
 
-  useEffect(() => {
-    localStorage.setItem('zettelkasten-notes', JSON.stringify(notes));
-  }, [notes]);
-
-  useEffect(() => {
-    localStorage.setItem('zettelkasten-folders', JSON.stringify(folders));
-  }, [folders]);
-
   const handleSaveNote = (noteData: Pick<Note, 'title' | 'content'> & { id?: string }) => {
-    if (noteData.id) {
-      let updatedNote: Note | undefined;
-      setNotes(
-        notes.map((n) => {
-          if (n.id === noteData.id) {
-            updatedNote = { ...n, ...noteData, updatedAt: new Date() };
-            return updatedNote;
-          }
-          return n;
-        })
-      );
-      if (updatedNote) {
-        setSelectedNote(updatedNote);
-        toast.success(`Note "${updatedNote.title}" updated!`);
-        setViewMode('preview');
-      }
-    } else {
-      const newNote: Note = {
-        id: uuidv4(),
-        title: noteData.title,
-        content: noteData.content,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        folderId: currentFolderId || undefined,
-      };
-      setNotes([newNote, ...notes]);
-      setSelectedNote(newNote);
-      toast.success(`Note "${newNote.title}" created!`);
-      setViewMode('preview');
-    }
+    const payload = {
+      ...noteData,
+      ...(!noteData.id && { folderId: currentFolderId }),
+    };
+    const saved = saveNote(payload);
+    setSelectedNote(saved);
+    setViewMode('preview');
   };
 
   const handleSelectNote = (note: Note) => {
@@ -82,24 +40,16 @@ const Index = () => {
   };
   
   const handleDeleteNote = (noteId: string) => {
-    setNotes(notes.filter(note => note.id !== noteId));
+    deleteNote(noteId);
     if (selectedNote && selectedNote.id === noteId) {
       setSelectedNote(null);
     }
-    toast.error("Note deleted.");
   };
 
   const handleCreateFolder = () => {
     const folderName = prompt("Enter folder name:");
     if (folderName && folderName.trim()) {
-      const newFolder: Folder = {
-        id: uuidv4(),
-        name: folderName.trim(),
-        createdAt: new Date(),
-        parentId: currentFolderId,
-      };
-      setFolders([newFolder, ...folders]);
-      toast.success(`Folder "${newFolder.name}" created!`);
+      createFolder(folderName.trim(), currentFolderId);
     }
   };
 
@@ -111,25 +61,26 @@ const Index = () => {
 
   const handleBackToList = () => {
     setViewMode('list');
+    setSelectedNote(null);
   };
 
   const handleToggleView = () => {
     setViewMode(prev => (prev === 'edit' ? 'preview' : 'edit'));
   };
 
-  const filteredFolders = folders.filter(folder => {
+  const filteredFolders = useMemo(() => folders.filter(folder => {
     if (currentFolderId === null) {
       return !folder.parentId;
     }
     return folder.parentId === currentFolderId;
-  });
+  }), [folders, currentFolderId]);
 
-  const filteredNotes = notes.filter(note => {
+  const filteredNotes = useMemo(() => notes.filter(note => {
     if (currentFolderId === null) {
       return !note.folderId;
     }
     return note.folderId === currentFolderId;
-  });
+  }), [notes, currentFolderId]);
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>

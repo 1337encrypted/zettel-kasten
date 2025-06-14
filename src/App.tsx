@@ -13,7 +13,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="system" storageKey="zettelkasten-ui-theme" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="system" storageKey="zettelkasten-ui-theme" enableSystem>
       <TooltipProvider>
         <Toaster />
         <Sonner />

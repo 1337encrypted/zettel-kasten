@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,20 +5,22 @@ import { AppHeader } from '@/components/AppHeader';
 import { AppFooter } from '@/components/AppFooter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { User } from 'lucide-react';
+import { User, Clock } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 import { Link } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
 
 interface UserProfile {
   id: string;
   username: string | null;
   note_count: number;
+  created_at: string | null;
 }
 
 const fetchUsersWithNoteCounts = async () => {
   const { data: profiles, error: profilesError } = await supabase
     .from('profiles')
-    .select('id, username');
+    .select('id, username, created_at');
   
   if (profilesError) throw profilesError;
 
@@ -85,6 +86,12 @@ const Home = () => {
                 </CardHeader>
                 <CardContent>
                   <p>{user.note_count} {user.note_count === 1 ? 'note' : 'notes'}</p>
+                  {user.created_at && (
+                    <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      Joined {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </Link>

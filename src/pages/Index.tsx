@@ -96,6 +96,7 @@ const Index = () => {
         onNewNote={handleNewNote}
         onCreateFolder={handleCreateFolder}
         onSelectFolder={handleSelectFolderFromCommandMenu}
+        onSelectAll={handleSelectAll}
       />
     </div>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Trash2, Archive, ArrowLeft, User, Keyboard } from 'lucide-react';
+import { LogOut, Trash2, Archive, ArrowLeft, Home, Keyboard } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,9 +80,9 @@ export const AppHeader = ({
                   <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link to={`/u/${user.id}`}>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>My Profile</span>
+                    <Link to="/">
+                      <Home className="mr-2 h-4 w-4" />
+                      <span>Homepage</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onCheatSheetOpenChange?.(true)} className="cursor-pointer" disabled={!onCheatSheetOpenChange}>
@@ -139,9 +139,15 @@ export const AppHeader = ({
       </div>
       
       <div className="w-1/3 text-center">
-        <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-          <span className="text-4xl font-bold tracking-wide">Zet</span>
-        </Link>
+        {location.pathname === '/dashboard' ? (
+          <div className="inline-flex items-center justify-center gap-3 text-foreground">
+            <span className="text-4xl font-bold tracking-wide">Zet</span>
+          </div>
+        ) : (
+          <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
+            <span className="text-4xl font-bold tracking-wide">Zet</span>
+          </Link>
+        )}
       </div>
       
       <div className="w-1/3 flex justify-end">

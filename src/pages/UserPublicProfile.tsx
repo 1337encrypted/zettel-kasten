@@ -125,15 +125,6 @@ const UserPublicProfile = () => {
 
             {viewMode === 'list' ? (
               <div>
-                {readmeNote && !currentFolderId && (
-                  <div className="mb-8">
-                    <NoteView 
-                      note={readmeNote} 
-                      allNotes={allNotes} 
-                      onSelectNote={handleSelectNote} 
-                    />
-                  </div>
-                )}
                 <div className="space-y-6">
                   <FolderList
                     folders={filteredFolders}
@@ -158,6 +149,15 @@ const UserPublicProfile = () => {
                     </div>
                   )}
                 </div>
+                {readmeNote && !currentFolderId && (
+                  <div className="mt-8">
+                    <NoteView 
+                      note={readmeNote} 
+                      allNotes={allNotes} 
+                      onSelectNote={handleSelectNote} 
+                    />
+                  </div>
+                )}
               </div>
             ) : (
                 <div className="flex-grow flex flex-col">

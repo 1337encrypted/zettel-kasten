@@ -12,10 +12,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowUp } from 'lucide-react';
 import { useNavigationShortcuts } from '@/hooks/useNavigationShortcuts';
 import { Note, Folder } from '@/types';
-import { Database } from '@/types/supabase';
-
-type NoteRow = Database['public']['Tables']['notes']['Row'];
-type MappedNote = Omit<NoteRow, 'created_at' | 'updated_at'> & { createdAt: Date, updatedAt: Date };
 
 const fetchUserProfileData = async (userId: string) => {
   const { data: profile, error: profileError } = await supabase
@@ -34,20 +30,31 @@ const fetchUserProfileData = async (userId: string) => {
 
   if (notesError) throw notesError;
 
-  const notes: MappedNote[] = (notesData || []).map(note => ({
-    ...note,
+  const notes: Note[] = (notesData || []).map(note => ({
+    id: note.id,
+    title: note.title,
+    content: note.content ?? '',
     createdAt: new Date(note.created_at),
     updatedAt: new Date(note.updated_at),
+    folderId: note.folder_id ?? undefined,
+    tags: note.tags ?? undefined,
   }));
 
-  const { data: folders, error: foldersError } = await supabase
+  const { data: foldersData, error: foldersError } = await supabase
     .from('folders')
     .select('*')
     .eq('user_id', profile.id);
 
   if (foldersError) throw foldersError;
 
-  return { profile, notes, folders: folders || [] };
+  const folders: Folder[] = (foldersData || []).map(folder => ({
+    id: folder.id,
+    name: folder.name,
+    createdAt: new Date(folder.created_at),
+    parentId: folder.parent_id,
+  }));
+
+  return { profile, notes, folders };
 };
 
 const UserPublicProfile = () => {
@@ -55,7 +62,7 @@ const UserPublicProfile = () => {
   useNavigationShortcuts();
 
   const [viewMode, setViewMode] = useState<'list' | 'preview'>('list');
-  const [selectedNote, setSelectedNote] = useState<MappedNote | null>(null);
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
 
   const { data, isLoading, error } = useQuery({
@@ -66,9 +73,9 @@ const UserPublicProfile = () => {
 
   const { filteredFolders, filteredNotes, currentFolder } = useMemo(() => {
     if (!data) return { filteredFolders: [], filteredNotes: [], currentFolder: null };
-    const folders = data.folders.filter(f => f.parent_id === currentFolderId);
+    const folders = data.folders.filter(f => f.parentId === currentFolderId);
     const notes = data.notes
-      .filter(n => n.folder_id === currentFolderId)
+      .filter(n => n.folderId === currentFolderId)
       .sort((a, b) => a.title.localeCompare(b.title));
     const currentFolder = data.folders.find(f => f.id === currentFolderId) || null;
     return { filteredFolders: folders, filteredNotes: notes, currentFolder };
@@ -77,7 +84,7 @@ const UserPublicProfile = () => {
   const allNotes = useMemo(() => data?.notes || [], [data]);
 
   const handleSelectNote = (note: Note) => {
-    setSelectedNote(note as MappedNote);
+    setSelectedNote(note);
     setViewMode('preview');
   };
 
@@ -93,7 +100,7 @@ const UserPublicProfile = () => {
   const handleNavigateUp = () => {
     if (!currentFolderId || !data) return;
     const currentFolder = data.folders.find(f => f.id === currentFolderId);
-    setCurrentFolderId(currentFolder?.parent_id || null);
+    setCurrentFolderId(currentFolder?.parentId || null);
   };
 
   return (
@@ -140,7 +147,7 @@ const UserPublicProfile = () => {
                 <div className="flex-grow flex flex-col">
                   <div className="flex-grow">
                      <NoteView 
-                        note={selectedNote as Note | null}
+                        note={selectedNote}
                         allNotes={allNotes}
                         onSelectNote={handleSelectNote}
                      />

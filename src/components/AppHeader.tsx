@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
@@ -33,13 +32,15 @@ export const AppHeader = ({
   viewMode,
   onBackToList,
   cheatSheetOpen,
-  onCheatSheetOpenChange
+  onCheatSheetOpenChange,
+  onNavigateUp,
 }: {
   onExportAllNotes?: () => void;
   viewMode?: 'list' | 'edit' | 'preview';
   onBackToList?: () => void;
   cheatSheetOpen?: boolean;
   onCheatSheetOpenChange?: (open: boolean) => void;
+  onNavigateUp?: () => void;
 }) => {
   const { user, signOut } = useAuth();
   const location = useLocation();
@@ -63,6 +64,10 @@ export const AppHeader = ({
       <div className="w-1/3 flex items-center gap-2">
         {viewMode && viewMode !== 'list' && onBackToList ? (
           <Button onClick={onBackToList} variant="outline" size="icon" aria-label="Back to list">
+            <ArrowLeft />
+          </Button>
+        ) : onNavigateUp ? (
+          <Button onClick={onNavigateUp} variant="outline" size="icon" aria-label="Up a level">
             <ArrowLeft />
           </Button>
         ) : showNavBackButton && (

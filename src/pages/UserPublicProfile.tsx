@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppHeader } from '@/components/AppHeader';
@@ -8,9 +8,7 @@ import { AppFooter } from '@/components/AppFooter';
 import NoteList from '@/components/NoteList';
 import FolderList from '@/components/FolderList';
 import NoteView from '@/components/NoteView';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowUp } from 'lucide-react';
-import { useNavigationShortcuts } from '@/hooks/useNavigationShortcuts';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Note, Folder } from '@/types';
 
 const fetchUserProfileData = async (userId: string) => {
@@ -59,7 +57,6 @@ const fetchUserProfileData = async (userId: string) => {
 
 const UserPublicProfile = () => {
   const { userId } = useParams<{ userId: string }>();
-  useNavigationShortcuts();
 
   const [viewMode, setViewMode] = useState<'list' | 'preview'>('list');
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
@@ -114,9 +111,29 @@ const UserPublicProfile = () => {
     setCurrentFolderId(currentFolder?.parentId || null);
   };
 
+  const handleEscape = () => {
+    if (viewMode === 'preview') {
+      handleBackToList();
+    } else if (currentFolderId) {
+      handleNavigateUp();
+    }
+  };
+
+  useKeyboardShortcuts({
+    onNewNote: () => {},
+    onToggleCommandMenu: () => {},
+    onEscape: handleEscape,
+    onSelectAll: () => {},
+    onOpenShortcuts: () => {},
+  });
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8">
-      <AppHeader viewMode={viewMode} onBackToList={handleBackToList} />
+      <AppHeader
+        viewMode={viewMode}
+        onBackToList={handleBackToList}
+        onNavigateUp={currentFolderId ? handleNavigateUp : undefined}
+      />
       <main className="flex-grow container mx-auto px-4 py-8">
         {isLoading && <p className="text-center">Loading profile...</p>}
         {error && <p className="text-destructive text-center">{(error as Error).message}</p>}
@@ -124,9 +141,6 @@ const UserPublicProfile = () => {
           <div>
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-3xl font-bold">Notes by {data.profile.username || 'Anonymous'}</h1>
-              {currentFolderId && (
-                <Button variant="outline" onClick={handleNavigateUp}><ArrowUp className="mr-2" /> Up a level</Button>
-              )}
             </div>
 
             {viewMode === 'list' ? (

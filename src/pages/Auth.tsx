@@ -40,19 +40,40 @@ const AuthPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-      },
-    });
-    if (error) {
-      toast.error(error.message);
-    } else {
+    try {
+      const { data, error: functionError } = await supabase.functions.invoke('check-user-exists', {
+        body: { email },
+      });
+
+      if (functionError) {
+        throw functionError;
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (data.exists) {
+        toast.error('An account with this email already exists.');
+        return;
+      }
+
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (signUpError) {
+        throw signUpError;
+      }
       toast.info('Check your email to confirm your account!');
+    } catch (error: any) {
+      toast.error(error.message || 'An error occurred during sign up.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

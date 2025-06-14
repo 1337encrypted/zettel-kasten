@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -110,7 +109,7 @@ const UserPublicProfile = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8">
-      <AppHeader />
+      <AppHeader viewMode={viewMode} onBackToList={handleBackToList} />
       <main className="flex-grow container mx-auto px-4 py-8">
         {isLoading && <p className="text-center">Loading profile...</p>}
         {error && <p className="text-destructive text-center">{(error as Error).message}</p>}
@@ -167,11 +166,6 @@ const UserPublicProfile = () => {
                         allNotes={allNotes}
                         onSelectNote={handleSelectNote}
                      />
-                  </div>
-                  <div className="flex items-center justify-between mt-4 p-2 border-t sticky bottom-0 bg-background">
-                    <Button variant="outline" onClick={handleBackToList} size="icon" title="Back to List">
-                      <ArrowLeft />
-                    </Button>
                   </div>
                 </div>
             )}

@@ -1,10 +1,9 @@
-
 import { useState, useCallback } from 'react';
 import { Note } from '@/types';
 
 interface useNoteSelectionProps {
     filteredNotes: Note[];
-    deleteMultipleNotes: (noteIds: string[]) => Promise<void>;
+    deleteMultipleNotes: (noteIds: string[]) => Promise<any>;
 }
 
 export const useNoteSelection = ({ filteredNotes, deleteMultipleNotes }: useNoteSelectionProps) => {

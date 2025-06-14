@@ -94,7 +94,7 @@ export const AppHeader = ({ onExportAllNotes }: { onExportAllNotes?: () => void 
       
       <div className="w-1/3 text-center">
         <h1 className="text-4xl font-bold text-primary tracking-wide">
-          Zet
+          <Link to="/">Zet</Link>
         </h1>
       </div>
       

@@ -20,7 +20,7 @@ const AuthPage = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard', { replace: true });
+      navigate('/', { replace: true });
     }
   }, [user, navigate]);
 
@@ -32,7 +32,7 @@ const AuthPage = () => {
       toast.error(error.message);
     } else {
       toast.success('Logged in successfully!');
-      navigate('/dashboard');
+      navigate('/');
     }
     setLoading(false);
   };

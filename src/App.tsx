@@ -10,6 +10,8 @@ import { ThemeProvider } from "./components/theme-provider";
 import { AuthProvider } from "./context/AuthContext";
 import AuthPage from "./pages/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ConfirmEmailPage from "./pages/ConfirmEmail";
+import ResetPasswordPage from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +24,8 @@ const App = () => (
           <AuthProvider>
             <Routes>
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/confirm-email" element={<ConfirmEmailPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Index />} />
               </Route>

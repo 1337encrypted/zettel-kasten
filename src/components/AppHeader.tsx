@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
@@ -141,7 +142,7 @@ export const AppHeader = ({
       <div className="w-1/3 text-center">
         {location.pathname === '/dashboard' ? (
           <div className="inline-flex items-center justify-center gap-3 text-foreground">
-            <span className="text-4xl font-bold tracking-wide">Zet</span>
+            <span className="text-4xl font-bold tracking-wide">{user?.user_metadata.username || 'Zet'}</span>
           </div>
         ) : (
           <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">

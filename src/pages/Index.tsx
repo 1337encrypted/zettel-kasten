@@ -1,14 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import NoteEditor from '@/components/NoteEditor';
 import NoteList from '@/components/NoteList';
 import NoteView from '@/components/NoteView';
-import { Note } from '@/types';
+import { Folder, Note } from '@/types';
 import { toast } from "@/components/ui/sonner";
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Eye, Pencil } from 'lucide-react';
+import { ArrowLeft, Eye, Pencil, FolderPlus } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import FolderList from '@/components/FolderList';
 
 const Index = () => {
   const [notes, setNotes] = useState<Note[]>(() => {
@@ -19,12 +19,24 @@ const Index = () => {
       updatedAt: new Date(note.updatedAt),
     })) : [];
   });
+  const [folders, setFolders] = useState<Folder[]>(() => {
+    const savedFolders = localStorage.getItem('zettelkasten-folders');
+    return savedFolders ? JSON.parse(savedFolders).map((folder: any) => ({
+      ...folder,
+      createdAt: new Date(folder.createdAt),
+    })) : [];
+  });
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null | 'unassigned'>(null);
 
   useEffect(() => {
     localStorage.setItem('zettelkasten-notes', JSON.stringify(notes));
   }, [notes]);
+
+  useEffect(() => {
+    localStorage.setItem('zettelkasten-folders', JSON.stringify(folders));
+  }, [folders]);
 
   const handleSaveNote = (noteData: Pick<Note, 'title' | 'content'> & { id?: string }) => {
     if (noteData.id) {
@@ -50,6 +62,7 @@ const Index = () => {
         content: noteData.content,
         createdAt: new Date(),
         updatedAt: new Date(),
+        folderId: selectedFolderId && selectedFolderId !== 'unassigned' ? selectedFolderId : undefined,
       };
       setNotes([newNote, ...notes]);
       setSelectedNote(newNote);
@@ -76,6 +89,19 @@ const Index = () => {
     toast.error("Note deleted.");
   };
 
+  const handleCreateFolder = () => {
+    const folderName = prompt("Enter folder name:");
+    if (folderName && folderName.trim()) {
+      const newFolder: Folder = {
+        id: uuidv4(),
+        name: folderName.trim(),
+        createdAt: new Date(),
+      };
+      setFolders([newFolder, ...folders]);
+      toast.success(`Folder "${newFolder.name}" created!`);
+    }
+  };
+
   const handleBackToList = () => {
     setViewMode('list');
   };
@@ -83,6 +109,16 @@ const Index = () => {
   const handleToggleView = () => {
     setViewMode(prev => (prev === 'edit' ? 'preview' : 'edit'));
   };
+
+  const filteredNotes = notes.filter(note => {
+    if (selectedFolderId === 'unassigned') {
+      return !note.folderId;
+    }
+    if (selectedFolderId) {
+      return note.folderId === selectedFolderId;
+    }
+    return true; // if selectedFolderId is null, show all notes
+  });
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
@@ -98,11 +134,22 @@ const Index = () => {
       <main className="flex-grow flex flex-col">
         {viewMode === 'list' ? (
           <div className="space-y-6">
-            <Button onClick={handleNewNote} className="w-full sm:w-auto">
-              + Create New Note
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={handleNewNote} className="w-full sm:w-auto">
+                + Create New Note
+              </Button>
+              <Button onClick={handleCreateFolder} variant="outline" size="icon" title="Create Folder">
+                <FolderPlus />
+              </Button>
+            </div>
+            <FolderList
+              folders={folders}
+              notes={notes}
+              onSelectFolder={setSelectedFolderId}
+              selectedFolderId={selectedFolderId}
+            />
             <NoteList 
-              notes={notes} 
+              notes={filteredNotes} 
               onSelectNote={handleSelectNote}
               selectedNoteId={selectedNote?.id}
               onDeleteNote={handleDeleteNote}
@@ -122,21 +169,12 @@ const Index = () => {
               )}
             </div>
             <div className="flex items-center justify-between mt-4 p-2 border-t sticky bottom-0 bg-background">
-              <Button variant="outline" onClick={handleBackToList}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to List
+              <Button variant="outline" onClick={handleBackToList} size="icon" title="Back to List">
+                <ArrowLeft />
               </Button>
               {selectedNote && (
-                <Button onClick={handleToggleView}>
-                  {viewMode === 'edit' ? (
-                    <>
-                      <Eye className="mr-2 h-4 w-4" /> Preview
-                    </>
-                  ) : (
-                    <>
-                      <Pencil className="mr-2 h-4 w-4" /> Edit
-                    </>
-                  )}
+                <Button onClick={handleToggleView} size="icon" title={viewMode === 'edit' ? 'Preview' : 'Edit'}>
+                  {viewMode === 'edit' ? <Eye/> : <Pencil/>}
                 </Button>
               )}
             </div>

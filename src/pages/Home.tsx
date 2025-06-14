@@ -61,7 +61,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
-      <AppHeader />
+      <AppHeader showLogo={false} />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8 max-w-lg mx-auto">
           <Input 

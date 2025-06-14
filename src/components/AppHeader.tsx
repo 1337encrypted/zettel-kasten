@@ -25,7 +25,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
 import { Link, useLocation } from 'react-router-dom';
 
-export const AppHeader = ({ onExportAllNotes }: { onExportAllNotes?: () => void }) => {
+export const AppHeader = ({ onExportAllNotes, showLogo = true }: { onExportAllNotes?: () => void; showLogo?: boolean }) => {
   const { user, signOut } = useAuth();
   const location = useLocation();
 
@@ -100,10 +100,12 @@ export const AppHeader = ({ onExportAllNotes }: { onExportAllNotes?: () => void 
       </div>
       
       <div className="w-1/3 text-center">
-        <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-          <img src="/lovable-uploads/3d4105c3-8713-4c19-b696-105b36d2928e.png" alt="Zet Logo" className="h-10 w-auto" />
-          <span className="text-4xl font-bold tracking-wide">Zet</span>
-        </Link>
+        {showLogo && (
+          <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
+            <img src="/lovable-uploads/3d4105c3-8713-4c19-b696-105b36d2928e.png" alt="Zet Logo" className="h-10 w-auto" />
+            <span className="text-4xl font-bold tracking-wide">Zet</span>
+          </Link>
+        )}
       </div>
       
       <div className="w-1/3 flex justify-end">

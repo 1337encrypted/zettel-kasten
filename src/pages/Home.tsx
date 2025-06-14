@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AppHeader } from '@/components/AppHeader';
 import { AppFooter } from '@/components/AppFooter';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { User, Clock } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
@@ -74,25 +75,30 @@ const Home = () => {
         </div>
         {isLoading && <p className="text-center">Loading users...</p>}
         {error && <p className="text-destructive text-center">Could not load users. For this to work, RLS policies on 'profiles' and 'notes' tables must allow public read access.</p>}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col gap-4 max-w-3xl mx-auto w-full">
           {filteredUsers?.map(user => (
             <Link to={`/u/${user.id}`} key={user.id}>
-              <Card className="h-full hover:bg-muted/50 transition-colors">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User />
-                    {user.username || 'Anonymous'}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{user.note_count} {user.note_count === 1 ? 'note' : 'notes'}</p>
-                  {user.created_at && (
-                    <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      Joined {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
-                    </p>
-                  )}
-                </CardContent>
+              <Card className="hover:bg-muted/50 transition-colors w-full">
+                <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="bg-primary/10 p-3 rounded-full">
+                            <User className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                            <p className="font-semibold text-lg">{user.username || 'Anonymous'}</p>
+                            {user.created_at && (
+                                <p className="text-sm text-muted-foreground flex items-center gap-1">
+                                    <Clock className="h-4 w-4" />
+                                    Joined {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <div className="text-right">
+                         <p className="font-semibold text-lg">{user.note_count}</p>
+                         <p className="text-sm text-muted-foreground">{user.note_count === 1 ? 'note' : 'notes'}</p>
+                    </div>
+                </div>
               </Card>
             </Link>
           ))}

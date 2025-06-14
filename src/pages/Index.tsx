@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from "react";
 import NoteList from "@/components/NoteList";
 import NoteEditor from "@/components/NoteEditor";
@@ -6,7 +5,7 @@ import NoteViewer from "@/components/NoteViewer";
 import NoteGraph from "@/components/NoteGraph";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Search, List, Graph } from "lucide-react";
+import { Search, List, Network } from "lucide-react";
 
 // --- Types ---
 export type Note = {
@@ -133,7 +132,7 @@ const Index = () => {
             onClick={() => setShowGraph(v=>!v)}
             className="ml-2"
           >
-            <Graph size={16} className="mr-1" />
+            <Network size={16} className="mr-1" />
             Graph View
           </Button>
         </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Note } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
@@ -169,6 +168,8 @@ const Index = () => {
             onBackToList={handleBackToList}
             onToggleView={handleToggleView}
             onDelete={handleDeleteNote}
+            allNotes={notes}
+            onSelectNote={handleSelectNote}
           />
         )}
       </main>

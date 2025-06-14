@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -70,11 +71,6 @@ const UserPublicProfile = () => {
     enabled: !!userId,
   });
 
-  const readmeNote = useMemo(() => {
-    if (!data) return null;
-    return data.notes.find(n => n.title.toLowerCase() === 'readme');
-  }, [data]);
-
   const { filteredFolders, filteredNotes, currentFolder } = useMemo(() => {
     if (!data) return { filteredFolders: [], filteredNotes: [], currentFolder: null };
     const folders = data.folders.filter(f => f.parentId === currentFolderId);
@@ -84,6 +80,17 @@ const UserPublicProfile = () => {
     const currentFolder = data.folders.find(f => f.id === currentFolderId) || null;
     return { filteredFolders: folders, filteredNotes: notes, currentFolder };
   }, [data, currentFolderId]);
+
+  const readmeNote = useMemo(() => {
+    return filteredNotes.find(n => n.title.toLowerCase() === 'readme');
+  }, [filteredNotes]);
+
+  const notesForList = useMemo(() => {
+    if (readmeNote) {
+      return filteredNotes.filter(n => n.id !== readmeNote.id);
+    }
+    return filteredNotes;
+  }, [filteredNotes, readmeNote]);
 
   const allNotes = useMemo(() => data?.notes || [], [data]);
 
@@ -136,19 +143,19 @@ const UserPublicProfile = () => {
                     isPublicView={true}
                   />
                   <NoteList
-                    notes={filteredNotes}
+                    notes={notesForList}
                     onSelectNote={handleSelectNote}
                     selectedNoteIds={[]}
                     onToggleNoteSelection={() => {}}
                   />
-                   {filteredFolders.length === 0 && filteredNotes.length === 0 && (
+                   {filteredFolders.length === 0 && notesForList.length === 0 && (
                     <div className="text-center text-muted-foreground pt-8">
                       <p className="font-mono text-lg"># Empty</p>
                       <p>This folder is empty.</p>
                     </div>
                   )}
                 </div>
-                {readmeNote && !currentFolderId && (
+                {readmeNote && (
                   <div className="mt-8">
                     <NoteView 
                       note={readmeNote} 

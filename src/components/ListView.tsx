@@ -5,9 +5,6 @@ import { Button } from '@/components/ui/button';
 import { FolderPlus, File } from 'lucide-react';
 import FolderList from '@/components/FolderList';
 import NoteList from '@/components/NoteList';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkBreaks from 'remark-breaks';
 
 interface ListViewProps {
   filteredFolders: Folder[];
@@ -38,9 +35,6 @@ export const ListView: React.FC<ListViewProps> = ({
   onDeleteNote,
   onDeleteFolder,
 }) => {
-  const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme.md');
-  const notesWithoutReadme = filteredNotes.filter(note => note.title.toLowerCase() !== 'readme.md');
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -60,22 +54,11 @@ export const ListView: React.FC<ListViewProps> = ({
         onDeleteFolder={onDeleteFolder}
       />
       <NoteList
-        notes={notesWithoutReadme}
+        notes={filteredNotes}
         onSelectNote={onSelectNote}
         selectedNoteId={selectedNoteId}
         onDeleteNote={onDeleteNote}
       />
-      {readmeNote && (
-        <div className="mt-6 p-4 border rounded-lg prose dark:prose-invert max-w-none bg-card text-card-foreground shadow">
-          <h2 className="font-bold text-lg mb-2 flex items-center gap-2 not-prose">
-            <File className="w-5 h-5 inline-block" />
-            README.md
-          </h2>
-          <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
-            {readmeNote.content}
-          </ReactMarkdown>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -28,14 +27,10 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export const AppHeader = ({
   onExportAllNotes,
-  showLogo = true,
-  showTitleOnly = false,
   viewMode,
   onBackToList
 }: {
   onExportAllNotes?: () => void;
-  showLogo?: boolean;
-  showTitleOnly?: boolean;
   viewMode?: 'list' | 'edit' | 'preview';
   onBackToList?: () => void;
 }) => {
@@ -127,16 +122,9 @@ export const AppHeader = ({
       </div>
       
       <div className="w-1/3 text-center">
-        {showTitleOnly ? (
-          <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-            <span className="text-4xl font-bold tracking-wide">Zet</span>
-          </Link>
-        ) : showLogo && (
-          <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-            <img src="/lovable-uploads/3d4105c3-8713-4c19-b696-105b36d2928e.png" alt="Zet Logo" className="h-10 w-auto" />
-            <span className="text-4xl font-bold tracking-wide">Zet</span>
-          </Link>
-        )}
+        <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
+          <span className="text-4xl font-bold tracking-wide">Zet</span>
+        </Link>
       </div>
       
       <div className="w-1/3 flex justify-end">

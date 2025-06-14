@@ -42,7 +42,7 @@ const ResetPasswordPage = () => {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <img src="/lovable-uploads/3d4105c3-8713-4c19-b696-105b36d2928e.png" alt="Zet Logo" className="w-32 h-32 mb-8" />
+      <h1 className="text-5xl font-bold tracking-wide mb-8">Zet</h1>
       <ResetPasswordForm
         handlePasswordUpdate={handlePasswordUpdate}
         loading={loading}

@@ -130,7 +130,7 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
-      <AppHeader showTitleOnly={true} />
+      <AppHeader />
       <main className="flex-grow flex flex-col items-center justify-center">
         {view === 'tabs' ? (
           <Tabs defaultValue="login" className="w-full max-w-sm" onValueChange={() => { setPassword(''); setUsername(''); }}>

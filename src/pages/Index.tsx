@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppLogic } from '@/hooks/useAppLogic';
 
@@ -47,7 +46,6 @@ const Index = () => {
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
       <AppHeader
         onExportAllNotes={handleExportAllNotes}
-        showTitleOnly={true}
         viewMode={viewMode}
         onBackToList={handleBackToList}
       />

@@ -1,3 +1,4 @@
+
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -23,8 +24,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
+import { Link } from 'react-router-dom';
 
-export const AppHeader = ({ onExportAllNotes }: { onExportAllNotes: () => void }) => {
+export const AppHeader = ({ onExportAllNotes }: { onExportAllNotes?: () => void }) => {
   const { user, signOut } = useAuth();
 
   const handleDeleteAccount = async () => {
@@ -41,7 +43,7 @@ export const AppHeader = ({ onExportAllNotes }: { onExportAllNotes: () => void }
   return (
     <header className="mb-8 flex items-center justify-between relative h-10">
       <div className="w-1/3">
-        {user && (
+        {user ? (
           <AlertDialog>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -50,7 +52,7 @@ export const AppHeader = ({ onExportAllNotes }: { onExportAllNotes: () => void }
               <DropdownMenuContent align="start">
                 <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onExportAllNotes} className="cursor-pointer">
+                <DropdownMenuItem onClick={onExportAllNotes} className="cursor-pointer" disabled={!onExportAllNotes}>
                   <Archive className="mr-2 h-4 w-4" />
                   <span>Export All Notes</span>
                 </DropdownMenuItem>
@@ -83,6 +85,10 @@ export const AppHeader = ({ onExportAllNotes }: { onExportAllNotes: () => void }
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+        ) : (
+           <Button asChild variant="outline">
+            <Link to="/auth">Login</Link>
+          </Button>
         )}
       </div>
       

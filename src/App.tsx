@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,13 +24,12 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              <Route path="/home" element={<Home />} />
+              <Route path="/" element={<Home />} />
               <Route path="/u/:userId" element={<UserPublicProfile />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/confirm-email" element={<ConfirmEmailPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Index />} />
                 <Route path="/dashboard" element={<Index />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

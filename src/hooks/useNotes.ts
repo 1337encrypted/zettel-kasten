@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Note } from '@/types';
@@ -60,5 +59,13 @@ export const useNotes = () => {
     toast.error("Note deleted.");
   };
 
-  return { notes, saveNote, deleteNote };
+  const deleteNotesByFolderIds = (folderIds: string[]) => {
+    const notesToDeleteCount = notes.filter(note => note.folderId && folderIds.includes(note.folderId)).length;
+    setNotes(prevNotes => prevNotes.filter(note => !note.folderId || !folderIds.includes(note.folderId)));
+    if (notesToDeleteCount > 0) {
+      toast.error(`${notesToDeleteCount} note${notesToDeleteCount > 1 ? 's' : ''} deleted.`);
+    }
+  };
+
+  return { notes, saveNote, deleteNote, deleteNotesByFolderIds };
 };

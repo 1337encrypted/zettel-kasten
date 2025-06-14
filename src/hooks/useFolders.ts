@@ -35,5 +35,27 @@ export const useFolders = () => {
     }
   };
 
-  return { folders, createFolder };
+  const deleteFolderAndDescendants = (folderId: string): string[] => {
+    const folderToDelete = folders.find(f => f.id === folderId);
+    if (!folderToDelete) return [];
+
+    const allFolders = [...folders];
+    const idsToDelete: string[] = [];
+    const queue: string[] = [folderId];
+
+    while(queue.length > 0) {
+      const currentId = queue.shift()!;
+      idsToDelete.push(currentId);
+      const children = allFolders.filter(f => f.parentId === currentId);
+      for (const child of children) {
+        queue.push(child.id);
+      }
+    }
+    
+    setFolders(prevFolders => prevFolders.filter(f => !idsToDelete.includes(f.id)));
+    toast.error(`Folder "${folderToDelete.name}" and its sub-folders deleted.`);
+    return idsToDelete;
+  };
+
+  return { folders, createFolder, deleteFolderAndDescendants };
 };

@@ -1,8 +1,8 @@
-
 import React, { useState, useMemo } from 'react';
 import { Note } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
 import { useFolders } from '@/hooks/useFolders';
+import Fuse from 'fuse.js';
 
 import { AppHeader } from '@/components/AppHeader';
 import { AppFooter } from '@/components/AppFooter';
@@ -17,6 +17,7 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleSaveNote = (noteData: Pick<Note, 'title' | 'content'> & { id?: string }) => {
     const payload = {
@@ -86,14 +87,31 @@ const Index = () => {
     setViewMode(prev => (prev === 'edit' ? 'preview' : 'edit'));
   };
 
-  const filteredFolders = useMemo(() => folders.filter(folder => {
-    if (currentFolderId === null) {
-      return !folder.parentId;
-    }
-    return folder.parentId === currentFolderId;
-  }), [folders, currentFolderId]);
+  const fuse = useMemo(() => new Fuse(notes, {
+    keys: ['title', 'content'],
+    includeScore: true,
+    threshold: 0.4,
+  }), [notes]);
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    return fuse.search(searchQuery).map(result => result.item);
+  }, [searchQuery, fuse]);
+
+  const filteredFolders = useMemo(() => {
+    if (searchQuery.trim()) return [];
+    return folders.filter(folder => {
+      if (currentFolderId === null) {
+        return !folder.parentId;
+      }
+      return folder.parentId === currentFolderId;
+    });
+  }, [folders, currentFolderId, searchQuery]);
 
   const filteredNotes = useMemo(() => {
+    if (searchQuery.trim()) {
+      return searchResults;
+    }
     const notesInFolder = notes.filter(note => {
       if (currentFolderId === null) {
         return !note.folderId;
@@ -102,13 +120,15 @@ const Index = () => {
     });
     
     return notesInFolder.sort((a, b) => {
+      if (a.title.toLowerCase() === 'readme') return -1;
+      if (b.title.toLowerCase() === 'readme') return 1;
       if (sortOrder === 'asc') {
         return a.title.localeCompare(b.title);
       } else {
         return b.title.localeCompare(a.title);
       }
     });
-  }, [notes, currentFolderId, sortOrder]);
+  }, [notes, currentFolderId, sortOrder, searchQuery, searchResults]);
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
@@ -131,6 +151,8 @@ const Index = () => {
             onDeleteFolder={handleDeleteFolder}
             sortOrder={sortOrder}
             onSortOrderChange={setSortOrder}
+            searchQuery={searchQuery}
+            onSearchQueryChange={setSearchQuery}
           />
         ) : (
           <DetailView 

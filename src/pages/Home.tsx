@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -64,10 +63,6 @@ const Home = () => {
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
       <AppHeader />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-primary tracking-wide">Welcome to Zet</h1>
-            <p className="text-xl text-muted-foreground mt-2">Discover and read notes from our community.</p>
-        </div>
         <div className="mb-8 max-w-lg mx-auto">
           <Input 
             placeholder="Search for users..."

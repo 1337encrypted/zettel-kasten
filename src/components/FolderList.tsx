@@ -31,7 +31,6 @@ const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId
 
   return (
     <div className="font-mono border border-border p-4 rounded-lg bg-secondary/20">
-      <h2 className="text-xl font-semibold mb-4 text-primary">~/</h2>
       <ul className="space-y-1">
         {currentFolderId && (
           <li

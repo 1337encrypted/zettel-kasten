@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Note } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -11,12 +12,11 @@ interface NoteListProps {
 
 const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId, onDeleteNote }) => {
   if (notes.length === 0) {
-    return <p className="text-muted-foreground font-mono">~/notes$ # Empty</p>;
+    return <p className="text-muted-foreground font-mono"># Empty</p>;
   }
 
   return (
     <div className="font-mono border border-border p-4 rounded-lg bg-secondary/20">
-      <h2 className="text-xl font-semibold mb-4 text-primary">~/notes/</h2>
       <ul className="space-y-1">
         {notes.map((note) => (
           <li

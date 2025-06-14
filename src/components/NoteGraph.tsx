@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Note } from "@/pages/Index";
-import { SigmaContainer, useLoadGraph } from "@react-sigma/core";
+import { SigmaContainer, useLoadGraph } from "react-sigma-v2";
 
 // Dummy initial graph, just to render network structure
 type GraphProps = {

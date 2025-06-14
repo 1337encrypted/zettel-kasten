@@ -57,10 +57,12 @@ export const ListView: React.FC<ListViewProps> = ({
   onSelectAll,
 }) => {
   const isMobile = useIsMobile();
+  const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme');
   const isSearching = !!searchQuery.trim();
 
+  const selectableNotes = filteredNotes.filter(n => n.title.toLowerCase() !== 'readme');
   const numSelected = selectedNoteIds.length;
-  const allNotesSelected = filteredNotes.length > 0 && numSelected === filteredNotes.length;
+  const allNotesSelected = selectableNotes.length > 0 && numSelected === selectableNotes.length;
 
   return (
     <div className="space-y-6">
@@ -111,7 +113,7 @@ export const ListView: React.FC<ListViewProps> = ({
               checked={allNotesSelected}
               onCheckedChange={onSelectAll}
               aria-label="Select all notes"
-              disabled={filteredNotes.length === 0}
+              disabled={selectableNotes.length === 0}
             />
             <span className="text-sm text-muted-foreground">{numSelected} selected</span>
           </div>
@@ -122,12 +124,23 @@ export const ListView: React.FC<ListViewProps> = ({
         </div>
       )}
       <NoteList
-        notes={filteredNotes}
+        notes={selectableNotes}
         onSelectNote={onSelectNote}
         selectedNoteId={selectedNoteId}
         selectedNoteIds={selectedNoteIds}
         onToggleNoteSelection={onToggleNoteSelection}
       />
+      {readmeNote && !isSearching && (
+        <div className="mt-6 p-4 border rounded-lg prose dark:prose-invert max-w-none bg-card text-card-foreground shadow">
+          <h2 className="font-bold text-lg mb-2 flex items-center gap-2 not-prose">
+            <File className="w-5 h-5 inline-block" />
+            README
+          </h2>
+          <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+            {readmeNote.content}
+          </ReactMarkdown>
+        </div>
+      )}
     </div>
   );
 };

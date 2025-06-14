@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { User } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
+import { Link } from 'react-router-dom';
 
 interface UserProfile {
   id: string;
@@ -74,17 +75,19 @@ const Home = () => {
         {error && <p className="text-destructive text-center">Could not load users. For this to work, RLS policies on 'profiles' and 'notes' tables must allow public read access.</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredUsers?.map(user => (
-            <Card key={user.id}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User />
-                  {user.username || 'Anonymous'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{user.note_count} notes</p>
-              </CardContent>
-            </Card>
+            <Link to={`/u/${user.id}`} key={user.id}>
+              <Card className="h-full hover:bg-muted/50 transition-colors">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User />
+                    {user.username || 'Anonymous'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>{user.note_count} {user.note_count === 1 ? 'note' : 'notes'}</p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </main>

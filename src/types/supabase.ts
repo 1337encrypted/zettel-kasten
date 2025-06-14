@@ -16,18 +16,21 @@ export type Database = {
           id: string
           name: string
           parent_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
           parent_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
           parent_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -41,31 +44,34 @@ export type Database = {
       }
       notes: {
         Row: {
-          content: string
+          content: string | null
           created_at: string
           folder_id: string | null
           id: string
           tags: string[] | null
           title: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          content: string
+          content?: string | null
           created_at?: string
           folder_id?: string | null
           id?: string
           tags?: string[] | null
           title: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          content?: string
+          content?: string | null
           created_at?: string
           folder_id?: string | null
           id?: string
           tags?: string[] | null
           title?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -76,6 +82,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+          website: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {

@@ -1,8 +1,7 @@
-
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Trash2 } from 'lucide-react';
+import { LogOut, Trash2, Archive } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,7 +24,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
 
-export const AppHeader = () => {
+export const AppHeader = ({ onExportAllNotes }: { onExportAllNotes: () => void }) => {
   const { user, signOut } = useAuth();
 
   const handleDeleteAccount = async () => {
@@ -51,6 +50,10 @@ export const AppHeader = () => {
               <DropdownMenuContent align="start">
                 <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onExportAllNotes} className="cursor-pointer">
+                  <Archive className="mr-2 h-4 w-4" />
+                  <span>Export All Notes</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut} className="cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Logout</span>

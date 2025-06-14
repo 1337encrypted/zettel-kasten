@@ -45,7 +45,7 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
   };
 
   if (notes.length === 0) {
-    return <p className="text-muted-foreground font-mono"># Empty</p>;
+    return null;
   }
 
   return (

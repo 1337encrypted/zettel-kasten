@@ -31,6 +31,10 @@ const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId
     return notes.filter(note => note.folderId === folderId).length;
   }
 
+  if (folders.length === 0) {
+    return null;
+  }
+
   return (
     <div className="font-mono border border-border p-4 rounded-lg bg-secondary/20">
       <ul className="space-y-1">

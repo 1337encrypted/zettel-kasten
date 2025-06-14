@@ -45,7 +45,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
-      <AppHeader onExportAllNotes={handleExportAllNotes} />
+      <AppHeader onExportAllNotes={handleExportAllNotes} showTitleOnly={true} />
 
       <main className="flex-grow flex flex-col">
         {viewMode === 'list' ? (

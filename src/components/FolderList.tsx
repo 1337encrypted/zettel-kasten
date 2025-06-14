@@ -23,9 +23,10 @@ interface FolderListProps {
   onNavigateUp: () => void;
   onDeleteFolder: (folderId: string) => void;
   onRenameFolder: (folderId: string) => void;
+  isPublicView?: boolean;
 }
 
-const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId, onSelectFolder, onNavigateUp, onDeleteFolder, onRenameFolder }) => {
+const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId, onSelectFolder, onNavigateUp, onDeleteFolder, onRenameFolder, isPublicView = false }) => {
   const notesInFolderCount = (folderId: string) => {
     return notes.filter(note => note.folderId === folderId).length;
   }
@@ -46,50 +47,54 @@ const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId
               {folder.name}
             </div>
             <span className="text-sm text-muted-foreground mr-2">{notesInFolderCount(folder.id)}</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity h-8 w-8"
-              onClick={(e) => {
-                e.stopPropagation();
-                onRenameFolder(folder.id);
-              }}
-              title={`Rename "${folder.name}"`}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
+            {!isPublicView && (
+              <>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity h-8 w-8 text-destructive"
-                  onClick={(e) => e.stopPropagation()}
+                  className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity h-8 w-8"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRenameFolder(folder.id);
+                  }}
+                  title={`Rename "${folder.name}"`}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Pencil className="h-4 w-4" />
                 </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete the "{folder.name}" folder and all its contents, including sub-folders and notes.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteFolder(folder.id);
-                    }}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity h-8 w-8 text-destructive"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the "{folder.name}" folder and all its contents, including sub-folders and notes.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteFolder(folder.id);
+                        }}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
+            )}
           </li>
         ))}
       </ul>

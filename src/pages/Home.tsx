@@ -10,6 +10,7 @@ import { User, Clock } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import { useNavigationShortcuts } from '@/hooks/useNavigationShortcuts';
 
 interface UserProfile {
   id: string;
@@ -47,6 +48,7 @@ const fetchUsersWithNoteCounts = async () => {
 };
 
 const Home = () => {
+  useNavigationShortcuts();
   const [search, setSearch] = React.useState('');
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['usersWithNoteCounts'],

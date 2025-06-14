@@ -4,7 +4,7 @@ import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
 import NoteView from '@/components/NoteView';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Eye, Pencil } from 'lucide-react';
+import { ArrowLeft, Eye, Pencil, Delete } from 'lucide-react';
 
 interface DetailViewProps {
   viewMode: 'edit' | 'preview';
@@ -12,6 +12,7 @@ interface DetailViewProps {
   onSave: (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
   onBackToList: () => void;
   onToggleView: () => void;
+  onDelete: (noteId: string) => void;
 }
 
 export const DetailView: React.FC<DetailViewProps> = ({
@@ -20,6 +21,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
   onSave,
   onBackToList,
   onToggleView,
+  onDelete,
 }) => {
   return (
     <div className="flex-grow flex flex-col">
@@ -28,6 +30,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
           <NoteEditor 
             onSave={onSave} 
             selectedNote={selectedNote}
+            onDelete={onDelete}
           />
         ) : (
           <NoteView note={selectedNote} />
@@ -38,9 +41,16 @@ export const DetailView: React.FC<DetailViewProps> = ({
           <ArrowLeft />
         </Button>
         {selectedNote && (
-          <Button onClick={onToggleView} size="icon" title={viewMode === 'edit' ? 'Preview' : 'Edit'}>
-            {viewMode === 'edit' ? <Eye/> : <Pencil/>}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={onToggleView} size="icon" title={viewMode === 'edit' ? 'Preview' : 'Edit'}>
+              {viewMode === 'edit' ? <Eye/> : <Pencil/>}
+            </Button>
+            {viewMode === 'preview' && (
+              <Button variant="destructive" size="icon" title="Delete" onClick={() => onDelete(selectedNote.id)}>
+                <Delete />
+              </Button>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -14,9 +14,10 @@ import { v4 as uuidv4 } from 'uuid';
 interface NoteEditorProps {
   onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
   selectedNote: Note | null;
+  onDelete: (noteId: string) => void;
 }
 
-const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote }) => {
+const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
@@ -167,13 +168,22 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote }) => {
           {selectedNote ? 'Save Changes' : 'Create Note'}
         </Button>
         {selectedNote && (
-          <Button 
-            variant="outline" 
-            onClick={handleClear} 
-            className="w-full sm:w-auto ml-2"
-          >
-            Clear
-          </Button>
+          <>
+            <Button 
+              variant="outline" 
+              onClick={handleClear} 
+              className="w-full sm:w-auto ml-2"
+            >
+              Clear
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => onDelete(selectedNote.id)}
+              className="w-full sm:w-auto ml-2"
+            >
+              Delete
+            </Button>
+          </>
         )}
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Note } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
@@ -49,6 +50,7 @@ const Index = () => {
     deleteNote(noteId);
     if (selectedNote && selectedNote.id === noteId) {
       setSelectedNote(null);
+      setViewMode('list');
     }
   };
 
@@ -166,6 +168,7 @@ const Index = () => {
             onSave={handleSaveNote}
             onBackToList={handleBackToList}
             onToggleView={handleToggleView}
+            onDelete={handleDeleteNote}
           />
         )}
       </main>

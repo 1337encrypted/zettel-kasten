@@ -23,7 +23,7 @@ export const useNotes = () => {
     localStorage.setItem('zettelkasten-notes', JSON.stringify(notes));
   }, [notes]);
 
-  const saveNote = (noteData: Pick<Note, 'title' | 'content'> & { id?: string, folderId?: string | null }): Note => {
+  const saveNote = (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string, folderId?: string | null }): Note => {
     if (noteData.id) {
       const originalNote = notes.find(n => n.id === noteData.id);
       if (!originalNote) {
@@ -76,6 +76,7 @@ export const useNotes = () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         folderId: noteData.folderId || undefined,
+        tags: noteData.tags || [],
       };
       setNotes((prevNotes) => [newNote, ...prevNotes]);
       toast.success(`Note "${newNote.title}" created!`);

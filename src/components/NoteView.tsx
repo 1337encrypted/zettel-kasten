@@ -4,6 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { Note } from '@/types';
+import { Badge } from '@/components/ui/badge';
+import { Tag } from 'lucide-react';
 
 interface NoteViewProps {
   note: Note | null;
@@ -21,6 +23,14 @@ const NoteView: React.FC<NoteViewProps> = ({ note }) => {
   return (
     <div className="p-4 border rounded-lg shadow prose dark:prose-invert max-w-none">
       <h1 className="text-3xl font-bold mb-4">{note.title}</h1>
+      {note.tags && note.tags.length > 0 && (
+        <div className="flex items-center gap-2 mb-4 not-prose">
+          <Tag className="w-4 h-4 text-muted-foreground" />
+          {note.tags.map((tag) => (
+            <Badge key={tag} variant="secondary">{tag}</Badge>
+          ))}
+        </div>
+      )}
       <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{note.content}</ReactMarkdown>
       <div className="mt-4 text-xs text-muted-foreground">
         <p>Created: {note.createdAt.toLocaleDateString()}</p>

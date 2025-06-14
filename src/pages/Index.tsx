@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Note } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
@@ -19,7 +20,7 @@ const Index = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleSaveNote = (noteData: Pick<Note, 'title' | 'content'> & { id?: string }) => {
+  const handleSaveNote = (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => {
     const payload = {
       ...noteData,
       ...(!noteData.id && { folderId: currentFolderId }),
@@ -88,7 +89,7 @@ const Index = () => {
   };
 
   const fuse = useMemo(() => new Fuse(notes, {
-    keys: ['title', 'content'],
+    keys: ['title', 'content', 'tags'],
     includeScore: true,
     threshold: 0.4,
   }), [notes]);

@@ -9,7 +9,7 @@ import { ArrowLeft, Eye, Pencil } from 'lucide-react';
 interface DetailViewProps {
   viewMode: 'edit' | 'preview';
   selectedNote: Note | null;
-  onSave: (noteData: Pick<Note, 'title' | 'content'> & { id?: string }) => void;
+  onSave: (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
   onNewNote: () => void;
   onBackToList: () => void;
   onToggleView: () => void;

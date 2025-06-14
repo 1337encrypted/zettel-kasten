@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Note } from '@/types';
 
 interface NoteEditorProps {
-  onSave: (note: Pick<Note, 'title' | 'content'> & { id?: string }) => void;
+  onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
   selectedNote: Note | null;
   onNewNote: () => void;
 }
@@ -15,14 +15,17 @@ interface NoteEditorProps {
 const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [tags, setTags] = useState('');
 
   useEffect(() => {
     if (selectedNote) {
       setTitle(selectedNote.title);
       setContent(selectedNote.content);
+      setTags(selectedNote.tags?.join(', ') || '');
     } else {
       setTitle('');
       setContent('');
+      setTags('');
     }
   }, [selectedNote]);
 
@@ -32,7 +35,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
       console.warn('Title and content cannot be empty');
       return;
     }
-    onSave({ id: selectedNote?.id, title, content });
+    const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+    onSave({ id: selectedNote?.id, title, content, tags: tagsArray });
   };
 
   return (
@@ -46,6 +50,17 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter note title"
+          className="mt-1"
+        />
+      </div>
+      <div>
+        <Label htmlFor="note-tags" className="text-sm font-medium">Tags (comma-separated)</Label>
+        <Input
+          id="note-tags"
+          type="text"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          placeholder="e.g. programming, react, thoughts"
           className="mt-1"
         />
       </div>

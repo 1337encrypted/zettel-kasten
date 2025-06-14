@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Folder } from '@/types';
 import { toast } from "@/components/ui/sonner";
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 const fromFolderDb = (dbFolder: any): Folder => ({
   id: dbFolder.id,
@@ -13,9 +14,10 @@ const fromFolderDb = (dbFolder: any): Folder => ({
 
 export const useFolders = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: folders = [], isLoading } = useQuery({
-    queryKey: ['folders'],
+    queryKey: ['folders', user?.id],
     queryFn: async (): Promise<Folder[]> => {
       const { data, error } = await supabase
         .from('folders')
@@ -27,7 +29,8 @@ export const useFolders = () => {
         throw new Error(error.message);
       }
       return data.map(fromFolderDb);
-    }
+    },
+    enabled: !!user,
   });
 
   const createFolderMutation = useMutation({
@@ -38,9 +41,14 @@ export const useFolders = () => {
           throw new Error("Folder name cannot be empty.");
       }
 
+      if (!user) {
+        toast.error("You must be logged in to create a folder.");
+        throw new Error("User not authenticated");
+      }
+
       const { data, error } = await supabase
         .from('folders')
-        .insert({ name: trimmedName, parent_id: parentId })
+        .insert({ name: trimmedName, parent_id: parentId, user_id: user.id })
         .select()
         .single();
       

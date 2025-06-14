@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Note } from '@/types';
 import { toast } from "@/components/ui/sonner";
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 const fromNoteDb = (dbNote: any): Note => ({
     id: dbNote.id,
@@ -16,9 +17,10 @@ const fromNoteDb = (dbNote: any): Note => ({
 
 export const useNotes = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: notes = [], isLoading } = useQuery({
-    queryKey: ['notes'],
+    queryKey: ['notes', user?.id],
     queryFn: async (): Promise<Note[]> => {
       const { data, error } = await supabase
         .from('notes')
@@ -30,7 +32,8 @@ export const useNotes = () => {
         throw new Error(error.message);
       }
       return data.map(fromNoteDb);
-    }
+    },
+    enabled: !!user,
   });
 
   const saveNoteMutation = useMutation({
@@ -56,9 +59,13 @@ export const useNotes = () => {
         toast.success(`Note "${data.title}" updated!`);
         return fromNoteDb(data);
       } else {
+        if (!user) {
+          toast.error("You must be logged in to create a note.");
+          throw new Error("User not authenticated");
+        }
         const { data, error } = await supabase
           .from('notes')
-          .insert(noteToSave)
+          .insert({ ...noteToSave, user_id: user.id })
           .select()
           .single();
         

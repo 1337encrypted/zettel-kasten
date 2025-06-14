@@ -15,18 +15,21 @@ export type Database = {
           id: string
           name: string
           parent_id: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
           parent_id?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
           parent_id?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -47,6 +50,7 @@ export type Database = {
           tags: string[] | null
           title: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           content?: string | null
@@ -56,6 +60,7 @@ export type Database = {
           tags?: string[] | null
           title: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           content?: string | null
@@ -65,6 +70,7 @@ export type Database = {
           tags?: string[] | null
           title?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -75,6 +81,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+          website: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+          website?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {

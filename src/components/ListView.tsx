@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Folder, Note } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,6 @@ import NoteList from '@/components/NoteList';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Input } from '@/components/ui/input';
 
 interface ListViewProps {
@@ -73,14 +71,15 @@ export const ListView: React.FC<ListViewProps> = ({
             />
         </div>
         <div className="flex items-center">
-            <ToggleGroup type="single" value={sortOrder} onValueChange={(value) => { if(value) onSortOrderChange(value as 'asc' | 'desc')}} aria-label="Sort notes" disabled={isSearching}>
-                <ToggleGroupItem value="asc" aria-label="Sort ascending" title="Sort ascending (A-Z)">
-                    <ArrowUpAZ className="h-4 w-4" />
-                </ToggleGroupItem>
-                <ToggleGroupItem value="desc" aria-label="Sort descending" title="Sort descending (Z-A)">
-                    <ArrowDownAZ className="h-4 w-4" />
-                </ToggleGroupItem>
-            </ToggleGroup>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => onSortOrderChange(sortOrder === 'asc' ? 'desc' : 'asc')}
+              disabled={isSearching}
+              title={`Sort by title: ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}. Click to toggle.`}
+            >
+              {sortOrder === 'asc' ? <ArrowUpAZ className="h-4 w-4" /> : <ArrowDownAZ className="h-4 w-4" />}
+            </Button>
         </div>
       </div>
       <FolderList

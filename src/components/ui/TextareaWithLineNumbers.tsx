@@ -23,10 +23,10 @@ const TextareaWithLineNumbers = React.forwardRef<HTMLTextAreaElement, TextareaPr
         };
 
         return (
-            <div className={cn("flex w-full overflow-hidden rounded-md border border-input bg-background", className)}>
+            <div className={cn("flex w-full rounded-md border border-input bg-background", className)}>
                 <div
                     ref={lineNumbersRef}
-                    className="p-2 pr-3 text-right text-muted-foreground select-none font-mono text-sm"
+                    className="p-2 pr-3 text-right text-muted-foreground select-none font-mono text-sm overflow-y-hidden"
                     style={{ lineHeight: '1.5rem', flexShrink: 0 }}
                     aria-hidden="true"
                 >

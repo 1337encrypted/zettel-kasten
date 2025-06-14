@@ -5,11 +5,12 @@ import NoteEditor from '@/components/NoteEditor';
 import NoteList from '@/components/NoteList';
 import NoteView from '@/components/NoteView';
 import { Note } from '@/types';
-import { toast } from "@/components/ui/sonner"; // Using sonner for toasts
+import { toast } from "@/components/ui/sonner";
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, Eye, Pencil } from 'lucide-react';
 
 const Index = () => {
   const [notes, setNotes] = useState<Note[]>(() => {
-    // Load notes from localStorage if available
     const savedNotes = localStorage.getItem('zettelkasten-notes');
     return savedNotes ? JSON.parse(savedNotes).map((note: any) => ({
       ...note,
@@ -18,29 +19,30 @@ const Index = () => {
     })) : [];
   });
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
 
   useEffect(() => {
-    // Save notes to localStorage whenever they change
     localStorage.setItem('zettelkasten-notes', JSON.stringify(notes));
   }, [notes]);
 
   const handleSaveNote = (noteData: Pick<Note, 'title' | 'content'> & { id?: string }) => {
     if (noteData.id) {
-      // Update existing note
+      let updatedNote: Note | undefined;
       setNotes(
-        notes.map((n) =>
-          n.id === noteData.id
-            ? { ...n, ...noteData, updatedAt: new Date() }
-            : n
-        )
+        notes.map((n) => {
+          if (n.id === noteData.id) {
+            updatedNote = { ...n, ...noteData, updatedAt: new Date() };
+            return updatedNote;
+          }
+          return n;
+        })
       );
-      toast.success(`Note "${noteData.title}" updated!`);
-      // If the updated note was the selected one, update selectedNote state as well
-      if (selectedNote && selectedNote.id === noteData.id) {
-        setSelectedNote(prev => prev ? { ...prev, ...noteData, updatedAt: new Date() } : null);
+      if (updatedNote) {
+        setSelectedNote(updatedNote);
+        toast.success(`Note "${updatedNote.title}" updated!`);
+        setViewMode('preview');
       }
     } else {
-      // Create new note
       const newNote: Note = {
         id: uuidv4(),
         title: noteData.title,
@@ -49,17 +51,20 @@ const Index = () => {
         updatedAt: new Date(),
       };
       setNotes([newNote, ...notes]);
-      setSelectedNote(newNote); // Select the new note
+      setSelectedNote(newNote);
       toast.success(`Note "${newNote.title}" created!`);
+      setViewMode('preview');
     }
   };
 
   const handleSelectNote = (note: Note) => {
     setSelectedNote(note);
+    setViewMode('preview');
   };
 
   const handleNewNote = () => {
-    setSelectedNote(null); // Deselect any current note to clear editor for new entry
+    setSelectedNote(null);
+    setViewMode('edit');
   };
   
   const handleDeleteNote = (noteId: string) => {
@@ -70,6 +75,14 @@ const Index = () => {
     toast.error("Note deleted.");
   };
 
+  const handleBackToList = () => {
+    setViewMode('list');
+  };
+
+  const handleToggleView = () => {
+    setViewMode(prev => (prev === 'edit' ? 'preview' : 'edit'));
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
       <header className="mb-8 text-center">
@@ -78,27 +91,54 @@ const Index = () => {
         </h1>
       </header>
       
-      <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1 space-y-6">
-          <NoteEditor 
-            onSave={handleSaveNote} 
-            selectedNote={selectedNote}
-          />
-           <button onClick={handleNewNote} className="w-full mt-2 p-2 bg-green-500 text-white rounded hover:bg-green-600">
-            New Note
-          </button>
-        </div>
-        
-        <div className="md:col-span-2 space-y-6">
-          <NoteList 
-            notes={notes} 
-            onSelectNote={handleSelectNote}
-            selectedNoteId={selectedNote?.id}
-            onDeleteNote={handleDeleteNote}
-          />
-          <NoteView note={selectedNote} />
-        </div>
-      </div>
+      <main className="flex-grow flex flex-col">
+        {viewMode === 'list' ? (
+          <div className="space-y-6">
+            <Button onClick={handleNewNote} className="w-full sm:w-auto">
+              + Create New Note
+            </Button>
+            <NoteList 
+              notes={notes} 
+              onSelectNote={handleSelectNote}
+              selectedNoteId={selectedNote?.id}
+              onDeleteNote={handleDeleteNote}
+            />
+          </div>
+        ) : (
+          <div className="flex-grow flex flex-col">
+            <div className="flex-grow">
+              {viewMode === 'edit' ? (
+                <NoteEditor 
+                  onSave={handleSaveNote} 
+                  selectedNote={selectedNote}
+                  onNewNote={handleNewNote}
+                />
+              ) : (
+                <NoteView note={selectedNote} />
+              )}
+            </div>
+            <div className="flex items-center justify-between mt-4 p-2 border-t sticky bottom-0 bg-background">
+              <Button variant="outline" onClick={handleBackToList}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to List
+              </Button>
+              {selectedNote && (
+                <Button onClick={handleToggleView}>
+                  {viewMode === 'edit' ? (
+                    <>
+                      <Eye className="mr-2 h-4 w-4" /> Preview
+                    </>
+                  ) : (
+                    <>
+                      <Pencil className="mr-2 h-4 w-4" /> Edit
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
       
       <footer className="mt-12 text-center text-sm text-muted-foreground">
         <p>&copy; {new Date().getFullYear()} Zettelkasten Notes. Built with Lovable.</p>

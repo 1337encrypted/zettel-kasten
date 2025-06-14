@@ -4,7 +4,7 @@ import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
 import NoteView from '@/components/NoteView';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Eye, Pencil, Delete } from 'lucide-react';
+import { ArrowLeft, Eye, Pencil, Trash2 } from 'lucide-react';
 
 interface DetailViewProps {
   viewMode: 'edit' | 'preview';
@@ -42,14 +42,14 @@ export const DetailView: React.FC<DetailViewProps> = ({
         </Button>
         {selectedNote && (
           <div className="flex items-center gap-2">
+            {viewMode === 'preview' && (
+              <Button variant="destructive" size="icon" title="Delete" onClick={() => onDelete(selectedNote.id)}>
+                <Trash2 />
+              </Button>
+            )}
             <Button onClick={onToggleView} size="icon" title={viewMode === 'edit' ? 'Preview' : 'Edit'}>
               {viewMode === 'edit' ? <Eye/> : <Pencil/>}
             </Button>
-            {viewMode === 'preview' && (
-              <Button variant="destructive" size="icon" title="Delete" onClick={() => onDelete(selectedNote.id)}>
-                <Delete />
-              </Button>
-            )}
           </div>
         )}
       </div>

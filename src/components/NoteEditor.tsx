@@ -170,7 +170,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
         {selectedNote && (
           <>
             <Button 
-              variant="outline" 
+              variant="secondary" 
               onClick={handleClear} 
               className="w-full sm:w-auto ml-2"
             >

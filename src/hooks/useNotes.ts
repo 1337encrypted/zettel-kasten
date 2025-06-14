@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Note } from '@/types';
 import { toast } from "@/components/ui/sonner";
@@ -14,6 +13,15 @@ const fromNoteDb = (dbNote: any): Note => ({
     folderId: dbNote.folder_id,
     tags: dbNote.tags || [],
 });
+
+const getFilePathsFromContent = (content: string): string[] => {
+    if (!content) return [];
+    const imageUrls = Array.from(content.matchAll(/!\[.*?\]\((.*?)\)/g), m => m[1]);
+    const supabaseUrlPart = `storage/v1/object/public/note-images/`;
+    return imageUrls
+        .filter(url => url.includes(supabaseUrlPart))
+        .map(url => url.substring(url.indexOf(supabaseUrlPart) + supabaseUrlPart.length));
+};
 
 export const useNotes = () => {
   const queryClient = useQueryClient();
@@ -47,6 +55,23 @@ export const useNotes = () => {
       };
 
       if (noteData.id) {
+        // Clean up images that are no longer referenced in the content
+        const oldNote = notes.find(n => n.id === noteData.id);
+        if (oldNote?.content) {
+            const oldFilePaths = getFilePathsFromContent(oldNote.content);
+            const newFilePaths = getFilePathsFromContent(noteData.content);
+            const pathsToDelete = oldFilePaths.filter(path => !newFilePaths.includes(path));
+
+            if (pathsToDelete.length > 0) {
+                const { error: deleteError } = await supabase.storage.from('note-images').remove(pathsToDelete);
+                if (deleteError) {
+                    toast.warning(`Could not clean up some images: ${deleteError.message}`);
+                } else {
+                    toast.info(`${pathsToDelete.length} unused image(s) cleaned up.`);
+                }
+            }
+        }
+
         const { data, error } = await supabase
           .from('notes')
           .update(noteToSave)
@@ -90,6 +115,18 @@ export const useNotes = () => {
 
   const deleteNoteMutation = useMutation({
       mutationFn: async (noteId: string) => {
+        const noteToDelete = notes.find(note => note.id === noteId);
+        
+        if (noteToDelete?.content) {
+            const pathsToDelete = getFilePathsFromContent(noteToDelete.content);
+            if (pathsToDelete.length > 0) {
+                const { error: imageError } = await supabase.storage.from('note-images').remove(pathsToDelete);
+                if (imageError) {
+                    toast.error(`Failed to delete images: ${imageError.message}`);
+                }
+            }
+        }
+        
         const { error } = await supabase.from('notes').delete().eq('id', noteId);
         if (error) {
             toast.error(error.message);
@@ -97,23 +134,41 @@ export const useNotes = () => {
         }
       },
       onSuccess: () => {
-          toast.error("Note deleted.");
+          toast.success("Note deleted.");
           queryClient.invalidateQueries({ queryKey: ['notes'] });
       }
   });
 
   const deleteNotesByFolderIdsMutation = useMutation({
       mutationFn: async (folderIds: string[]) => {
-        const { error } = await supabase.from('notes').delete().in('folder_id', folderIds);
-        if (error) {
-            toast.error(error.message);
-            throw error;
+        const { data: notesToDelete, error: fetchError } = await supabase
+          .from('notes')
+          .select('id, content')
+          .in('folder_id', folderIds);
+        
+        if (fetchError) throw fetchError;
+        
+        if (!notesToDelete || notesToDelete.length === 0) return 0;
+
+        const allFilePaths = notesToDelete.flatMap(note => getFilePathsFromContent(note.content));
+        
+        if (allFilePaths.length > 0) {
+            const { error: deleteImagesError } = await supabase.storage.from('note-images').remove(allFilePaths);
+            if (deleteImagesError) {
+                toast.error(`Failed to delete some images: ${deleteImagesError.message}`);
+            }
         }
-        return folderIds.length;
+
+        const noteIdsToDelete = notesToDelete.map(note => note.id);
+        const { error } = await supabase.from('notes').delete().in('id', noteIdsToDelete);
+        
+        if (error) throw error;
+        
+        return notesToDelete.length;
       },
       onSuccess: (count) => {
           if (count > 0) {
-            toast.error(`${count} note${count > 1 ? 's' : ''} deleted.`);
+            toast.success(`${count} note${count > 1 ? 's' : ''} and associated images deleted.`);
           }
           queryClient.invalidateQueries({ queryKey: ['notes'] });
       }

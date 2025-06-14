@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +5,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Note } from '@/types';
 import { ImagePlus } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/components/ui/sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 interface NoteEditorProps {
   onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
@@ -18,6 +21,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (selectedNote) {
@@ -41,26 +46,64 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
     onSave({ id: selectedNote?.id, title, content, tags: tagsArray });
   };
 
-  const handleAddImage = () => {
-    const url = window.prompt('Enter the image URL:');
-    if (url && textareaRef.current) {
-      const { selectionStart, selectionEnd } = textareaRef.current;
-      const imageMarkdown = `\n![image](${url})\n`;
-      
-      const newContent = 
-        content.substring(0, selectionStart) + 
-        imageMarkdown + 
-        content.substring(selectionEnd);
-      
-      setContent(newContent);
+  const handleAddImageClick = () => {
+    fileInputRef.current?.click();
+  };
 
-      setTimeout(() => {
-        if (textareaRef.current) {
-          const newCursorPosition = selectionStart + imageMarkdown.length;
-          textareaRef.current.focus();
-          textareaRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
-        }
-      }, 0);
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user) {
+      toast.error("You must be logged in to upload an image.");
+      return;
+    }
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const fileName = `${uuidv4()}.${file.name.split('.').pop()}`;
+      const filePath = `${user.id}/${fileName}`;
+      
+      toast.info("Uploading image...");
+
+      const { error: uploadError } = await supabase.storage
+        .from('note-images')
+        .upload(filePath, file);
+      
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from('note-images')
+        .getPublicUrl(filePath);
+      
+      const imageUrl = data.publicUrl;
+
+      if (textareaRef.current) {
+        const { selectionStart, selectionEnd } = textareaRef.current;
+        const imageMarkdown = `\n![${file.name}](${imageUrl})\n`;
+        
+        const newContent = 
+          content.substring(0, selectionStart) + 
+          imageMarkdown + 
+          content.substring(selectionEnd);
+        
+        setContent(newContent);
+  
+        setTimeout(() => {
+          if (textareaRef.current) {
+            const newCursorPosition = selectionStart + imageMarkdown.length;
+            textareaRef.current.focus();
+            textareaRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+          }
+        }, 0);
+      }
+      toast.success("Image uploaded and inserted!");
+    } catch (error: any) {
+      toast.error(`Image upload failed: ${error.message}`);
+    } finally {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -92,7 +135,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
       <div className="flex-grow flex flex-col">
         <div className="flex justify-between items-center mb-1">
           <Label htmlFor="note-content" className="text-sm font-medium">Content (Markdown)</Label>
-          <Button variant="ghost" size="sm" onClick={handleAddImage} type="button">
+          <Button variant="ghost" size="sm" onClick={handleAddImageClick} type="button">
               <ImagePlus className="mr-2 h-4 w-4" />
               Add Image
           </Button>
@@ -104,6 +147,13 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
           onChange={(e) => setContent(e.target.value)}
           placeholder="Enter note content in Markdown..."
           className="mt-1 flex-grow min-h-[200px]"
+        />
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleImageUpload}
+          className="hidden"
+          accept="image/png, image/jpeg, image/gif, image/webp"
         />
       </div>
       <div>

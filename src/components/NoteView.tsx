@@ -2,6 +2,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
 import { Note } from '@/types';
 
 interface NoteViewProps {
@@ -20,7 +21,7 @@ const NoteView: React.FC<NoteViewProps> = ({ note }) => {
   return (
     <div className="p-4 border rounded-lg shadow prose dark:prose-invert max-w-none">
       <h1 className="text-3xl font-bold mb-4">{note.title}</h1>
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{note.content}</ReactMarkdown>
       <div className="mt-4 text-xs text-muted-foreground">
         <p>Created: {note.createdAt.toLocaleDateString()}</p>
         <p>Last Updated: {note.updatedAt.toLocaleDateString()}</p>

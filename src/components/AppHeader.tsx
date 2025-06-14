@@ -1,3 +1,4 @@
+
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
 import { Link, useLocation } from 'react-router-dom';
 
-export const AppHeader = ({ onExportAllNotes, showLogo = true }: { onExportAllNotes?: () => void; showLogo?: boolean }) => {
+export const AppHeader = ({ onExportAllNotes, showLogo = true, showTitleOnly = false }: { onExportAllNotes?: () => void; showLogo?: boolean, showTitleOnly?: boolean }) => {
   const { user, signOut } = useAuth();
   const location = useLocation();
 
@@ -100,7 +101,11 @@ export const AppHeader = ({ onExportAllNotes, showLogo = true }: { onExportAllNo
       </div>
       
       <div className="w-1/3 text-center">
-        {showLogo && (
+        {showTitleOnly ? (
+          <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
+            <span className="text-4xl font-bold tracking-wide">Zet</span>
+          </Link>
+        ) : showLogo && (
           <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
             <img src="/lovable-uploads/3d4105c3-8713-4c19-b696-105b36d2928e.png" alt="Zet Logo" className="h-10 w-auto" />
             <span className="text-4xl font-bold tracking-wide">Zet</span>

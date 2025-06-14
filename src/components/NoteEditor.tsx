@@ -1,10 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Note } from '@/types';
+import { ImagePlus } from 'lucide-react';
 
 interface NoteEditorProps {
   onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
@@ -16,6 +17,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (selectedNote) {
@@ -37,6 +39,29 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
     }
     const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
     onSave({ id: selectedNote?.id, title, content, tags: tagsArray });
+  };
+
+  const handleAddImage = () => {
+    const url = window.prompt('Enter the image URL:');
+    if (url && textareaRef.current) {
+      const { selectionStart, selectionEnd } = textareaRef.current;
+      const imageMarkdown = `\n![image](${url})\n`;
+      
+      const newContent = 
+        content.substring(0, selectionStart) + 
+        imageMarkdown + 
+        content.substring(selectionEnd);
+      
+      setContent(newContent);
+
+      setTimeout(() => {
+        if (textareaRef.current) {
+          const newCursorPosition = selectionStart + imageMarkdown.length;
+          textareaRef.current.focus();
+          textareaRef.current.setSelectionRange(newCursorPosition, newCursorPosition);
+        }
+      }, 0);
+    }
   };
 
   return (
@@ -65,9 +90,16 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onNewNote
         />
       </div>
       <div className="flex-grow flex flex-col">
-        <Label htmlFor="note-content" className="text-sm font-medium">Content (Markdown)</Label>
+        <div className="flex justify-between items-center mb-1">
+          <Label htmlFor="note-content" className="text-sm font-medium">Content (Markdown)</Label>
+          <Button variant="ghost" size="sm" onClick={handleAddImage} type="button">
+              <ImagePlus className="mr-2 h-4 w-4" />
+              Add Image
+          </Button>
+        </div>
         <Textarea
           id="note-content"
+          ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Enter note content in Markdown..."

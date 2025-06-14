@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { Note } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
@@ -15,6 +16,7 @@ const Index = () => {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const handleSaveNote = (noteData: Pick<Note, 'title' | 'content'> & { id?: string }) => {
     const payload = {
@@ -91,12 +93,22 @@ const Index = () => {
     return folder.parentId === currentFolderId;
   }), [folders, currentFolderId]);
 
-  const filteredNotes = useMemo(() => notes.filter(note => {
-    if (currentFolderId === null) {
-      return !note.folderId;
-    }
-    return note.folderId === currentFolderId;
-  }), [notes, currentFolderId]);
+  const filteredNotes = useMemo(() => {
+    const notesInFolder = notes.filter(note => {
+      if (currentFolderId === null) {
+        return !note.folderId;
+      }
+      return note.folderId === currentFolderId;
+    });
+    
+    return notesInFolder.sort((a, b) => {
+      if (sortOrder === 'asc') {
+        return a.title.localeCompare(b.title);
+      } else {
+        return b.title.localeCompare(a.title);
+      }
+    });
+  }, [notes, currentFolderId, sortOrder]);
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
@@ -117,6 +129,8 @@ const Index = () => {
             onSelectNote={handleSelectNote}
             onDeleteNote={handleDeleteNote}
             onDeleteFolder={handleDeleteFolder}
+            sortOrder={sortOrder}
+            onSortOrderChange={setSortOrder}
           />
         ) : (
           <DetailView 

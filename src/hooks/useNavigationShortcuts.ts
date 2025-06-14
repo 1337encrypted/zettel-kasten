@@ -20,7 +20,7 @@ export const useNavigationShortcuts = () => {
     } else if (e.key === 'Escape' || e.key === 'Backspace') {
       if (window.location.pathname !== '/') {
         e.preventDefault();
-        navigate(-1);
+        navigate('/');
       }
     }
   }, [navigate]);

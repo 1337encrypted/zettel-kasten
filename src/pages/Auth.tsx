@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/sonner';
 import { useAuth } from '@/context/AuthContext';
@@ -9,10 +9,14 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
+import { useNavigationShortcuts } from '@/hooks/useNavigationShortcuts';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 const AuthPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  useNavigationShortcuts();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -129,6 +133,13 @@ const AuthPage = () => {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
+      <div className="absolute top-4 left-4">
+        <Button asChild variant="outline" size="icon" aria-label="Go back to homepage">
+          <Link to="/">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>

@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -70,6 +71,11 @@ const UserPublicProfile = () => {
     enabled: !!userId,
   });
 
+  const readmeNote = useMemo(() => {
+    if (!data) return null;
+    return data.notes.find(n => n.title.toLowerCase() === 'readme');
+  }, [data]);
+
   const { filteredFolders, filteredNotes, currentFolder } = useMemo(() => {
     if (!data) return { filteredFolders: [], filteredNotes: [], currentFolder: null };
     const folders = data.folders.filter(f => f.parentId === currentFolderId);
@@ -118,29 +124,40 @@ const UserPublicProfile = () => {
             </div>
 
             {viewMode === 'list' ? (
-              <div className="space-y-6">
-                <FolderList
-                  folders={filteredFolders}
-                  notes={allNotes}
-                  currentFolderId={currentFolderId}
-                  onSelectFolder={handleSelectFolder}
-                  onNavigateUp={handleNavigateUp}
-                  onDeleteFolder={() => {}}
-                  onRenameFolder={() => {}}
-                  isPublicView={true}
-                />
-                <NoteList
-                  notes={filteredNotes}
-                  onSelectNote={handleSelectNote}
-                  selectedNoteIds={[]}
-                  onToggleNoteSelection={() => {}}
-                />
-                 {filteredFolders.length === 0 && filteredNotes.length === 0 && (
-                  <div className="text-center text-muted-foreground pt-8">
-                    <p className="font-mono text-lg"># Empty</p>
-                    <p>This folder is empty.</p>
+              <div>
+                {readmeNote && !currentFolderId && (
+                  <div className="mb-8">
+                    <NoteView 
+                      note={readmeNote} 
+                      allNotes={allNotes} 
+                      onSelectNote={handleSelectNote} 
+                    />
                   </div>
                 )}
+                <div className="space-y-6">
+                  <FolderList
+                    folders={filteredFolders}
+                    notes={allNotes}
+                    currentFolderId={currentFolderId}
+                    onSelectFolder={handleSelectFolder}
+                    onNavigateUp={handleNavigateUp}
+                    onDeleteFolder={() => {}}
+                    onRenameFolder={() => {}}
+                    isPublicView={true}
+                  />
+                  <NoteList
+                    notes={filteredNotes}
+                    onSelectNote={handleSelectNote}
+                    selectedNoteIds={[]}
+                    onToggleNoteSelection={() => {}}
+                  />
+                   {filteredFolders.length === 0 && filteredNotes.length === 0 && (
+                    <div className="text-center text-muted-foreground pt-8">
+                      <p className="font-mono text-lg"># Empty</p>
+                      <p>This folder is empty.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
                 <div className="flex-grow flex flex-col">
@@ -159,7 +176,7 @@ const UserPublicProfile = () => {
                 </div>
             )}
 
-            {viewMode === 'list' && !currentFolderId && allNotes.length === 0 && data.folders.length === 0 && (
+            {viewMode === 'list' && !currentFolderId && !readmeNote && allNotes.length === 0 && data.folders.length === 0 && (
               <p className="text-center text-muted-foreground mt-12">This user has no public notes yet.</p>
             )}
           </div>

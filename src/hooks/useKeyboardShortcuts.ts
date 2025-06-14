@@ -25,7 +25,7 @@ export const useKeyboardShortcuts = ({
       onNewNote();
     }
 
-    if ((e.key === 'a' || e.key === 'c') && (e.metaKey || e.ctrlKey)) {
+    if (e.key === 'a' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       onSelectAll();
     }

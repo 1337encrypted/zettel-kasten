@@ -53,6 +53,8 @@ const DEMO_NOTES: Note[] = [
 ];
 
 const Index = () => {
+  console.log("Index component rendering");
+  
   // Simulate user session (upgrade with proper Clerk auth in next step)
   const isAuthenticated = true;
   const [notes, setNotes] = useState<Note[]>(DEMO_NOTES);
@@ -62,6 +64,10 @@ const Index = () => {
   const [showEditor, setShowEditor] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const { toast } = useToast();
+
+  console.log("Notes loaded:", notes.length);
+  console.log("Selected note:", selectedNoteId);
+  console.log("Show graph:", showGraph);
 
   const visibleNotes = useMemo(() =>
       notes.filter(
@@ -160,7 +166,7 @@ const Index = () => {
         {/* Main Panel: Editor/Viewer */}
         <section className="flex-1 h-full max-w-screen-xl mx-auto transition-all duration-200" style={{ fontFamily:"Playfair Display, serif" }}>
           {showGraph ? (
-            <div className="h-full flex items-center justify-center bg-background">
+            <div className="h-full flex items-center justify-center bg-background p-4">
               <NoteGraph notes={notes} selectNote={setSelectedNoteId} selectedId={selectedNoteId} />
             </div>
           ) : showEditor && isAuthenticated && selectedNote ? (

@@ -27,6 +27,17 @@ const Index = () => {
     setViewMode('edit');
   }, []);
 
+  const handleBackToList = useCallback(() => {
+    setViewMode('list');
+    setSelectedNote(null);
+  }, []);
+
+  const handleNavigateUp = useCallback(() => {
+    if (!currentFolderId) return;
+    const currentFolder = folders.find(f => f.id === currentFolderId);
+    setCurrentFolderId(currentFolder?.parentId || null);
+  }, [currentFolderId, folders]);
+
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -38,11 +49,21 @@ const Index = () => {
         e.preventDefault();
         handleNewNote();
       }
+
+      if (e.key === 'Escape') {
+        if (viewMode !== 'list') {
+          e.preventDefault();
+          handleBackToList();
+        } else if (currentFolderId) {
+          e.preventDefault();
+          handleNavigateUp();
+        }
+      }
     };
 
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
-  }, [handleNewNote]);
+  }, [handleNewNote, viewMode, currentFolderId, handleBackToList, handleNavigateUp]);
 
   const handleSaveNote = useCallback(async (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => {
     const payload = {
@@ -96,17 +117,6 @@ const Index = () => {
       console.error("Failed to delete folder and its contents:", error);
     }
   };
-
-  const handleNavigateUp = () => {
-    if (!currentFolderId) return;
-    const currentFolder = folders.find(f => f.id === currentFolderId);
-    setCurrentFolderId(currentFolder?.parentId || null);
-  };
-
-  const handleBackToList = useCallback(() => {
-    setViewMode('list');
-    setSelectedNote(null);
-  }, []);
 
   const handleToggleView = () => {
     setViewMode(prev => (prev === 'edit' ? 'preview' : 'edit'));

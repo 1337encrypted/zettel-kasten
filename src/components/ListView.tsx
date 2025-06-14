@@ -38,7 +38,7 @@ export const ListView: React.FC<ListViewProps> = ({
   onDeleteNote,
   onDeleteFolder,
 }) => {
-  const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme.md');
+  const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme');
 
   return (
     <div className="space-y-6">
@@ -68,7 +68,7 @@ export const ListView: React.FC<ListViewProps> = ({
         <div className="mt-6 p-4 border rounded-lg prose dark:prose-invert max-w-none bg-card text-card-foreground shadow">
           <h2 className="font-bold text-lg mb-2 flex items-center gap-2 not-prose">
             <File className="w-5 h-5 inline-block" />
-            README.md
+            README
           </h2>
           <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
             {readmeNote.content}

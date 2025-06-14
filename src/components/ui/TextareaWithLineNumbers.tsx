@@ -6,19 +6,16 @@ import { cn } from "@/lib/utils";
 const TextareaWithLineNumbers = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     ({ className, value, ...props }, ref) => {
         const lineNumbersRef = React.useRef<HTMLDivElement>(null);
-        const textareaRef = React.useRef<HTMLTextAreaElement>(null);
-
-        // Combine forwarded ref with internal ref
-        React.useImperativeHandle(ref, () => textareaRef.current!);
         
         const lineCount = React.useMemo(() => {
             const count = value ? String(value).split('\n').length : 1;
             return Math.max(1, count);
         }, [value]);
 
-        const handleScroll = () => {
-            if (lineNumbersRef.current && textareaRef.current) {
-                lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+        const handleScroll = (event: React.UIEvent<HTMLTextAreaElement>) => {
+            if (lineNumbersRef.current) {
+                lineNumbersRef.current.scrollTop = event.currentTarget.scrollTop;
+                lineNumbersRef.current.scrollLeft = event.currentTarget.scrollLeft;
             }
         };
 
@@ -35,7 +32,7 @@ const TextareaWithLineNumbers = React.forwardRef<HTMLTextAreaElement, TextareaPr
                     ))}
                 </div>
                 <Textarea
-                    ref={textareaRef}
+                    ref={ref}
                     value={value}
                     onScroll={handleScroll}
                     className="flex-grow !border-0 !rounded-none !ring-0 !ring-offset-0 p-2 font-mono text-sm resize-none bg-transparent"

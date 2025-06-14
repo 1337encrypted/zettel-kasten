@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Folder, Note } from '@/types';
 import { Folder as FolderIcon, Trash2, Pencil } from 'lucide-react';
@@ -32,18 +33,6 @@ const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId
   return (
     <div className="font-mono border border-border p-4 rounded-lg bg-secondary/20">
       <ul className="space-y-1">
-        {currentFolderId && (
-          <li
-            className={`p-2 rounded-md cursor-pointer transition-colors flex justify-between items-center group hover:bg-accent hover:text-accent-foreground`}
-            onClick={onNavigateUp}
-          >
-            <span className="font-medium flex items-center">
-              <span className="text-primary mr-2">{`>`}</span>
-              ..
-            </span>
-          </li>
-        )}
-
         {folders.map((folder) => (
           <li
             key={folder.id}

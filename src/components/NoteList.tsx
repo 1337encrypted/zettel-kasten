@@ -3,6 +3,7 @@ import React from 'react';
 import { Note } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from './ui/checkbox';
+import { File } from 'lucide-react';
 
 interface NoteListProps {
   notes: Note[];
@@ -42,7 +43,7 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
                 className="font-medium flex items-center cursor-pointer"
                 onClick={() => onSelectNote(note)}
               >
-                <span className="text-primary mr-2">{`>`}</span>
+                <File className="text-primary mr-2 h-4 w-4 shrink-0" />
                 {note.title}
               </span>
             </div>

@@ -79,7 +79,10 @@ export const useAppLogic = () => {
       }
 
       if (e.key === 'Escape') {
-        if (viewMode !== 'list') {
+        if (selectedNoteIds.length > 0) {
+          e.preventDefault();
+          setSelectedNoteIds([]);
+        } else if (viewMode !== 'list') {
           e.preventDefault();
           handleBackToList();
         } else if (currentFolderId) {
@@ -91,7 +94,7 @@ export const useAppLogic = () => {
 
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
-  }, [handleNewNote, viewMode, currentFolderId, handleBackToList, handleNavigateUp]);
+  }, [handleNewNote, viewMode, currentFolderId, handleBackToList, handleNavigateUp, selectedNoteIds]);
 
   const handleSaveNote = useCallback(async (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => {
     const payload = {
@@ -209,10 +212,11 @@ export const useAppLogic = () => {
   }, [notes, currentFolderId, sortOrder, searchQuery, searchResults]);
 
   const handleSelectAll = () => {
-    if (selectedNoteIds.length === filteredNotes.length) {
+    const selectableNotes = filteredNotes.filter(n => n.title.toLowerCase() !== 'readme');
+    if (selectableNotes.length > 0 && selectedNoteIds.length === selectableNotes.length) {
       setSelectedNoteIds([]);
     } else {
-      setSelectedNoteIds(filteredNotes.map(n => n.id));
+      setSelectedNoteIds(selectableNotes.map(n => n.id));
     }
   };
 

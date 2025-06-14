@@ -43,18 +43,6 @@ export const AppHeader = ({
   const { user, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [cheatSheetOpenState, setCheatSheetOpenState] = useState(cheatSheetOpen);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === '/' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setCheatSheetOpenState(p => !p);
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   const handleDeleteAccount = async () => {
     try {
@@ -159,7 +147,7 @@ export const AppHeader = ({
       <div className="w-1/3 flex justify-end">
         <ThemeToggle />
       </div>
-      {onCheatSheetOpenChange && <ShortcutCheatSheet open={!!cheatSheetOpenState} onOpenChange={onCheatSheetOpenChange} />}
+      {onCheatSheetOpenChange && <ShortcutCheatSheet open={!!cheatSheetOpen} onOpenChange={onCheatSheetOpenChange} />}
     </header>
   );
 };

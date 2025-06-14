@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppLogic } from '@/hooks/useAppLogic';
 
@@ -19,6 +20,8 @@ const Index = () => {
     searchQuery,
     commandMenuOpen,
     setCommandMenuOpen,
+    cheatSheetOpen,
+    setCheatSheetOpen,
     selectedNoteIds,
     handleNewNote,
     handleSaveNote,
@@ -40,6 +43,7 @@ const Index = () => {
     handleRenameFolder,
     handleSelectAll,
     handleExportAllNotes,
+    handleOpenShortcuts,
   } = useAppLogic();
 
   return (
@@ -48,6 +52,8 @@ const Index = () => {
         onExportAllNotes={handleExportAllNotes}
         viewMode={viewMode}
         onBackToList={handleBackToList}
+        cheatSheetOpen={cheatSheetOpen}
+        onCheatSheetOpenChange={setCheatSheetOpen}
       />
 
       <main className="flex-grow flex flex-col">
@@ -100,9 +106,11 @@ const Index = () => {
         onCreateFolder={handleCreateFolder}
         onSelectFolder={handleSelectFolderFromCommandMenu}
         onSelectAll={handleSelectAll}
+        onOpenShortcuts={handleOpenShortcuts}
       />
     </div>
   );
 };
 
 export default Index;
+

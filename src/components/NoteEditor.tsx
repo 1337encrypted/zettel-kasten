@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,7 +8,7 @@ import { Note } from '@/types';
 import { ImagePlus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
 interface NoteEditorProps {
@@ -43,15 +43,27 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
     setTags('');
   };
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (title.trim() === '' || content.trim() === '') {
-      // Ideally, show a toast message here
-      console.warn('Title and content cannot be empty');
+      toast.warning('Title and content cannot be empty');
       return;
     }
     const tagsArray = tags.split(',').map(t => t.trim()).filter(Boolean);
     onSave({ id: selectedNote?.id, title, content, tags: tagsArray });
-  };
+  }, [title, content, tags, onSave, selectedNote]);
+  
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, [handleSave]);
+
 
   const handleAddImageClick = () => {
     fileInputRef.current?.click();

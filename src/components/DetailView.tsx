@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
 import NoteView from '@/components/NoteView';
@@ -28,6 +28,18 @@ export const DetailView: React.FC<DetailViewProps> = ({
   allNotes,
   onSelectNote,
 }) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onBackToList();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onBackToList]);
+
   const handleCopyId = () => {
     if (selectedNote) {
       navigator.clipboard.writeText(selectedNote.id);

@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Note } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
 import { useFolders } from '@/hooks/useFolders';
@@ -10,6 +9,7 @@ import { AppFooter } from '@/components/AppFooter';
 import { ListView } from '@/components/ListView';
 import { DetailView } from '@/components/DetailView';
 import { Toaster } from '@/components/ui/sonner';
+import { CommandMenu } from '@/components/CommandMenu';
 
 const Index = () => {
   const { notes, saveNote, deleteNote, deleteNotesByFolderIds } = useNotes();
@@ -20,8 +20,31 @@ const Index = () => {
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [searchQuery, setSearchQuery] = useState('');
+  const [commandMenuOpen, setCommandMenuOpen] = useState(false);
 
-  const handleSaveNote = async (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => {
+  const handleNewNote = useCallback(() => {
+    setSelectedNote(null);
+    setViewMode('edit');
+  }, []);
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setCommandMenuOpen((open) => !open);
+      }
+      
+      if (e.key === 'n' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        handleNewNote();
+      }
+    };
+
+    document.addEventListener('keydown', down);
+    return () => document.removeEventListener('keydown', down);
+  }, [handleNewNote]);
+
+  const handleSaveNote = useCallback(async (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => {
     const payload = {
       ...noteData,
       ...(!noteData.id && { folderId: currentFolderId }),
@@ -34,18 +57,13 @@ const Index = () => {
       // The toast is already shown in useNotes hook
       console.error("Failed to save note:", error);
     }
-  };
+  }, [currentFolderId, saveNote]);
 
   const handleSelectNote = (note: Note) => {
     setSelectedNote(note);
     setViewMode('preview');
   };
 
-  const handleNewNote = () => {
-    setSelectedNote(null);
-    setViewMode('edit');
-  };
-  
   const handleDeleteNote = (noteId: string) => {
     deleteNote(noteId);
     if (selectedNote && selectedNote.id === noteId) {
@@ -54,12 +72,12 @@ const Index = () => {
     }
   };
 
-  const handleCreateFolder = () => {
+  const handleCreateFolder = useCallback(() => {
     const folderName = prompt("Enter folder name:");
     if (folderName && folderName.trim()) {
       createFolder(folderName.trim(), currentFolderId);
     }
-  };
+  }, [createFolder, currentFolderId]);
   
   const handleDeleteFolder = async (folderId: string) => {
     const folderToDelete = folders.find(f => f.id === folderId);
@@ -85,13 +103,20 @@ const Index = () => {
     setCurrentFolderId(currentFolder?.parentId || null);
   };
 
-  const handleBackToList = () => {
+  const handleBackToList = useCallback(() => {
     setViewMode('list');
     setSelectedNote(null);
-  };
+  }, []);
 
   const handleToggleView = () => {
     setViewMode(prev => (prev === 'edit' ? 'preview' : 'edit'));
+  };
+
+  const handleSelectFolderFromCommandMenu = (folderId: string) => {
+    setCurrentFolderId(folderId);
+    setViewMode('list');
+    setSelectedNote(null);
+    setSearchQuery('');
   };
 
   const fuse = useMemo(() => new Fuse(notes, {
@@ -184,6 +209,16 @@ const Index = () => {
       
       <AppFooter />
       <Toaster />
+      <CommandMenu
+        open={commandMenuOpen}
+        onOpenChange={setCommandMenuOpen}
+        notes={notes}
+        folders={folders}
+        onSelectNote={handleSelectNote}
+        onNewNote={handleNewNote}
+        onCreateFolder={handleCreateFolder}
+        onSelectFolder={handleSelectFolderFromCommandMenu}
+      />
     </div>
   );
 };

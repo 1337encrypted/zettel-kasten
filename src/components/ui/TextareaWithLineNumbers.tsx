@@ -31,14 +31,16 @@ const TextareaWithLineNumbers = React.forwardRef<HTMLTextAreaElement, TextareaPr
                         <div key={lineNumber}>{lineNumber}</div>
                     ))}
                 </div>
-                <Textarea
-                    ref={ref}
-                    value={value}
-                    onScroll={handleScroll}
-                    className="flex-grow !border-0 !rounded-none !ring-0 !ring-offset-0 p-2 font-mono text-sm resize-none bg-transparent"
-                    style={{ lineHeight: '1.5rem' }}
-                    {...props}
-                />
+                <div className="flex-grow relative">
+                    <Textarea
+                        ref={ref}
+                        value={value}
+                        onScroll={handleScroll}
+                        className="absolute inset-0 w-full h-full !border-0 !rounded-none !ring-0 !ring-offset-0 p-2 font-mono text-sm resize-none bg-transparent"
+                        style={{ lineHeight: '1.5rem' }}
+                        {...props}
+                    />
+                </div>
             </div>
         );
     }

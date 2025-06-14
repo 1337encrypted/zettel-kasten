@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Folder } from '@/types';
 import { toast } from "@/components/ui/sonner";
@@ -84,7 +85,7 @@ export const useFolders = () => {
             throw new Error(error.message);
         }
 
-        toast.error(`Folder "${folderToDelete.name}" and its sub-folders deleted.`);
+        toast.success(`Folder "${folderToDelete.name}" and its sub-folders deleted.`);
         return idsToDelete;
     },
     onSuccess: (_deletedIds, _folderId, _context) => {

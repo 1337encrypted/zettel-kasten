@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Note } from '@/types';
 import { toast } from "@/components/ui/sonner";
@@ -6,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 const fromNoteDb = (dbNote: any): Note => ({
     id: dbNote.id,
     title: dbNote.title,
-    content: dbNote.content,
+    content: dbNote.content || '',
     createdAt: new Date(dbNote.created_at),
     updatedAt: new Date(dbNote.updated_at),
     folderId: dbNote.folder_id,
@@ -51,6 +52,7 @@ export const useNotes = () => {
           .single();
 
         if (error) { throw error; }
+        if (!data) throw new Error("Note not found after update.");
         toast.success(`Note "${data.title}" updated!`);
         return fromNoteDb(data);
       } else {
@@ -61,6 +63,7 @@ export const useNotes = () => {
           .single();
         
         if (error) { throw error; }
+        if (!data) throw new Error("Could not create note.");
         toast.success(`Note "${data.title}" created!`);
         return fromNoteDb(data);
       }

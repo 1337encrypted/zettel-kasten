@@ -67,7 +67,7 @@ export const ListView: React.FC<ListViewProps> = ({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
                 type="text"
-                placeholder={isMobile ? "Search" : "Search notes by title or content..."}
+                placeholder={isMobile ? "Search" : "Search by title, content, tags, or ID..."}
                 value={searchQuery}
                 onChange={(e) => onSearchQueryChange(e.target.value)}
                 className="pl-10 w-full"

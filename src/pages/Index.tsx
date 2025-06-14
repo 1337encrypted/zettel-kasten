@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import NoteEditor from '@/components/NoteEditor';
@@ -28,7 +29,7 @@ const Index = () => {
   });
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
-  const [selectedFolderId, setSelectedFolderId] = useState<string | null | 'unassigned'>(null);
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
 
   useEffect(() => {
     localStorage.setItem('zettelkasten-notes', JSON.stringify(notes));
@@ -62,7 +63,7 @@ const Index = () => {
         content: noteData.content,
         createdAt: new Date(),
         updatedAt: new Date(),
-        folderId: selectedFolderId && selectedFolderId !== 'unassigned' ? selectedFolderId : undefined,
+        folderId: currentFolderId || undefined,
       };
       setNotes([newNote, ...notes]);
       setSelectedNote(newNote);
@@ -96,10 +97,17 @@ const Index = () => {
         id: uuidv4(),
         name: folderName.trim(),
         createdAt: new Date(),
+        parentId: currentFolderId,
       };
       setFolders([newFolder, ...folders]);
       toast.success(`Folder "${newFolder.name}" created!`);
     }
+  };
+
+  const handleNavigateUp = () => {
+    if (!currentFolderId) return;
+    const currentFolder = folders.find(f => f.id === currentFolderId);
+    setCurrentFolderId(currentFolder?.parentId || null);
   };
 
   const handleBackToList = () => {
@@ -110,14 +118,18 @@ const Index = () => {
     setViewMode(prev => (prev === 'edit' ? 'preview' : 'edit'));
   };
 
+  const filteredFolders = folders.filter(folder => {
+    if (currentFolderId === null) {
+      return !folder.parentId;
+    }
+    return folder.parentId === currentFolderId;
+  });
+
   const filteredNotes = notes.filter(note => {
-    if (selectedFolderId === 'unassigned') {
+    if (currentFolderId === null) {
       return !note.folderId;
     }
-    if (selectedFolderId) {
-      return note.folderId === selectedFolderId;
-    }
-    return true; // if selectedFolderId is null, show all notes
+    return note.folderId === currentFolderId;
   });
 
   return (
@@ -143,10 +155,11 @@ const Index = () => {
               </Button>
             </div>
             <FolderList
-              folders={folders}
+              folders={filteredFolders}
               notes={notes}
-              onSelectFolder={setSelectedFolderId}
-              selectedFolderId={selectedFolderId}
+              onSelectFolder={setCurrentFolderId}
+              currentFolderId={currentFolderId}
+              onNavigateUp={handleNavigateUp}
             />
             <NoteList 
               notes={filteredNotes} 

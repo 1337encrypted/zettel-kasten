@@ -6,52 +6,36 @@ import { Folder as FolderIcon } from 'lucide-react';
 interface FolderListProps {
   folders: Folder[];
   notes: Note[];
-  selectedFolderId: string | null | 'unassigned';
-  onSelectFolder: (folderId: string | null | 'unassigned') => void;
+  currentFolderId: string | null;
+  onSelectFolder: (folderId: string) => void;
+  onNavigateUp: () => void;
 }
 
-const FolderList: React.FC<FolderListProps> = ({ folders, notes, selectedFolderId, onSelectFolder }) => {
+const FolderList: React.FC<FolderListProps> = ({ folders, notes, currentFolderId, onSelectFolder, onNavigateUp }) => {
   const notesInFolderCount = (folderId: string) => {
     return notes.filter(note => note.folderId === folderId).length;
   }
-  
-  const unassignedNotesCount = notes.filter(note => !note.folderId).length;
 
   return (
     <div className="font-mono border border-border p-4 rounded-lg bg-secondary/20">
       <h2 className="text-xl font-semibold mb-4 text-primary">~/</h2>
       <ul className="space-y-1">
-        <li
-            className={`p-2 rounded-md cursor-pointer transition-colors flex justify-between items-center group ${
-              selectedFolderId === null ? 'bg-primary/20' : 'hover:bg-accent hover:text-accent-foreground'
-            }`}
-            onClick={() => onSelectFolder(null)}
-        >
+        {currentFolderId && (
+          <li
+            className={`p-2 rounded-md cursor-pointer transition-colors flex justify-between items-center group hover:bg-accent hover:text-accent-foreground`}
+            onClick={onNavigateUp}
+          >
             <span className="font-medium flex items-center">
-                <span className="text-primary mr-2">{`>`}</span>
-                All Notes
+              <span className="text-primary mr-2">{`>`}</span>
+              ..
             </span>
-            <span className="text-sm text-muted-foreground">{notes.length}</span>
-        </li>
-        <li
-            className={`p-2 rounded-md cursor-pointer transition-colors flex justify-between items-center group ${
-              selectedFolderId === 'unassigned' ? 'bg-primary/20' : 'hover:bg-accent hover:text-accent-foreground'
-            }`}
-            onClick={() => onSelectFolder('unassigned')}
-        >
-            <span className="font-medium flex items-center">
-                <span className="text-primary mr-2">{`>`}</span>
-                Unassigned
-            </span>
-            <span className="text-sm text-muted-foreground">{unassignedNotesCount}</span>
-        </li>
+          </li>
+        )}
 
         {folders.map((folder) => (
           <li
             key={folder.id}
-            className={`p-2 rounded-md cursor-pointer transition-colors flex justify-between items-center group ${
-              folder.id === selectedFolderId ? 'bg-primary/20' : 'hover:bg-accent hover:text-accent-foreground'
-            }`}
+            className={`p-2 rounded-md cursor-pointer transition-colors flex justify-between items-center group hover:bg-accent hover:text-accent-foreground`}
             onClick={() => onSelectFolder(folder.id)}
           >
             <span className="font-medium flex items-center">

@@ -12,7 +12,7 @@ interface NoteListProps {
 
 const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId, onDeleteNote }) => {
   if (notes.length === 0) {
-    return <p className="text-muted-foreground font-mono">C:\&gt; No notes yet. Create one!</p>;
+    return <p className="text-muted-foreground font-mono">~/notes$ No notes yet. Create one!</p>;
   }
 
   return (

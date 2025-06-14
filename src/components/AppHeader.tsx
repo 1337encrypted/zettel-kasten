@@ -1,7 +1,9 @@
+
+import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Trash2, Archive, ArrowLeft } from 'lucide-react';
+import { LogOut, Trash2, Archive, ArrowLeft, User, Keyboard } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +26,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { ShortcutCheatSheet } from './ShortcutCheatSheet';
 
 export const AppHeader = ({
   onExportAllNotes,
@@ -37,6 +40,18 @@ export const AppHeader = ({
   const { user, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [cheatSheetOpen, setCheatSheetOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setCheatSheetOpen(p => !p);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleDeleteAccount = async () => {
     try {
@@ -73,10 +88,21 @@ export const AppHeader = ({
                 <DropdownMenuContent align="start">
                   <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to={`/u/${user.id}`}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>My Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setCheatSheetOpen(true)} className="cursor-pointer">
+                    <Keyboard className="mr-2 h-4 w-4" />
+                    <span>Keyboard Shortcuts</span>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={onExportAllNotes} className="cursor-pointer" disabled={!onExportAllNotes}>
                     <Archive className="mr-2 h-4 w-4" />
                     <span>Export All Notes</span>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut} className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Logout</span>
@@ -130,6 +156,7 @@ export const AppHeader = ({
       <div className="w-1/3 flex justify-end">
         <ThemeToggle />
       </div>
+      <ShortcutCheatSheet open={cheatSheetOpen} onOpenChange={setCheatSheetOpen} />
     </header>
   );
 };

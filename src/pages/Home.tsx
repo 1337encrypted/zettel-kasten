@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { AppHeader } from '@/components/AppHeader';
+import { HomeHeader } from '@/components/HomeHeader';
 import { AppFooter } from '@/components/AppFooter';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -46,8 +47,8 @@ const Home = () => {
   );
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
-      <AppHeader />
+    <div className="min-h-screen w-full flex flex-col bg-background" style={{ fontFamily: "Inter, sans-serif" }}>
+      <HomeHeader />
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8 max-w-lg mx-auto">
           <Input 

@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useMemo } from 'react';
 import { Note, Folder } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
@@ -14,7 +13,7 @@ import { toast } from '@/components/ui/sonner';
 
 export const useAppLogic = () => {
   const { notes, saveNote, deleteNote, deleteNotesByFolderIds, deleteMultipleNotes } = useNotes();
-  const { folders, createFolder, deleteFolderAndDescendants, renameFolder, createFolderAsync } = useFolders();
+  const { folders, createFolder, deleteFolderAndDescendants, renameFolder } = useFolders();
 
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
@@ -112,37 +111,6 @@ export const useAppLogic = () => {
         toast.error("An error occurred while exporting notes.");
       });
   }, [notes, folders]);
-  
-  const handleSeedData = useCallback(async () => {
-    if (!createFolderAsync) {
-        toast.error("Folder creation function is not available.");
-        return;
-    }
-    try {
-      toast.info("Creating some sample data for you...");
-
-      // Folder: "Work"
-      const workFolder = await createFolderAsync({ folderName: 'Work', parentId: null });
-      await saveNote({ title: 'Meeting Notes', content: '### Q2 Planning Meeting\n\n- Discuss budget\n- Finalize roadmap', tags: ['work', 'meeting'], folderId: workFolder.id });
-      await saveNote({ title: 'Project Ideas', content: '* Idea 1: New feature for the app\n* Idea 2: Marketing campaign', tags: ['work', 'project'], folderId: workFolder.id });
-
-      // Folder: "Personal"
-      const personalFolder = await createFolderAsync({ folderName: 'Personal', parentId: null });
-      await saveNote({ title: 'To-do list', content: '- Buy groceries\n- Go to the gym\n- Read a book', tags: ['todo', 'personal'], folderId: personalFolder.id });
-
-      // Sub-folder in "Personal"
-      const recipesFolder = await createFolderAsync({ folderName: 'Recipes', parentId: personalFolder.id });
-      await saveNote({ title: 'Pasta Carbonara', content: 'Ingredients: spaghetti, eggs, pecorino cheese, guanciale, black pepper.', tags: ['food', 'recipe'], folderId: recipesFolder.id });
-      
-      // Note in root
-      await saveNote({ title: 'Random thought', content: 'What if we could travel faster than light?', tags: ['thoughts'] });
-
-      toast.success("Sample data created successfully!");
-    } catch (error) {
-      console.error("Failed to seed data:", error);
-      toast.error("An error occurred while creating sample data.");
-    }
-  }, [createFolderAsync, saveNote]);
 
   const handleBackToList = useCallback(() => {
     setViewMode('list');
@@ -226,6 +194,5 @@ export const useAppLogic = () => {
     handleSelectAll,
     handleExportAllNotes,
     handleOpenShortcuts,
-    handleSeedData,
   };
 };

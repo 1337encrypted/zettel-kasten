@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
@@ -9,7 +10,7 @@ import { toast } from 'sonner';
 interface DetailViewProps {
   viewMode: 'edit' | 'preview';
   selectedNote: Note | null;
-  onSave: (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
+  onSave: (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string, isPublic?: boolean }) => void;
   onBackToList: () => void;
   onToggleView: () => void;
   onDelete: (noteId: string) => void;

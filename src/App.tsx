@@ -28,7 +28,7 @@ const App = () => (
           <AuthProvider>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/u/:userId" element={<UserPublicProfile />} />
+              <Route path="/u/:userId/*" element={<UserPublicProfile />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/confirm-email" element={<ConfirmEmailPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />

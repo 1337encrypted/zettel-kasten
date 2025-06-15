@@ -10,7 +10,10 @@ const fromFolderDb = (dbFolder: any): Folder => ({
   name: dbFolder.name,
   createdAt: new Date(dbFolder.created_at),
   parentId: dbFolder.parent_id,
-});
+  // Additions for structural compatibility
+  isPublic: dbFolder.is_public,
+  slug: dbFolder.slug,
+} as Folder);
 
 export const useFolders = () => {
   const queryClient = useQueryClient();

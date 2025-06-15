@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Note, Folder } from '@/types';
+import { Note, Folder, Profile } from '@/types';
 
 const fetchUserProfileData = async (userId: string) => {
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id, username, avatar_url, updated_at')
+    .select('id, username, avatar_url, updated_at, is_public')
     .eq('id', userId)
     .single();
 
@@ -20,15 +20,17 @@ const fetchUserProfileData = async (userId: string) => {
 
   if (notesError) throw notesError;
 
-  const notes: Note[] = (notesData || []).map(note => ({
+  const notes: Note[] = (notesData || []).map((note: any) => ({
     id: note.id,
     title: note.title,
     content: note.content ?? '',
     createdAt: new Date(note.created_at),
     updatedAt: new Date(note.updated_at),
     folderId: note.folder_id ?? undefined,
-    tags: note.tags ?? undefined,
-  }));
+    tags: note.tags ?? [],
+    isPublic: note.is_public,
+    slug: note.slug,
+  } as Note));
 
   const { data: foldersData, error: foldersError } = await supabase
     .from('folders')
@@ -37,12 +39,14 @@ const fetchUserProfileData = async (userId: string) => {
 
   if (foldersError) throw foldersError;
 
-  const folders: Folder[] = (foldersData || []).map(folder => ({
+  const folders: Folder[] = (foldersData || []).map((folder: any) => ({
     id: folder.id,
     name: folder.name,
     createdAt: new Date(folder.created_at),
     parentId: folder.parent_id,
-  }));
+    isPublic: folder.is_public,
+    slug: folder.slug,
+  } as Folder));
 
   return { profile, notes, folders };
 };

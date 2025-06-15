@@ -34,22 +34,28 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_public: boolean
           name: string
           parent_id: string | null
+          slug: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          is_public?: boolean
           name: string
           parent_id?: string | null
+          slug?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          is_public?: boolean
           name?: string
           parent_id?: string | null
+          slug?: string | null
           user_id?: string
         }
         Relationships: [
@@ -68,6 +74,8 @@ export type Database = {
           created_at: string
           folder_id: string | null
           id: string
+          is_public: boolean
+          slug: string | null
           tags: string[] | null
           title: string
           updated_at: string
@@ -78,6 +86,8 @@ export type Database = {
           created_at?: string
           folder_id?: string | null
           id?: string
+          is_public?: boolean
+          slug?: string | null
           tags?: string[] | null
           title: string
           updated_at?: string
@@ -88,6 +98,8 @@ export type Database = {
           created_at?: string
           folder_id?: string | null
           id?: string
+          is_public?: boolean
+          slug?: string | null
           tags?: string[] | null
           title?: string
           updated_at?: string
@@ -109,6 +121,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_public: boolean
           updated_at: string | null
           username: string | null
           website: string | null
@@ -118,6 +131,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          is_public?: boolean
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -127,6 +141,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_public?: boolean
           updated_at?: string | null
           username?: string | null
           website?: string | null
@@ -161,6 +176,14 @@ export type Database = {
     Functions: {
       is_admin: {
         Args: { p_user_id: string }
+        Returns: boolean
+      }
+      is_folder_public: {
+        Args: { p_folder_id: string }
+        Returns: boolean
+      }
+      is_note_public: {
+        Args: { p_note_id: string }
         Returns: boolean
       }
     }

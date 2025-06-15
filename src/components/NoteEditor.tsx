@@ -6,9 +6,12 @@ import { Label } from '@/components/ui/label';
 import { Note } from '@/types';
 import { ImagePlus } from 'lucide-react';
 import { useNoteEditor } from '@/hooks/useNoteEditor';
+import { Switch } from './ui/switch';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 interface NoteEditorProps {
-  onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
+  onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string, isPublic?: boolean }) => void;
   selectedNote: Note | null;
   onDelete: (noteId: string) => void;
 }
@@ -24,10 +27,42 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
     textareaRef,
     fileInputRef,
     handleClear,
-    handleSave,
     handleAddImageClick,
     handleImageUpload,
-  } = useNoteEditor({ onSave, selectedNote });
+  } = useNoteEditor({ onSave: () => {}, selectedNote });
+
+  const { user } = useAuth();
+  const [isPublic, setIsPublic] = React.useState(false);
+
+  React.useEffect(() => {
+    if (selectedNote) {
+      setIsPublic((selectedNote as any).isPublic || false);
+    } else {
+      setIsPublic(false);
+    }
+  }, [selectedNote]);
+
+  const handleSave = () => {
+    if (!title.trim()) {
+      toast.error('Title is required.');
+      return;
+    }
+    const tagArray = tags.split(',').map(tag => tag.trim()).filter(Boolean);
+    onSave({
+      id: selectedNote?.id,
+      title,
+      content,
+      tags: tagArray,
+      isPublic,
+    });
+  };
+  
+  const publicLink = React.useMemo(() => {
+    if (isPublic && selectedNote && (selectedNote as any).slug && user) {
+        return `${window.location.origin}/u/${user.id}/${(selectedNote as any).slug}`;
+    }
+    return null;
+  }, [isPublic, selectedNote, user]);
 
   return (
     <div className="space-y-4 p-4 border rounded-lg shadow h-full flex flex-col">
@@ -78,6 +113,18 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
           accept="image/png, image/jpeg, image/gif, image/webp"
         />
       </div>
+      <div className="flex items-center space-x-2">
+        <Switch id="is-public" checked={isPublic} onCheckedChange={setIsPublic} />
+        <Label htmlFor="is-public">Make this note public</Label>
+      </div>
+      {publicLink && (
+        <div className="text-sm text-muted-foreground p-2 bg-secondary rounded-md break-all">
+          <Label className="font-semibold">Public link:</Label>
+          <a href={publicLink} target="_blank" rel="noopener noreferrer" className="text-primary underline ml-2">
+            {publicLink}
+          </a>
+        </div>
+      )}
       <div>
         <Button onClick={handleSave} className="w-full sm:w-auto">
           {selectedNote ? 'Save Changes' : 'Create Note'}

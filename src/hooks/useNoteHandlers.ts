@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { Note } from '@/types';
 
-type NoteDataToSave = Pick<Note, 'title' | 'content' | 'tags'> & { id?: string };
+type NoteDataToSave = Pick<Note, 'title' | 'content' | 'tags'> & { id?: string, isPublic?: boolean };
 
 interface UseNoteHandlersProps {
     currentFolderId: string | null;

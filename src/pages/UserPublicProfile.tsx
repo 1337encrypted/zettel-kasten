@@ -1,19 +1,23 @@
-
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AppHeader } from '@/components/AppHeader';
 import { AppFooter } from '@/components/AppFooter';
 import NoteList from '@/components/NoteList';
 import FolderList from '@/components/FolderList';
 import NoteView from '@/components/NoteView';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { Note } from '@/types';
+import { Note, Folder } from '@/types';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Link2 } from 'lucide-react';
 
 const UserPublicProfile = () => {
-  const { userId } = useParams<{ userId: string }>();
+  const params = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const userId = params.userId;
+  const slug = params['*'];
 
   const [viewMode, setViewMode] = useState<'list' | 'preview'>('list');
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
@@ -31,7 +35,28 @@ const UserPublicProfile = () => {
     currentFolder,
   } = useUserProfile(userId, currentFolderId);
 
+  useEffect(() => {
+    if (slug && allNotes.length > 0) {
+      const noteBySlug = allNotes.find(n => (n as any).slug === slug);
+      if (noteBySlug) {
+        setSelectedNote(noteBySlug);
+        setViewMode('preview');
+        return;
+      }
+      
+      const folderBySlug = allFolders.find(f => (f as any).slug === slug);
+      if (folderBySlug) {
+        setCurrentFolderId((folderBySlug as any).id);
+        navigate(`/u/${userId}/${slug}`, { replace: true });
+        return;
+      }
+    }
+  }, [slug, allNotes, allFolders, navigate, userId]);
+
   const handleSelectNote = (note: Note) => {
+    if ((note as any).slug) {
+      navigate(`/u/${userId}/${(note as any).slug}`);
+    }
     setSelectedNote(note);
     setViewMode('preview');
   };
@@ -39,15 +64,33 @@ const UserPublicProfile = () => {
   const handleBackToList = () => {
     setViewMode('list');
     setSelectedNote(null);
+    if (slug) {
+      const folder = allFolders.find(f => f.id === currentFolderId);
+      if (folder && (folder as any).slug) {
+        navigate(`/u/${userId}/${(folder as any).slug}`);
+      } else {
+        navigate(`/u/${userId}`);
+      }
+    }
   };
 
-  const handleSelectFolder = (folderId: string) => {
-    setCurrentFolderId(folderId);
+  const handleSelectFolder = (folder: Folder) => {
+    if ((folder as any).slug) {
+      navigate(`/u/${userId}/${(folder as any).slug}`);
+    }
+    setCurrentFolderId(folder.id);
   };
 
   const handleNavigateUp = () => {
     if (!currentFolderId) return;
-    setCurrentFolderId(currentFolder?.parentId || null);
+    const parentId = currentFolder?.parentId || null;
+    const parentFolder = allFolders.find(f => f.id === parentId);
+    if (parentFolder && (parentFolder as any).slug) {
+        navigate(`/u/${userId}/${(parentFolder as any).slug}`);
+    } else {
+        navigate(`/u/${userId}`);
+    }
+    setCurrentFolderId(parentId);
   };
 
   const handleEscape = () => {
@@ -89,6 +132,10 @@ const UserPublicProfile = () => {
               </Avatar>
               <h1 className="text-3xl font-bold">Notes by {profile.username || 'Anonymous'}</h1>
             </div>
+            <p className="mb-4 text-muted-foreground flex items-center gap-2">
+                <Link2 className="w-4 h-4" />
+                Public profile link: <a href={window.location.href} className="text-primary hover:underline">{window.location.href}</a>
+            </p>
 
             {viewMode === 'list' ? (
               <div>
@@ -97,7 +144,10 @@ const UserPublicProfile = () => {
                     folders={filteredFolders}
                     notes={allNotes}
                     currentFolderId={currentFolderId}
-                    onSelectFolder={handleSelectFolder}
+                    onSelectFolder={(folderId) => {
+                        const folder = allFolders.find(f => f.id === folderId);
+                        if (folder) handleSelectFolder(folder);
+                    }}
                     onNavigateUp={handleNavigateUp}
                     onDeleteFolder={() => {}}
                     onRenameFolder={() => {}}

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +11,9 @@ import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigationShortcuts } from '@/hooks/useNavigationShortcuts';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useDebounce } from '@/hooks/useDebounce';
+import { NoteSearchResultCard } from '@/components/search/NoteSearchResultCard';
+import { UserSearchResultCard } from '@/components/search/UserSearchResultCard';
 
 interface UserProfile {
   id: string;
@@ -33,18 +35,52 @@ const fetchUsersWithNoteCounts = async (): Promise<UserProfile[]> => {
   return (data as any || []) as UserProfile[];
 };
 
+interface SearchResult {
+    result_type: 'user' | 'note';
+    result_id: string;
+    username: string | null;
+    user_avatar_url: string | null;
+    user_updated_at: string | null;
+    note_title: string | null;
+    note_slug: string | null;
+    note_updated_at: string | null;
+    note_tags: string[] | null;
+    note_author_id: string | null;
+    note_author_username: string | null;
+    note_author_avatar_url: string | null;
+    note_author_updated_at: string | null;
+}
+
+const searchPublicContent = async (searchTerm: string): Promise<SearchResult[]> => {
+    if (!searchTerm.trim()) return [];
+    const { data, error } = await supabase.rpc('search_public_content', { p_search_term: searchTerm });
+
+    if (error) {
+        console.error('Error searching public content:', error);
+        throw error;
+    }
+
+    return (data as any || []) as SearchResult[];
+}
+
 const Home = () => {
   useNavigationShortcuts();
   const [search, setSearch] = React.useState('');
-  const { data: users, isLoading, error } = useQuery({
+  const debouncedSearch = useDebounce(search, 300);
+
+  const { data: users, isLoading: isLoadingUsers, error: usersError } = useQuery({
     queryKey: ['usersWithNoteCounts'],
     queryFn: fetchUsersWithNoteCounts,
     retry: false,
+    enabled: !debouncedSearch,
   });
 
-  const filteredUsers = users?.filter(user => 
-    (user.username || 'anonymous').toLowerCase().includes(search.toLowerCase())
-  );
+  const { data: searchResults, isLoading: isLoadingSearch, error: searchError } = useQuery({
+      queryKey: ['publicSearch', debouncedSearch],
+      queryFn: () => searchPublicContent(debouncedSearch),
+      enabled: !!debouncedSearch,
+      retry: false,
+  });
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-background" style={{ fontFamily: "Inter, sans-serif" }}>
@@ -52,15 +88,33 @@ const Home = () => {
       <main className="flex-grow container mx-auto px-4 py-8">
         <div className="mb-8 max-w-lg mx-auto">
           <Input 
-            placeholder="Search for users..."
+            placeholder="Search for users, notes, or tags..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        {isLoading && <p className="text-center">Loading users...</p>}
-        {error && <p className="text-destructive text-center">Could not load users. Please try again later.</p>}
+        {(isLoadingUsers || isLoadingSearch) && <p className="text-center">Loading...</p>}
+        {usersError && <p className="text-destructive text-center">Could not load users. Please try again later.</p>}
+        {searchError && <p className="text-destructive text-center">Could not perform search. Please try again later.</p>}
         <div className="flex flex-col gap-4 max-w-3xl mx-auto w-full">
-          {filteredUsers?.map(user => {
+          {debouncedSearch ? (
+            <>
+              {searchResults && searchResults.length > 0 ? (
+                searchResults.map(result => {
+                    if (result.result_type === 'user') {
+                        return <UserSearchResultCard key={`user-${result.result_id}`} result={result as any} />;
+                    }
+                    if (result.result_type === 'note') {
+                        return <NoteSearchResultCard key={`note-${result.result_id}`} result={result as any} />;
+                    }
+                    return null;
+                })
+              ) : (
+                !isLoadingSearch && <p className="text-center text-muted-foreground">No results found for "{debouncedSearch}".</p>
+              )}
+            </>
+          ) : (
+            users?.map(user => {
             const uniqueAvatarUrl = user.avatar_url && user.updated_at ? `${user.avatar_url}?t=${new Date(user.updated_at).getTime()}` : user.avatar_url;
             return (
               <Link to={`/u/${user.id}`} key={user.id}>
@@ -91,7 +145,8 @@ const Home = () => {
                 </Card>
               </Link>
             )
-          })}
+          })
+          )}
         </div>
       </main>
       <AppFooter />

@@ -250,6 +250,24 @@ export type Database = {
         Args: { p_note_id: string }
         Returns: boolean
       }
+      search_public_content: {
+        Args: { p_search_term: string }
+        Returns: {
+          result_type: Database["public"]["Enums"]["search_result_type"]
+          result_id: string
+          username: string
+          user_avatar_url: string
+          user_updated_at: string
+          note_title: string
+          note_slug: string
+          note_updated_at: string
+          note_tags: string[]
+          note_author_id: string
+          note_author_username: string
+          note_author_avatar_url: string
+          note_author_updated_at: string
+        }[]
+      }
       set_folder_path_public: {
         Args: { p_folder_id: string }
         Returns: undefined
@@ -257,6 +275,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      search_result_type: "user" | "note"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -373,6 +392,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      search_result_type: ["user", "note"],
     },
   },
 } as const

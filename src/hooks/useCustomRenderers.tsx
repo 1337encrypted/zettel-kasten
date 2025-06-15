@@ -1,7 +1,7 @@
-
 import React, { useMemo } from 'react';
 import { Note } from '@/types';
 import { Link2 } from 'lucide-react';
+import UnresolvedNoteLink from '@/components/UnresolvedNoteLink';
 
 export const useCustomRenderers = (allNotes: Note[], onSelectNote: (note: Note) => void) => {
     const notesById = useMemo(() => {
@@ -39,11 +39,7 @@ export const useCustomRenderers = (allNotes: Note[], onSelectNote: (note: Note) 
                                     </a>
                                 );
                             } else {
-                                return (
-                                    <span key={`${i}-${j}`} className="text-muted-foreground italic">
-                                        {`[[${noteId}]]`}
-                                    </span>
-                                );
+                                return <UnresolvedNoteLink key={`${i}-${j}`} noteId={noteId} />;
                             }
                         }
                         return part;

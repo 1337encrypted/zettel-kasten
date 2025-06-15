@@ -5,7 +5,6 @@ import FolderList from '@/components/FolderList';
 import NoteList from '@/components/NoteList';
 import { ListViewHeader } from './ListViewHeader';
 import { SelectionToolbar } from './SelectionToolbar';
-import NoteView from '@/components/NoteView';
 
 interface ListViewProps {
   filteredFolders: Folder[];
@@ -28,7 +27,6 @@ interface ListViewProps {
   onToggleNoteSelection: (noteId: string) => void;
   onBulkDeleteNotes: () => void;
   onSelectAll: () => void;
-  readmeNote?: Note;
 }
 
 export const ListView: React.FC<ListViewProps> = ({
@@ -52,7 +50,6 @@ export const ListView: React.FC<ListViewProps> = ({
   onToggleNoteSelection,
   onBulkDeleteNotes,
   onSelectAll,
-  readmeNote,
 }) => {
   const isSearching = !!searchQuery.trim();
 
@@ -70,14 +67,6 @@ export const ListView: React.FC<ListViewProps> = ({
         onSortOrderChange={onSortOrderChange}
         isSearching={isSearching}
       />
-      
-      {readmeNote && (
-        <NoteView 
-          note={readmeNote}
-          allNotes={allNotes}
-          onSelectNote={onSelectNote}
-        />
-      )}
 
       <FolderList
         folders={filteredFolders}

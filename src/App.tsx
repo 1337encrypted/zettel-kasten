@@ -25,8 +25,8 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="system" storageKey="zettelkasten-ui-theme" enableSystem>
       <TooltipProvider>
         <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
+        <AuthProvider>
+          <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/u/:userId/*" element={<UserPublicProfile />} />
@@ -43,8 +43,8 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </AuthProvider>
-        </BrowserRouter>
+          </BrowserRouter>
+        </AuthProvider>
       </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>

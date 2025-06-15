@@ -1,4 +1,3 @@
-
 import { useRef } from 'react';
 import { toast } from 'sonner';
 import { useNotes } from './useNotes';
@@ -52,12 +51,12 @@ export const useFolderImporter = ({ currentFolderId }: { currentFolderId: string
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { saveNote } = useNotes();
-  const { folders, createFolder } = useFolders();
+  const { folders, createFolderAsync } = useFolders();
   const importFolderInputRef = useRef<HTMLInputElement>(null);
 
   const handleFolderImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files || !user || !createFolder) {
+    if (!files || !user || !createFolderAsync) {
       toast.error('Could not prepare for folder import. Please try again.');
       return;
     }
@@ -97,7 +96,7 @@ export const useFolderImporter = ({ currentFolderId }: { currentFolderId: string
         folderPathToIdMap.set(path, existingFolder.id);
       } else {
         try {
-          const newFolder = await createFolder.mutateAsync({ name: folderName, parentId: parentId ?? null });
+          const newFolder = await createFolderAsync({ folderName, parentId: parentId ?? null });
           if (newFolder) {
             folderPathToIdMap.set(path, newFolder.id);
             currentFolders.push(newFolder);

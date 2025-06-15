@@ -160,6 +160,7 @@ export const useFolders = () => {
     folders,
     isLoading,
     createFolder: (folderName: string, parentId: string | null) => createFolderMutation.mutate({ folderName, parentId }),
+    createFolderAsync: createFolderMutation.mutateAsync,
     renameFolder: (folderId: string, newName: string) => renameFolderMutation.mutate({ folderId, newName }),
     deleteFolderAndDescendants: deleteFolderMutation.mutateAsync,
   };

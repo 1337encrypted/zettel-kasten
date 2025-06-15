@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -17,14 +16,9 @@ interface NoteViewProps {
 }
 
 const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => {
-  const notesByTitle = useMemo(() => {
+  const notesById = useMemo(() => {
     return allNotes.reduce((acc, note) => {
-        if (note.title) {
-            const normalizedTitle = note.title.trim().toLowerCase();
-            if (!acc[normalizedTitle]) { // Take the first one if there are duplicates
-                acc[normalizedTitle] = note;
-            }
-        }
+        acc[note.id] = note;
         return acc;
     }, {} as Record<string, Note>);
   }, [allNotes]);
@@ -47,9 +41,8 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
           return parts.map((part, j) => {
             const match = /\[\[(.+?)\]\]/.exec(part);
             if (match) {
-              const noteTitle = match[1];
-              const normalizedTitle = noteTitle.trim().toLowerCase();
-              const linkedNote = notesByTitle[normalizedTitle];
+              const noteId = match[1];
+              const linkedNote = notesById[noteId];
               if (linkedNote) {
                 return (
                   <a
@@ -68,7 +61,7 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
               } else {
                 return (
                   <span key={`${i}-${j}`} className="text-muted-foreground italic">
-                    {`[[${noteTitle}]]`}
+                    {`[[${noteId}]]`}
                   </span>
                 );
               }

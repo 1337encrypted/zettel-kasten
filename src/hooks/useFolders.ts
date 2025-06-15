@@ -1,9 +1,24 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Folder } from '@/types';
 import { toast } from "@/components/ui/sonner";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+
+const slugify = (text: string) => {
+  if (!text) return null;
+  const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'
+  const b = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrssssssttuuuuuuuuuwxyyzzz------'
+  const p = new RegExp(a.split('').join('|'), 'g')
+
+  return text.toString().toLowerCase()
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+    .replace(/&/g, '-and-') // Replace & with 'and'
+    .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+    .replace(/\-\-+/g, '-') // Replace multiple - with single -
+    .replace(/^-+/, '') // Trim - from start of text
+    .replace(/-+$/, '') // Trim - from end of text
+}
 
 const fromFolderDb = (dbFolder: any): Folder => ({
   id: dbFolder.id,
@@ -50,9 +65,11 @@ export const useFolders = () => {
         throw new Error("User not authenticated");
       }
 
+      const slug = slugify(trimmedName);
+
       const { data, error } = await supabase
         .from('folders')
-        .insert({ name: trimmedName, parent_id: parentId, user_id: user.id })
+        .insert({ name: trimmedName, parent_id: parentId, user_id: user.id, slug: slug })
         .select()
         .single();
       
@@ -81,9 +98,11 @@ export const useFolders = () => {
         throw new Error("Folder name cannot be empty.");
       }
 
+      const slug = slugify(trimmedName);
+
       const { data, error } = await supabase
         .from('folders')
-        .update({ name: trimmedName })
+        .update({ name: trimmedName, slug: slug })
         .eq('id', folderId)
         .select()
         .single();

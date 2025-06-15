@@ -36,29 +36,47 @@ const UserPublicProfile = () => {
   } = useUserProfile(userId, currentFolderId);
 
   useEffect(() => {
-    if (slug && allNotes.length > 0) {
-      const noteBySlug = allNotes.find(n => (n as any).slug === slug);
+    if (!userId || isLoading) return;
+
+    if (!slug) {
+      setCurrentFolderId(null);
+      setSelectedNote(null);
+      setViewMode('list');
+      return;
+    }
+    
+    if (allNotes.length > 0 || allFolders.length > 0) {
+      // Find note or folder by slug. Assumes slugs are unique per user.
+      const noteBySlug = allNotes.find(n => n.slug === slug);
       if (noteBySlug) {
         setSelectedNote(noteBySlug);
+        setCurrentFolderId(noteBySlug.folderId || null);
         setViewMode('preview');
         return;
       }
-      
-      const folderBySlug = allFolders.find(f => (f as any).slug === slug);
+  
+      const folderBySlug = allFolders.find(f => f.slug === slug);
       if (folderBySlug) {
-        setCurrentFolderId((folderBySlug as any).id);
-        navigate(`/u/${userId}/${slug}`, { replace: true });
+        setCurrentFolderId(folderBySlug.id);
+        setSelectedNote(null);
+        setViewMode('list');
         return;
       }
+
+      // If slug is provided but no matching content found, redirect to user root.
+      if (!isLoading) {
+        navigate(`/u/${userId}`, { replace: true });
+      }
     }
-  }, [slug, allNotes, allFolders, navigate, userId]);
+  }, [slug, userId, allNotes, allFolders, isLoading, navigate]);
 
   const handleSelectNote = (note: Note) => {
-    if ((note as any).slug) {
-      navigate(`/u/${userId}/${(note as any).slug}`);
+    if (note.slug) {
+      navigate(`/u/${userId}/${note.slug}`);
+    } else {
+      setSelectedNote(note);
+      setViewMode('preview');
     }
-    setSelectedNote(note);
-    setViewMode('preview');
   };
 
   const handleBackToList = () => {
@@ -75,10 +93,11 @@ const UserPublicProfile = () => {
   };
 
   const handleSelectFolder = (folder: Folder) => {
-    if ((folder as any).slug) {
-      navigate(`/u/${userId}/${(folder as any).slug}`);
+    if (folder.slug) {
+      navigate(`/u/${userId}/${folder.slug}`);
+    } else {
+      setCurrentFolderId(folder.id);
     }
-    setCurrentFolderId(folder.id);
   };
 
   const handleNavigateUp = () => {

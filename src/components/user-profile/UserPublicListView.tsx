@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Folder, Note } from '@/types';
 import FolderList from '@/components/FolderList';
@@ -51,10 +50,7 @@ const UserPublicListView: React.FC<UserPublicListViewProps> = ({
           onToggleNoteSelection={() => {}}
         />
         {filteredFolders.length === 0 && notesForList.length === 0 && (
-          <div className="text-center text-muted-foreground pt-8">
-            <p className="font-mono text-lg"># Empty</p>
-            <p>This folder is empty.</p>
-          </div>
+          <></>
         )}
       </div>
       {readmeNote && (

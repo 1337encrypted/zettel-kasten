@@ -1,4 +1,3 @@
-
 export interface Note {
   id: string;
   title: string;
@@ -9,6 +8,7 @@ export interface Note {
   folderId?: string;
   isPublic?: boolean;
   slug?: string;
+  userId?: string;
 }
 
 export interface Folder {

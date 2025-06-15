@@ -14,21 +14,21 @@ import { useDeleteNotesByFolder } from './notes/useDeleteNotesByFolder';
 export const useNotes = () => {
   const { user } = useAuth();
 
-  const { data: notes = [], isLoading } = useQuery({
+  const { data: notes = [], isLoading } = useQuery<Note[]>({
     queryKey: ['notes', user?.id],
-    queryFn: async (): Promise<Note[]> => {
+    queryFn: async () => {
+      if (!user) return [];
       const { data, error } = await supabase
         .from('notes')
         .select('*')
-        .eq('user_id', user!.id)
+        .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
       if (error) {
         toast.error("Failed to load notes.");
         throw new Error(error.message);
       }
-      // Manually map fields since fromNoteDb is in a read-only file and we can't update it.
-      // Using `as Note` to be structurally compatible. The new fields will be available at runtime.
+      
       return data.map((dbNote: any) => ({
         id: dbNote.id,
         title: dbNote.title,
@@ -40,7 +40,7 @@ export const useNotes = () => {
         isPublic: dbNote.is_public,
         slug: dbNote.slug,
         userId: dbNote.user_id,
-      } as Note));
+      }));
     },
     enabled: !!user,
   });

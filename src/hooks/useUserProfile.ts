@@ -1,17 +1,20 @@
-
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Note, Folder, Profile } from '@/types';
 
 const fetchUserProfileData = async (userId: string) => {
-  const { data: profile, error: profileError } = await supabase
+  const { data: profileData, error: profileError } = await supabase
     .from('profiles')
     .select('id, username, avatar_url, updated_at, is_public')
     .eq('id', userId)
     .single();
 
   if (profileError) throw profileError;
+
+  // The 'profileData' might be incorrectly typed as SelectQueryError due to potentially stale generated types.
+  // We cast it to 'unknown' then to 'Profile | null' to bypass the incorrect typing.
+  const profile = profileData as unknown as Profile | null;
 
   // Defensive check for cases where Supabase might return an error-like object in the data field.
   if (profile && typeof profile === 'object' && 'code' in profile && 'message' in profile) {

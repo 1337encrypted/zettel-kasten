@@ -1,3 +1,4 @@
+
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -35,17 +36,10 @@ export const AppHeader = ({
           isAtRoot={isAtRootOfNotes}
         />
         {user && (
-          <>
-            <UserMenu
-              onExportAllNotes={onExportAllNotes}
-              onCheatSheetOpenChange={onCheatSheetOpenChange}
-            />
-            {location.pathname !== '/dashboard' && (
-              <Button asChild>
-                <Link to="/dashboard">Dashboard</Link>
-              </Button>
-            )}
-          </>
+          <UserMenu
+            onExportAllNotes={onExportAllNotes}
+            onCheatSheetOpenChange={onCheatSheetOpenChange}
+          />
         )}
       </div>
       
@@ -63,6 +57,11 @@ export const AppHeader = ({
       
       <div className="w-1/3 flex justify-end items-center gap-2">
         <ThemeToggle />
+        {user && location.pathname !== '/dashboard' && (
+          <Button asChild>
+            <Link to="/dashboard">Dashboard</Link>
+          </Button>
+        )}
         {!user && location.pathname !== '/auth' && (
            <Button asChild>
             <Link to="/auth">Login</Link>

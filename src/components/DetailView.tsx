@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
@@ -82,15 +81,10 @@ export const DetailView: React.FC<DetailViewProps> = ({
       <div className="flex items-center justify-between mt-4 p-2 border-t sticky bottom-0 bg-background">
         <div className="flex items-center gap-2">
             {selectedNote && viewMode === 'preview' && (
-                <>
-                    <div className="flex items-center space-x-2">
-                        <Switch id="is-public-preview" checked={isPublic} onCheckedChange={handlePublicToggle} />
-                        <Label htmlFor="is-public-preview">Public</Label>
-                    </div>
-                    <Button variant="outline" size="icon" title="Copy Note ID" onClick={handleCopyId}>
-                        <Copy className="h-4 w-4" />
-                    </Button>
-                </>
+                <div className="flex items-center space-x-2">
+                    <Switch id="is-public-preview" checked={isPublic} onCheckedChange={handlePublicToggle} />
+                    <Label htmlFor="is-public-preview">Public</Label>
+                </div>
             )}
         </div>
         <div className="flex items-center gap-2 justify-end">
@@ -101,6 +95,11 @@ export const DetailView: React.FC<DetailViewProps> = ({
                         <Switch id="is-public-edit" checked={isPublic} onCheckedChange={setIsPublic} />
                         <Label htmlFor="is-public-edit">Public</Label>
                     </div>
+                )}
+                {viewMode === 'preview' && (
+                    <Button variant="outline" size="icon" title="Copy Note ID" onClick={handleCopyId}>
+                        <Copy className="h-4 w-4" />
+                    </Button>
                 )}
                 <Button onClick={onToggleView} size="icon" title={viewMode === 'edit' ? 'Preview' : 'Edit'}>
                 {viewMode === 'edit' ? <Eye/> : <Pencil/>}

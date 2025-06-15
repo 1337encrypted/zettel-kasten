@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
 import NoteView from '@/components/NoteView';
@@ -31,7 +32,21 @@ export const DetailView: React.FC<DetailViewProps> = ({
   allNotes,
   onSelectNote,
 }) => {
+  const location = useLocation();
   const [isPublic, setIsPublic] = React.useState(false);
+
+  React.useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.substring(1);
+      // Use a timeout to ensure the element is rendered before scrolling
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, [location.hash]);
 
   React.useEffect(() => {
     if (selectedNote) {

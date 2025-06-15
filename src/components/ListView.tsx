@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Folder, Note } from '@/types';
 import FolderList from '@/components/FolderList';
@@ -56,7 +55,7 @@ export const ListView: React.FC<ListViewProps> = ({
   const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme');
   const isSearching = !!searchQuery.trim();
 
-  const selectableNotes = filteredNotes.filter(n => n.title.toLowerCase() !== 'readme');
+  const selectableNotes = filteredNotes;
   const allNotesSelected = selectableNotes.length > 0 && selectedNoteIds.length === selectableNotes.length;
 
   const customRenderers = useCustomRenderers(allNotes, onSelectNote);

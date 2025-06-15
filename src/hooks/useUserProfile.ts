@@ -1,3 +1,4 @@
+
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +12,12 @@ const fetchUserProfileData = async (userId: string) => {
     .single();
 
   if (profileError) throw profileError;
+
+  // Defensive check for cases where Supabase might return an error-like object in the data field.
+  if (profile && typeof profile === 'object' && 'code' in profile && 'message' in profile) {
+    throw new Error((profile as any).message);
+  }
+  
   if (!profile) throw new Error('User profile not found or is private.');
 
   const { data: notesData, error: notesError } = await supabase

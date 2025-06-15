@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { AppHeader } from '@/components/AppHeader';
+import { HomeHeader } from '@/components/HomeHeader';
 import { AppFooter } from '@/components/AppFooter';
 import NoteView from '@/components/NoteView';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -41,10 +41,9 @@ const UserPublicProfile = () => {
   });
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8">
-      <AppHeader
-        viewMode={viewMode}
-        onBackToList={handleBackToList}
+    <div className="min-h-screen w-full flex flex-col bg-background">
+      <HomeHeader
+        onBackToList={viewMode === 'preview' ? handleBackToList : undefined}
         onNavigateUp={currentFolderId ? handleNavigateUp : undefined}
       />
       <main className="flex-grow container mx-auto px-4 py-8">

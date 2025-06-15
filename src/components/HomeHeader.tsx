@@ -5,15 +5,31 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from './ThemeToggle';
 import { DocsLink } from './DocsLink';
+import { ArrowLeft, ArrowUp } from 'lucide-react';
 
-export const HomeHeader = () => {
+interface HomeHeaderProps {
+  onBackToList?: () => void;
+  onNavigateUp?: () => void;
+}
+
+export const HomeHeader = ({ onBackToList, onNavigateUp }: HomeHeaderProps) => {
   const { user } = useAuth();
 
   return (
     <header className="w-full border-b">
       <div className="container mx-auto px-4">
         <div className="relative flex h-16 items-center">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            {onBackToList && (
+              <Button variant="ghost" size="icon" onClick={onBackToList} aria-label="Back to list">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            )}
+            {onNavigateUp && (
+              <Button variant="ghost" size="icon" onClick={onNavigateUp} aria-label="Navigate up">
+                <ArrowUp className="h-5 w-5" />
+              </Button>
+            )}
             {user && (
               <UserMenu />
             )}

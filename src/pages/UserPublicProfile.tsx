@@ -40,11 +40,14 @@ const UserPublicProfile = () => {
     onOpenShortcuts: () => {},
   });
 
+  const isAtProfileRoot = viewMode === 'list' && !currentFolderId;
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-background">
       <HomeHeader
         onBackToList={viewMode === 'preview' ? handleBackToList : undefined}
         onNavigateUp={currentFolderId ? handleNavigateUp : undefined}
+        showHomeButton={isAtProfileRoot}
       />
       <main className="flex-grow container mx-auto px-4 py-8">
         {isLoading && <p className="text-center">Loading profile...</p>}

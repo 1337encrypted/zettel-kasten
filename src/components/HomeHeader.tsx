@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from './ThemeToggle';
 import { DocsLink } from './DocsLink';
-import { ArrowLeft, ArrowUp } from 'lucide-react';
+import { ArrowLeft, ArrowUp, Home } from 'lucide-react';
 
 interface HomeHeaderProps {
   onBackToList?: () => void;
   onNavigateUp?: () => void;
+  showHomeButton?: boolean;
 }
 
-export const HomeHeader = ({ onBackToList, onNavigateUp }: HomeHeaderProps) => {
+export const HomeHeader = ({ onBackToList, onNavigateUp, showHomeButton }: HomeHeaderProps) => {
   const { user } = useAuth();
 
   return (
@@ -20,6 +21,13 @@ export const HomeHeader = ({ onBackToList, onNavigateUp }: HomeHeaderProps) => {
       <div className="container mx-auto px-4">
         <div className="relative flex h-16 items-center">
           <div className="flex items-center gap-2">
+            {showHomeButton && (
+              <Button variant="ghost" size="icon" asChild>
+                <Link to="/" aria-label="Home">
+                  <Home className="h-5 w-5" />
+                </Link>
+              </Button>
+            )}
             {onBackToList && (
               <Button variant="ghost" size="icon" onClick={onBackToList} aria-label="Back to list">
                 <ArrowLeft className="h-5 w-5" />

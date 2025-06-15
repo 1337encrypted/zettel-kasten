@@ -55,6 +55,8 @@ export type Database = {
           name: string
           parent_id: string | null
           user_id: string
+          is_public: boolean
+          slug: string | null
         }
         Insert: {
           created_at?: string
@@ -62,6 +64,8 @@ export type Database = {
           name: string
           parent_id?: string | null
           user_id: string
+          is_public?: boolean
+          slug?: string | null
         }
         Update: {
           created_at?: string
@@ -69,6 +73,8 @@ export type Database = {
           name?: string
           parent_id?: string | null
           user_id?: string
+          is_public?: boolean
+          slug?: string | null
         }
         Relationships: [
           {
@@ -90,6 +96,8 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+          is_public: boolean
+          slug: string | null
         }
         Insert: {
           content?: string | null
@@ -100,6 +108,8 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
+          is_public?: boolean
+          slug?: string | null
         }
         Update: {
           content?: string | null
@@ -110,6 +120,8 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+          is_public?: boolean
+          slug?: string | null
         }
         Relationships: [
           {
@@ -130,6 +142,7 @@ export type Database = {
           username: string | null
           website: string | null
           created_at: string
+          is_public: boolean
         }
         Insert: {
           avatar_url?: string | null
@@ -139,6 +152,7 @@ export type Database = {
           username?: string | null
           website?: string | null
           created_at?: string
+          is_public?: boolean
         }
         Update: {
           avatar_url?: string | null
@@ -148,6 +162,7 @@ export type Database = {
           username?: string | null
           website?: string | null
           created_at?: string
+          is_public?: boolean
         }
         Relationships: []
       }
@@ -185,6 +200,37 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_folders_for_user: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          is_public: boolean
+          name: string
+          parent_id: string | null
+          slug: string | null
+          user_id: string
+        }[]
+      }
+      get_public_notes_for_user: {
+        Args: {
+          p_user_id: string
+        }
+        Returns: {
+          content: string | null
+          created_at: string
+          folder_id: string | null
+          id: string
+          is_public: boolean
+          slug: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       is_admin: {
         Args: {
           p_user_id: string

@@ -1,13 +1,14 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
 import { Note } from '@/types';
 import { Badge } from '@/components/ui/badge';
-import { Tag, Link2, Copy } from 'lucide-react';
+import { Tag, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useCustomRenderers } from '@/hooks/useCustomRenderers';
 
 interface NoteViewProps {
   note: Note | null;
@@ -16,12 +17,7 @@ interface NoteViewProps {
 }
 
 const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => {
-  const notesById = useMemo(() => {
-    return allNotes.reduce((acc, note) => {
-        acc[note.id] = note;
-        return acc;
-    }, {} as Record<string, Note>);
-  }, [allNotes]);
+  const customLinkRenderer = useCustomRenderers(allNotes, onSelectNote);
 
   if (!note) {
     return (
@@ -32,48 +28,7 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
   }
 
   const customRenderers = {
-    p: (paragraph: { children?: React.ReactNode; node?: any }) => {
-      const childrenArray = React.Children.toArray(paragraph.children);
-  
-      const processedChildren = childrenArray.flatMap((child, i) => {
-        if (typeof child === 'string') {
-          const parts = child.split(/(\[\[.+?\]\])/g);
-          return parts.map((part, j) => {
-            const match = /\[\[(.+?)\]\]/.exec(part);
-            if (match) {
-              const noteId = match[1];
-              const linkedNote = notesById[noteId];
-              if (linkedNote) {
-                return (
-                  <a
-                    key={`${i}-${j}`}
-                    className="text-primary hover:underline cursor-pointer font-semibold inline-flex items-center gap-1"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onSelectNote(linkedNote);
-                    }}
-                    href="#"
-                  >
-                    <Link2 className="w-4 h-4" />
-                    {linkedNote.title}
-                  </a>
-                );
-              } else {
-                return (
-                  <span key={`${i}-${j}`} className="text-muted-foreground italic">
-                    {`[[${noteId}]]`}
-                  </span>
-                );
-              }
-            }
-            return part;
-          });
-        }
-        return child;
-      });
-  
-      return <p>{processedChildren}</p>;
-    },
+    ...customLinkRenderer,
     pre: ({ children }: { children?: React.ReactNode }) => {
       if (!children || !React.isValidElement(children)) {
         return <pre>{children}</pre>;

@@ -1,16 +1,12 @@
-import React, { useMemo } from 'react';
+
+import React from 'react';
 import { Folder, Note } from '@/types';
-import { Button } from '@/components/ui/button';
-import { FolderPlus, File, FilePlus, ArrowUpAZ, ArrowDownAZ, Search, Trash2, Link2 } from 'lucide-react';
 import FolderList from '@/components/FolderList';
 import NoteList from '@/components/NoteList';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkBreaks from 'remark-breaks';
-import rehypeRaw from 'rehype-raw';
-import { Input } from '@/components/ui/input';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Checkbox } from './ui/checkbox';
+import { ListViewHeader } from './ListViewHeader';
+import { SelectionToolbar } from './SelectionToolbar';
+import { ReadmeDisplay } from './ReadmeDisplay';
+import { useCustomRenderers } from '@/hooks/useCustomRenderers';
 
 interface ListViewProps {
   filteredFolders: Folder[];
@@ -57,99 +53,26 @@ export const ListView: React.FC<ListViewProps> = ({
   onBulkDeleteNotes,
   onSelectAll,
 }) => {
-  const isMobile = useIsMobile();
   const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme');
   const isSearching = !!searchQuery.trim();
 
   const selectableNotes = filteredNotes.filter(n => n.title.toLowerCase() !== 'readme');
-  const numSelected = selectedNoteIds.length;
-  const allNotesSelected = selectableNotes.length > 0 && numSelected === selectableNotes.length;
+  const allNotesSelected = selectableNotes.length > 0 && selectedNoteIds.length === selectableNotes.length;
 
-  const notesById = useMemo(() => {
-    return allNotes.reduce((acc, note) => {
-        acc[note.id] = note;
-        return acc;
-    }, {} as Record<string, Note>);
-  }, [allNotes]);
-
-  const customRenderers = {
-    p: (paragraph: { children?: React.ReactNode; node?: any }) => {
-      const childrenArray = React.Children.toArray(paragraph.children);
-  
-      const processedChildren = childrenArray.flatMap((child, i) => {
-        if (typeof child === 'string') {
-          const parts = child.split(/(\[\[.+?\]\])/g);
-          return parts.map((part, j) => {
-            const match = /\[\[(.+?)\]\]/.exec(part);
-            if (match) {
-              const noteId = match[1];
-              const linkedNote = notesById[noteId];
-              if (linkedNote) {
-                return (
-                  <a
-                    key={`${i}-${j}`}
-                    className="text-primary hover:underline cursor-pointer font-semibold inline-flex items-center gap-1"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onSelectNote(linkedNote);
-                    }}
-                    href="#"
-                  >
-                    <Link2 className="w-4 h-4" />
-                    {linkedNote.title}
-                  </a>
-                );
-              } else {
-                return (
-                  <span key={`${i}-${j}`} className="text-muted-foreground italic">
-                    {`[[${noteId}]]`}
-                  </span>
-                );
-              }
-            }
-            return part;
-          });
-        }
-        return child;
-      });
-  
-      return <p>{processedChildren}</p>;
-    },
-  };
+  const customRenderers = useCustomRenderers(allNotes, onSelectNote);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-            <Button onClick={onNewNote} variant="outline" size="icon" title="Create New Note">
-              <FilePlus />
-            </Button>
-            <Button onClick={onCreateFolder} variant="outline" size="icon" title="Create Folder">
-              <FolderPlus />
-            </Button>
-        </div>
-        <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-                type="text"
-                placeholder={isMobile ? "Search" : "Search by title, content, tags, or ID..."}
-                value={searchQuery}
-                onChange={(e) => onSearchQueryChange(e.target.value)}
-                className="pl-10 w-full"
-            />
-        </div>
-        <div className="flex items-center">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => onSortOrderChange(sortOrder === 'asc' ? 'desc' : 'asc')}
-              disabled={isSearching}
-              title={`Sort by title: ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}. Click to toggle.`}
-            >
-              {sortOrder === 'asc' ? <ArrowUpAZ className="h-4 w-4" /> : <ArrowDownAZ className="h-4 w-4" />}
-            </Button>
-        </div>
-      </div>
+      <ListViewHeader
+        onNewNote={onNewNote}
+        onCreateFolder={onCreateFolder}
+        searchQuery={searchQuery}
+        onSearchQueryChange={onSearchQueryChange}
+        sortOrder={sortOrder}
+        onSortOrderChange={onSortOrderChange}
+        isSearching={isSearching}
+      />
+      
       <FolderList
         folders={filteredFolders}
         notes={allNotes}
@@ -159,23 +82,17 @@ export const ListView: React.FC<ListViewProps> = ({
         onDeleteFolder={onDeleteFolder}
         onRenameFolder={onRenameFolder}
       />
+
       {selectedNoteIds.length > 0 && (
-        <div className="flex items-center justify-between p-2 px-4 border rounded-lg bg-secondary/30 font-mono">
-          <div className="flex items-center gap-4">
-            <Checkbox
-              checked={allNotesSelected}
-              onCheckedChange={onSelectAll}
-              aria-label="Select all notes"
-              disabled={selectableNotes.length === 0}
-            />
-            <span className="text-sm text-muted-foreground">{numSelected} selected</span>
-          </div>
-          <Button variant="destructive" size="sm" onClick={onBulkDeleteNotes} disabled={numSelected === 0}>
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
-        </div>
+        <SelectionToolbar
+          numSelected={selectedNoteIds.length}
+          allNotesSelected={allNotesSelected}
+          onSelectAll={onSelectAll}
+          onBulkDeleteNotes={onBulkDeleteNotes}
+          canSelectAny={selectableNotes.length > 0}
+        />
       )}
+      
       <NoteList
         notes={filteredNotes}
         onSelectNote={onSelectNote}
@@ -183,23 +100,13 @@ export const ListView: React.FC<ListViewProps> = ({
         selectedNoteIds={selectedNoteIds}
         onToggleNoteSelection={onToggleNoteSelection}
       />
+      
       {readmeNote && !isSearching && (
-        <div
-          className="mt-6 p-4 border rounded-lg prose dark:prose-invert max-w-none bg-card text-card-foreground shadow cursor-pointer hover:bg-card/95 transition-colors"
-          onClick={() => onSelectNote(readmeNote)}
-        >
-          <h2 className="font-bold text-lg mb-2 flex items-center gap-2 not-prose">
-            <File className="w-5 h-5 inline-block" />
-            README
-          </h2>
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkBreaks]}
-            rehypePlugins={[rehypeRaw]}
-            components={customRenderers}
-          >
-            {readmeNote.content}
-          </ReactMarkdown>
-        </div>
+        <ReadmeDisplay
+          readmeNote={readmeNote}
+          onSelectNote={onSelectNote}
+          customRenderers={customRenderers}
+        />
       )}
     </div>
   );

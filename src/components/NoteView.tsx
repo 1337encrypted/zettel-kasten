@@ -110,7 +110,29 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
           </Button>
         </div>
       );
-    }
+    },
+    a: (props: React.ComponentPropsWithoutRef<'a'>) => {
+      const { href, children } = props;
+
+      if (href && href.startsWith('#')) {
+        const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+          e.preventDefault();
+          const id = href.substring(1);
+          const element = document.getElementById(id);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        };
+        return <a href={href} onClick={handleClick}>{children}</a>;
+      }
+
+      // For external links, open in a new tab.
+      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+        return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
+      }
+
+      return <a {...props}>{children}</a>;
+    },
   };
 
   return (

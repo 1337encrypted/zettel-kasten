@@ -1,7 +1,8 @@
-import { useState } from 'react';
+
+import { useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Trash2, Archive, Keyboard, Camera, Shield, Users, KeyRound, BookOpen } from 'lucide-react';
+import { LogOut, Trash2, Archive, Keyboard, Camera, Shield, Users, KeyRound, BookOpen, Import } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,6 +47,7 @@ export const UserMenu = ({
   const { fileInputRef, handleAvatarClick, handleAvatarUpload, isUploading } = useAvatarHandler();
   const { isAdmin } = useIsAdmin();
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const importFileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDeleteAccount = async () => {
     try {
@@ -55,6 +57,22 @@ export const UserMenu = ({
       signOut();
     } catch (error: any) {
       toast.error(`Failed to delete account: ${error.message}`);
+    }
+  };
+
+  const handleImportClick = () => {
+    importFileInputRef.current?.click();
+  };
+
+  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      console.log('Selected files for import:', files);
+      toast.success(`${files.length} file(s) selected for import. See developer console for details.`);
+      // Reset file input value to allow selecting the same file again
+      if (importFileInputRef.current) {
+        importFileInputRef.current.value = '';
+      }
     }
   };
 
@@ -72,6 +90,13 @@ export const UserMenu = ({
           onChange={handleAvatarUpload}
           className="hidden"
           accept="image/png, image/jpeg, image/gif"
+      />
+      <input
+        type="file"
+        ref={importFileInputRef}
+        onChange={handleFileImport}
+        className="hidden"
+        multiple
       />
       <AlertDialog>
         <DropdownMenu>
@@ -101,6 +126,10 @@ export const UserMenu = ({
                     <Users className="mr-2 h-4 w-4" />
                     <span>User Management</span>
                   </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleImportClick} className="cursor-pointer">
+                  <Import className="mr-2 h-4 w-4" />
+                  <span>Import Files</span>
                 </DropdownMenuItem>
               </>
             )}

@@ -19,6 +19,12 @@ const UserPublicProfile = () => {
     handleSelectFolder,
     handleNavigateUp,
     handleEscape,
+    sortOrder,
+    setSortOrder,
+    searchQuery,
+    setSearchQuery,
+    searchedAndSortedFolders,
+    searchedAndSortedNotes,
   } = usePublicProfileLogic();
 
   const {
@@ -27,8 +33,6 @@ const UserPublicProfile = () => {
     allFolders,
     isLoading,
     error,
-    filteredFolders,
-    notesForList,
     readmeNote,
   } = userProfileQuery;
 
@@ -58,15 +62,18 @@ const UserPublicProfile = () => {
 
             {viewMode === 'list' ? (
               <UserPublicListView
-                filteredFolders={filteredFolders}
-                notesForList={notesForList}
+                filteredFolders={searchedAndSortedFolders}
+                notesForList={searchedAndSortedNotes}
                 allNotes={allNotes}
                 allFolders={allFolders}
                 currentFolderId={currentFolderId}
-                readmeNote={readmeNote}
                 onSelectFolder={handleSelectFolder}
                 onSelectNote={handleSelectNote}
                 onNavigateUp={handleNavigateUp}
+                sortOrder={sortOrder}
+                onSortOrderChange={setSortOrder}
+                searchQuery={searchQuery}
+                onSearchQueryChange={setSearchQuery}
               />
             ) : (
                 <div className="flex-grow flex flex-col">

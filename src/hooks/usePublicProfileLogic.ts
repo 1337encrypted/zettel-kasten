@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Note, Folder } from '@/types';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useSearchAndSort } from '@/hooks/useSearchAndSort';
 
 export const usePublicProfileLogic = () => {
     const params = useParams();
@@ -17,6 +18,19 @@ export const usePublicProfileLogic = () => {
   
     const userProfileQuery = useUserProfile(userId, currentFolderId);
     const { allNotes, allFolders, isLoading, currentFolder } = userProfileQuery;
+  
+    const {
+      sortOrder,
+      setSortOrder,
+      searchQuery,
+      setSearchQuery,
+      filteredFolders: searchedAndSortedFolders,
+      filteredNotes: searchedAndSortedNotes,
+    } = useSearchAndSort({
+      notes: allNotes,
+      folders: allFolders,
+      currentFolderId,
+    });
   
     useEffect(() => {
       if (!userId || isLoading) return;
@@ -62,6 +76,7 @@ export const usePublicProfileLogic = () => {
     };
   
     const handleBackToList = () => {
+      setSearchQuery('');
       setViewMode('list');
       setSelectedNote(null);
       if (slug) {
@@ -75,6 +90,7 @@ export const usePublicProfileLogic = () => {
     };
   
     const handleSelectFolder = (folder: Folder) => {
+      setSearchQuery('');
       if (folder.slug) {
         navigate(`/u/${userId}/${folder.slug}`);
       } else {
@@ -83,6 +99,7 @@ export const usePublicProfileLogic = () => {
     };
   
     const handleNavigateUp = () => {
+      setSearchQuery('');
       if (!currentFolderId) return;
       const parentId = currentFolder?.parentId || null;
       const parentFolder = allFolders.find(f => f.id === parentId);
@@ -114,5 +131,11 @@ export const usePublicProfileLogic = () => {
         handleSelectFolder,
         handleNavigateUp,
         handleEscape,
+        sortOrder,
+        setSortOrder,
+        searchQuery,
+        setSearchQuery,
+        searchedAndSortedFolders,
+        searchedAndSortedNotes,
     }
 }

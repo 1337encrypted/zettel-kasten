@@ -38,6 +38,19 @@ const updateProfileVisibility = async ({ userId, is_public }: { userId: string; 
   if (error) {
     throw new Error(error.message);
   }
+
+  if (is_public === false) {
+    const { error: foldersError } = await supabase.from('folders').update({ is_public: false }).eq('user_id', userId);
+    if (foldersError) {
+        toast.error(`Failed to make folders private: ${foldersError.message}`);
+    }
+    
+    const { error: notesError } = await supabase.from('notes').update({ is_public: false }).eq('user_id', userId);
+    if (notesError) {
+        toast.error(`Failed to make notes private: ${notesError.message}`);
+    }
+  }
+
   return data;
 };
 
@@ -63,6 +76,9 @@ export const ProfileVisibilityToggle = () => {
     },
     onSuccess: (data, variables) => {
       toast.success(`Your profile is now ${variables.is_public ? 'public' : 'private'}.`);
+      if (!variables.is_public) {
+        toast.info("All your folders and notes have been made private.");
+      }
     },
     onError: (err: Error, newProfileData, context) => {
       if (context?.previousProfile) {
@@ -72,6 +88,8 @@ export const ProfileVisibilityToggle = () => {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: ['folders', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['notes', user?.id] });
     },
   });
 

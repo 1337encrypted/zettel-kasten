@@ -66,7 +66,7 @@ export const AppHeader = ({
       </div>
       
       <div className="w-1/3 flex justify-end items-center gap-2">
-        {currentFolder && onUpdateFolder && profile && typeof isFolderUpdating !== 'undefined' && (
+        {currentFolder && onUpdateFolder && profile && profile.is_public && typeof isFolderUpdating !== 'undefined' && (
           <FolderVisibilityToggle
             folder={currentFolder}
             onUpdate={onUpdateFolder}

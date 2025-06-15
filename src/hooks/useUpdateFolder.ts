@@ -5,6 +5,15 @@ import { toast } from "sonner";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 
+const getDescendantFolderIds = (folderId: string, allFolders: Folder[]): string[] => {
+    const children = allFolders.filter(f => f.parentId === folderId);
+    let descendants = children.map(c => c.id);
+    for (const child of children) {
+        descendants = [...descendants, ...getDescendantFolderIds(child.id, allFolders)];
+    }
+    return descendants;
+};
+
 export const useUpdateFolder = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -24,9 +33,25 @@ export const useUpdateFolder = () => {
       if (error) throw error;
       if (!data) throw new Error("Folder not found after update.");
       
+      if (data.is_public === false) {
+        const allFolders: Folder[] | undefined = queryClient.getQueryData(['folders', user?.id]);
+        if (allFolders) {
+            const descendantFolderIds = getDescendantFolderIds(folderData.id, allFolders);
+            const allAffectedFolderIds = [folderData.id, ...descendantFolderIds];
+
+            if (descendantFolderIds.length > 0) {
+                const { error: foldersError } = await supabase.from('folders').update({ is_public: false }).in('id', descendantFolderIds);
+                if (foldersError) toast.warning("Failed to update subfolder visibility.");
+            }
+            
+            const { error: notesError } = await supabase.from('notes').update({ is_public: false }).in('folder_id', allAffectedFolderIds);
+            if (notesError) toast.warning("Failed to update note visibility within folder(s).");
+        }
+      }
+
       const message = data.is_public ? "Folder is now public." : "Folder is now private.";
       toast.success(message, {
-          description: "Note visibility inside this folder will update accordingly."
+          description: data.is_public ? "Notes inside can now be made public." : "All content inside this folder has been made private."
       });
 
       const anyData = data as any;

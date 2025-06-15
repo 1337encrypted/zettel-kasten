@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Note, Folder } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
 import { useFolders } from '@/hooks/useFolders';
@@ -14,12 +15,47 @@ import { toast } from '@/components/ui/sonner';
 export const useAppLogic = () => {
   const { notes, saveNote, deleteNote, deleteNotesByFolderIds, deleteMultipleNotes } = useNotes();
   const { folders, createFolder, deleteFolderAndDescendants, renameFolder } = useFolders();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
   const [cheatSheetOpen, setCheatSheetOpen] = useState(false);
+
+  useEffect(() => {
+    if (folders.length === 0 && (location.pathname !== '/dashboard' && location.pathname !== '/dashboard/')) return;
+
+    const path = location.pathname.replace(/^\/dashboard\/?/, '');
+    if (!path) {
+      if (currentFolderId !== null) setCurrentFolderId(null);
+      return;
+    }
+    
+    const slugs = path.split('/');
+    let folder: Folder | undefined;
+    let parentId: string | null = null;
+    let validPath = true;
+
+    for (const slug of slugs) {
+      if (!slug) continue;
+      folder = folders.find(f => f.slug === slug && f.parentId === parentId);
+      if (!folder) {
+        validPath = false;
+        break;
+      }
+      parentId = folder.id;
+    }
+
+    if (validPath) {
+      if (currentFolderId !== parentId) {
+        setCurrentFolderId(parentId);
+      }
+    } else if (folders.length > 0) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [location.pathname, folders, navigate, currentFolderId]);
 
   const {
     sortOrder,
@@ -43,6 +79,25 @@ export const useAppLogic = () => {
     resetSelection,
   } = useNoteSelection({ filteredNotes: selectableNotes, deleteMultipleNotes });
 
+  const getFolderPath = useCallback((folderId: string | null): string => {
+    if (!folderId) return '/dashboard';
+    
+    let path = '';
+    let currentFolderIdInPath: string | null = folderId;
+    
+    while(currentFolderIdInPath) {
+        const folder = folders.find(f => f.id === currentFolderIdInPath);
+        if (!folder) {
+            console.error("Could not find folder in path construction:", currentFolderIdInPath);
+            return '/dashboard';
+        }
+        path = `/${folder.slug}${path}`;
+        currentFolderIdInPath = folder.parentId;
+    }
+    
+    return `/dashboard${path}`;
+  }, [folders]);
+
   const {
     handleRenameFolder,
     handleSelectFolder,
@@ -52,12 +107,13 @@ export const useAppLogic = () => {
   } = useFolderHandlers({
     folders,
     currentFolderId,
-    setCurrentFolderId,
     resetSelection,
     renameFolder,
     createFolder,
     deleteFolderAndDescendants,
     deleteNotesByFolderIds,
+    getFolderPath,
+    navigate,
   });
 
   const {
@@ -153,7 +209,7 @@ export const useAppLogic = () => {
   };
 
   const handleSelectFolderFromCommandMenu = (folderId: string) => {
-    setCurrentFolderId(folderId);
+    handleSelectFolder(folderId);
     setViewMode('list');
     setSelectedNote(null);
     setSearchQuery('');

@@ -1,27 +1,30 @@
 
 import { useCallback } from 'react';
 import { Folder } from '@/types';
+import { NavigateOptions, To } from 'react-router-dom';
 
 interface UseFolderHandlersProps {
     folders: Folder[];
     currentFolderId: string | null;
-    setCurrentFolderId: (folderId: string | null) => void;
     resetSelection: () => void;
     renameFolder: (folderId: string, newName: string) => void;
     createFolder: (folderName: string, parentId: string | null) => void;
     deleteFolderAndDescendants: (folderId: string) => Promise<string[]>;
     deleteNotesByFolderIds: (folderIds: string[]) => Promise<number>;
+    getFolderPath: (folderId: string | null) => string;
+    navigate: (to: To, options?: NavigateOptions) => void;
 }
 
 export const useFolderHandlers = ({
     folders,
     currentFolderId,
-    setCurrentFolderId,
     resetSelection,
     renameFolder,
     createFolder,
     deleteFolderAndDescendants,
-    deleteNotesByFolderIds
+    deleteNotesByFolderIds,
+    getFolderPath,
+    navigate,
 }: UseFolderHandlersProps) => {
     const handleRenameFolder = (folderId: string) => {
         const folder = folders.find(f => f.id === folderId);
@@ -33,16 +36,18 @@ export const useFolderHandlers = ({
     };
 
     const handleSelectFolder = (folderId: string | null) => {
-        setCurrentFolderId(folderId);
+        const path = getFolderPath(folderId);
+        navigate(path);
         resetSelection();
     };
 
     const handleNavigateUp = useCallback(() => {
         if (!currentFolderId) return;
         const currentFolder = folders.find(f => f.id === currentFolderId);
-        setCurrentFolderId(currentFolder?.parentId || null);
+        const parentPath = getFolderPath(currentFolder?.parentId || null);
+        navigate(parentPath);
         resetSelection();
-    }, [currentFolderId, folders, setCurrentFolderId, resetSelection]);
+    }, [currentFolderId, folders, getFolderPath, navigate, resetSelection]);
 
     const handleCreateFolder = useCallback(() => {
         const folderName = prompt("Enter folder name:");
@@ -62,7 +67,8 @@ export const useFolderHandlers = ({
             }
 
             if (currentFolderId && deletedFolderIds?.includes(currentFolderId)) {
-                setCurrentFolderId(parentId);
+                const parentPath = getFolderPath(parentId);
+                navigate(parentPath);
             }
         } catch (error) {
             console.error("Failed to delete folder and its contents:", error);

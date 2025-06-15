@@ -35,7 +35,7 @@ const App = () => (
               <Route path="/confirm-email" element={<ConfirmEmailPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route element={<ProtectedRoute />}>
-                <Route path="/dashboard" element={<Index />} />
+                <Route path="/dashboard/*" element={<Index />} />
               </Route>
               <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<AdminPage />} />

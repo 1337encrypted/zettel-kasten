@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
@@ -88,9 +87,9 @@ export const DetailView: React.FC<DetailViewProps> = ({
     if (selectedNote && viewMode === 'preview') {
         onSave({
             id: selectedNote.id,
-            title: title,
-            content: content,
-            tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+            title: selectedNote.title,
+            content: selectedNote.content,
+            tags: selectedNote.tags,
             isPublic: checked,
         });
         toast.info(`Note is now ${checked ? 'public' : 'private'}.`);

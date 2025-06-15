@@ -192,6 +192,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      demote_folder_path_if_private: {
+        Args: { p_folder_id: string }
+        Returns: undefined
+      }
+      folder_has_public_content: {
+        Args: { p_folder_id: string }
+        Returns: boolean
+      }
       get_public_folders_for_user: {
         Args: { p_user_id: string }
         Returns: {
@@ -241,6 +249,10 @@ export type Database = {
       is_note_public: {
         Args: { p_note_id: string }
         Returns: boolean
+      }
+      set_folder_path_public: {
+        Args: { p_folder_id: string }
+        Returns: undefined
       }
     }
     Enums: {

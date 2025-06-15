@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { Note, Folder, Profile } from '@/types';
 import { NavigateOptions, To } from 'react-router-dom';
@@ -21,7 +20,6 @@ interface UseNoteHandlersProps {
 
 export const useNoteHandlers = ({
     currentFolderId,
-    selectedNote,
     setSelectedNote,
     setViewMode,
     resetSelection,
@@ -29,8 +27,6 @@ export const useNoteHandlers = ({
     deleteNote,
     navigate,
     getNotePath,
-    folders,
-    profile,
 }: UseNoteHandlersProps) => {
 
     const handleNewNote = useCallback(() => {
@@ -40,23 +36,9 @@ export const useNoteHandlers = ({
     }, [resetSelection, setSelectedNote, setViewMode]);
     
     const handleSaveNote = useCallback(async (noteData: NoteDataToSave) => {
-        let isPublic = noteData.isPublic ?? false;
-
-        const noteFolderId = noteData.id 
-            ? selectedNote?.folderId 
-            : currentFolderId;
-        
-        const parentFolder = noteFolderId ? folders?.find(f => f.id === noteFolderId) : null;
-
-        if (!profile?.is_public) {
-            isPublic = false;
-        } else if (parentFolder && !parentFolder.isPublic) {
-            isPublic = false;
-        }
-
         const payload = {
             ...noteData,
-            isPublic,
+            isPublic: noteData.isPublic ?? false,
             ...(!noteData.id && { folderId: currentFolderId }),
         };
         try {
@@ -67,7 +49,7 @@ export const useNoteHandlers = ({
         } catch (error) {
             console.error("Failed to save note:", error);
         }
-    }, [currentFolderId, saveNote, setSelectedNote, setViewMode, navigate, getNotePath, folders, profile, selectedNote]);
+    }, [currentFolderId, saveNote, setSelectedNote, setViewMode, navigate, getNotePath]);
     
     const handleSelectNote = (note: Note) => {
         setSelectedNote(note);

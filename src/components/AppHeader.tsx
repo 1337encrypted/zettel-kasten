@@ -1,4 +1,3 @@
-
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { ShortcutCheatSheet } from './ShortcutCheatSheet';
 import { UserMenu } from './UserMenu';
 import { HeaderNavigation } from './HeaderNavigation';
-import { FolderVisibilityToggle } from './FolderVisibilityToggle';
 import { Folder, Profile } from '@/types';
 
 export const AppHeader = ({
@@ -67,12 +65,7 @@ export const AppHeader = ({
       
       <div className="w-1/3 flex justify-end items-center gap-2">
         {currentFolder && onUpdateFolder && profile && profile.is_public && typeof isFolderUpdating !== 'undefined' && (
-          <FolderVisibilityToggle
-            folder={currentFolder}
-            onUpdate={onUpdateFolder}
-            isProfilePublic={profile.is_public}
-            isUpdating={isFolderUpdating}
-          />
+          
         )}
         <ThemeToggle />
         {user && !currentFolder && location.pathname !== '/dashboard' && (

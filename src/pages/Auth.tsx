@@ -148,6 +148,17 @@ const AuthPage = () => {
     setLoading(false);
   };
 
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
       <AppHeader />
@@ -161,6 +172,7 @@ const AuthPage = () => {
             <TabsContent value="login">
               <LoginForm
                 handleLogin={handleLogin}
+                handleGoogleLogin={handleGoogleLogin}
                 loading={loading}
                 email={email}
                 setEmail={setEmail}
@@ -172,6 +184,7 @@ const AuthPage = () => {
             <TabsContent value="signup">
               <SignupForm
                 handleSignup={handleSignup}
+                handleGoogleLogin={handleGoogleLogin}
                 loading={loading}
                 email={email}
                 setEmail={setEmail}

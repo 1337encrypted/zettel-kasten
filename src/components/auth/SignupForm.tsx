@@ -8,6 +8,7 @@ import { PasswordInput } from './PasswordInput';
 
 interface SignupFormProps {
   handleSignup: (e: React.FormEvent) => Promise<void>;
+  handleGoogleLogin: () => Promise<void>;
   loading: boolean;
   email: string;
   setEmail: (email: string) => void;
@@ -19,7 +20,7 @@ interface SignupFormProps {
   setUsername: (username: string) => void;
 }
 
-export const SignupForm = ({ handleSignup, loading, email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, username, setUsername }: SignupFormProps) => {
+export const SignupForm = ({ handleSignup, handleGoogleLogin, loading, email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, username, setUsername }: SignupFormProps) => {
   return (
     <Card>
       <CardHeader>
@@ -27,6 +28,19 @@ export const SignupForm = ({ handleSignup, loading, email, setEmail, password, s
         <CardDescription>Create a new account.</CardDescription>
       </CardHeader>
       <CardContent>
+        <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
+          Sign up with Google
+        </Button>
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or with email
+            </span>
+          </div>
+        </div>
         <form onSubmit={handleSignup} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="username-signup">Username</Label>

@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -7,6 +8,7 @@ import { PasswordInput } from './PasswordInput';
 
 interface LoginFormProps {
   handleLogin: (e: React.FormEvent) => Promise<void>;
+  handleGoogleLogin: () => Promise<void>;
   loading: boolean;
   email: string;
   setEmail: (email: string) => void;
@@ -15,7 +17,7 @@ interface LoginFormProps {
   onForgotPassword: () => void;
 }
 
-export const LoginForm = ({ handleLogin, loading, email, setEmail, password, setPassword, onForgotPassword }: LoginFormProps) => {
+export const LoginForm = ({ handleLogin, handleGoogleLogin, loading, email, setEmail, password, setPassword, onForgotPassword }: LoginFormProps) => {
   return (
     <Card>
       <CardHeader>
@@ -35,6 +37,19 @@ export const LoginForm = ({ handleLogin, loading, email, setEmail, password, set
             {loading ? 'Logging in...' : 'Login'}
           </Button>
         </form>
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+        <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
+          Sign in with Google
+        </Button>
         <div className="mt-4 text-center text-sm">
           <Button variant="link" onClick={onForgotPassword}>
             Forgot Password?

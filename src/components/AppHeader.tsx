@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
@@ -30,6 +31,8 @@ import { ProfileAvatar } from './ProfileAvatar';
 import { useAvatarHandler } from '@/hooks/useAvatarHandler';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { AdminSettingsDialog } from './AdminSettingsDialog';
+
+const UNTOUCHABLE_USER_ID = '0c90fe7b-b66d-44fa-8a35-3ee7a2c39001';
 
 export const AppHeader = ({
   onExportAllNotes,
@@ -64,6 +67,7 @@ export const AppHeader = ({
   };
 
   const showNavBackButton = location.pathname !== '/';
+  const isUntouchableUser = user?.id === UNTOUCHABLE_USER_ID;
 
   return (
     <header className="mb-8 flex items-center justify-between relative h-10">
@@ -140,7 +144,16 @@ export const AppHeader = ({
                     <span>Logout</span>
                   </DropdownMenuItem>
                   <AlertDialogTrigger asChild>
-                    <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer">
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer"
+                      disabled={isUntouchableUser}
+                      onSelect={(e) => {
+                        if (isUntouchableUser) {
+                          e.preventDefault();
+                        }
+                      }}
+                      title={isUntouchableUser ? "This account cannot be deleted." : "Delete Account"}
+                    >
                       <Trash2 className="mr-2 h-4 w-4" />
                       <span>Delete Account</span>
                     </DropdownMenuItem>

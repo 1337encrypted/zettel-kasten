@@ -45,7 +45,7 @@ export const AppHeader = ({
           onNavigateUp={onNavigateUp}
           isAtRoot={isAtRootOfNotes}
         />
-        {user && (
+        {user && user.id && (
           <UserMenu
             onExportAllNotes={onExportAllNotes}
             onCheatSheetOpenChange={onCheatSheetOpenChange}
@@ -55,19 +55,19 @@ export const AppHeader = ({
       </div>
       
       <div className="w-1/3 text-center">
-        <Link to={user ? '/dashboard' : '/'} className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
+        <Link to={user && user.id ? '/dashboard' : '/'} className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
           <span className="text-4xl font-bold tracking-wide font-mono">Zet</span>
         </Link>
       </div>
       
       <div className="w-1/3 flex justify-end items-center gap-2">
         <ThemeToggle />
-        {user && !currentFolder && location.pathname !== '/dashboard' && (
+        {user && user.id && !currentFolder && location.pathname !== '/dashboard' && (
           <Button asChild>
             <Link to="/dashboard">Dashboard</Link>
           </Button>
         )}
-        {!user && location.pathname !== '/auth' && (
+        {(!user || !user.id) && location.pathname !== '/auth' && (
            <Button asChild>
             <Link to="/auth">Login</Link>
           </Button>

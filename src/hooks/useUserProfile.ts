@@ -6,11 +6,11 @@ import { Note, Folder, Profile } from '@/types';
 const fetchUserProfileData = async (userId: string) => {
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id, username, avatar_url, updated_at, is_public')
+    .select('id, username, avatar_url, updated_at')
     .eq('id', userId)
     .single();
 
-  if (profileError) throw new Error('User not found');
+  if (profileError) throw profileError;
   if (!profile) throw new Error('User not found');
 
   const { data: notesData, error: notesError } = await supabase
@@ -48,7 +48,12 @@ const fetchUserProfileData = async (userId: string) => {
     slug: folder.slug,
   } as Folder));
 
-  return { profile, notes, folders };
+  const augmentedProfile: Profile = {
+    ...profile,
+    is_public: true, // Assuming public if fetched, as we cannot get the flag.
+  };
+
+  return { profile: augmentedProfile, notes, folders };
 };
 
 

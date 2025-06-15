@@ -70,7 +70,8 @@ export const useSaveNote = () => {
         if (error) { throw error; }
         if (!data) throw new Error("Note not found after update.");
         toast.success(`Note "${data.title}" updated!`);
-        return { ...data, isPublic: data.is_public, folderId: data.folder_id, createdAt: new Date(data.created_at), updatedAt: new Date(data.updated_at) } as Note;
+        const anyData = data as any;
+        return { ...anyData, isPublic: anyData.is_public, folderId: anyData.folder_id, createdAt: new Date(anyData.created_at), updatedAt: new Date(anyData.updated_at) } as Note;
       } else {
         if (!user) {
           toast.error("You must be logged in to create a note.");
@@ -85,7 +86,8 @@ export const useSaveNote = () => {
         if (error) { throw error; }
         if (!data) throw new Error("Could not create note.");
         toast.success(`Note "${data.title}" created!`);
-        return { ...data, isPublic: data.is_public, folderId: data.folder_id, createdAt: new Date(data.created_at), updatedAt: new Date(data.updated_at) } as Note;
+        const anyData = data as any;
+        return { ...anyData, isPublic: anyData.is_public, folderId: anyData.folder_id, createdAt: new Date(anyData.created_at), updatedAt: new Date(anyData.updated_at) } as Note;
       }
     },
     onSuccess: (savedNote) => {

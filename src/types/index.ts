@@ -7,6 +7,8 @@ export interface Note {
   updatedAt: Date;
   tags?: string[];
   folderId?: string;
+  isPublic?: boolean;
+  slug?: string;
 }
 
 export interface Folder {
@@ -14,4 +16,14 @@ export interface Folder {
   name: string;
   createdAt: Date;
   parentId?: string | null;
+  isPublic?: boolean;
+  slug?: string;
+}
+
+export interface Profile {
+  id: string;
+  username: string | null;
+  avatar_url: string | null;
+  updated_at: string | null;
+  is_public: boolean;
 }

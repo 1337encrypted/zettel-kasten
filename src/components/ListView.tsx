@@ -1,13 +1,14 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Folder, Note } from '@/types';
 import { Button } from '@/components/ui/button';
-import { FolderPlus, File, FilePlus, ArrowUpAZ, ArrowDownAZ, Search, Trash2 } from 'lucide-react';
+import { FolderPlus, File, FilePlus, ArrowUpAZ, ArrowDownAZ, Search, Trash2, Link2 } from 'lucide-react';
 import FolderList from '@/components/FolderList';
 import NoteList from '@/components/NoteList';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
 import { Input } from '@/components/ui/input';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Checkbox } from './ui/checkbox';
@@ -64,6 +65,58 @@ export const ListView: React.FC<ListViewProps> = ({
   const selectableNotes = filteredNotes.filter(n => n.title.toLowerCase() !== 'readme');
   const numSelected = selectedNoteIds.length;
   const allNotesSelected = selectableNotes.length > 0 && numSelected === selectableNotes.length;
+
+  const notesById = useMemo(() => {
+    return allNotes.reduce((acc, note) => {
+        acc[note.id] = note;
+        return acc;
+    }, {} as Record<string, Note>);
+  }, [allNotes]);
+
+  const customRenderers = {
+    p: (paragraph: { children?: React.ReactNode; node?: any }) => {
+      const childrenArray = React.Children.toArray(paragraph.children);
+  
+      const processedChildren = childrenArray.flatMap((child, i) => {
+        if (typeof child === 'string') {
+          const parts = child.split(/(\[\[.+?\]\])/g);
+          return parts.map((part, j) => {
+            const match = /\[\[(.+?)\]\]/.exec(part);
+            if (match) {
+              const noteId = match[1];
+              const linkedNote = notesById[noteId];
+              if (linkedNote) {
+                return (
+                  <a
+                    key={`${i}-${j}`}
+                    className="text-primary hover:underline cursor-pointer font-semibold inline-flex items-center gap-1"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onSelectNote(linkedNote);
+                    }}
+                    href="#"
+                  >
+                    <Link2 className="w-4 h-4" />
+                    {linkedNote.title}
+                  </a>
+                );
+              } else {
+                return (
+                  <span key={`${i}-${j}`} className="text-muted-foreground italic">
+                    {`[[${noteId}]]`}
+                  </span>
+                );
+              }
+            }
+            return part;
+          });
+        }
+        return child;
+      });
+  
+      return <p>{processedChildren}</p>;
+    },
+  };
 
   return (
     <div className="space-y-6">
@@ -137,7 +190,11 @@ export const ListView: React.FC<ListViewProps> = ({
             <File className="w-5 h-5 inline-block" />
             README
           </h2>
-          <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkBreaks]}
+            rehypePlugins={[rehypeRaw]}
+            components={customRenderers}
+          >
             {readmeNote.content}
           </ReactMarkdown>
         </div>

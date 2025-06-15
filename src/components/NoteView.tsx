@@ -93,13 +93,13 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
         newParaChildren = [newText, ...paraChildren.slice(1)];
       } else if (React.isValidElement(firstChildOfPara) && typeof firstChildOfPara.props.children === 'string') {
         const newText = (firstChildOfPara.props.children as string).substring(match[0].length);
-        const newChild = React.cloneElement(firstChildOfPara, { children: newText });
+        const newChild = React.cloneElement(firstChildOfPara as React.ReactElement<any>, { children: newText });
         newParaChildren = [newChild, ...paraChildren.slice(1)];
       } else {
         return <blockquote className="pl-4 my-4 border-l-4" {...rest}>{children}</blockquote>;
       }
 
-      const newFirstPara = React.cloneElement(firstPara, { children: newParaChildren });
+      const newFirstPara = React.cloneElement(firstPara as React.ReactElement<any>, { children: newParaChildren });
       const newChildren = [newFirstPara, ...originalChildren.slice(1)];
       
       return (

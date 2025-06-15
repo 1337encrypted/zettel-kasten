@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Folder } from '@/types';
 import { toast } from "@/components/ui/sonner";
@@ -162,5 +163,6 @@ export const useFolders = () => {
     createFolder: (folderName: string, parentId: string | null) => createFolderMutation.mutate({ folderName, parentId }),
     renameFolder: (folderId: string, newName: string) => renameFolderMutation.mutate({ folderId, newName }),
     deleteFolderAndDescendants: deleteFolderMutation.mutateAsync,
+    createFolderAsync: createFolderMutation.mutateAsync,
   };
 };

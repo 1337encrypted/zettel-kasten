@@ -1,3 +1,4 @@
+
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ export const AppHeader = ({
   cheatSheetOpen,
   onCheatSheetOpenChange,
   onNavigateUp,
+  onSeedData,
 }: {
   onExportAllNotes?: () => void;
   viewMode?: 'list' | 'edit' | 'preview';
@@ -20,6 +22,7 @@ export const AppHeader = ({
   cheatSheetOpen?: boolean;
   onCheatSheetOpenChange?: (open: boolean) => void;
   onNavigateUp?: () => void;
+  onSeedData?: () => void;
 }) => {
   const { user } = useAuth();
   const location = useLocation();
@@ -40,6 +43,7 @@ export const AppHeader = ({
               onExportAllNotes={onExportAllNotes}
               onCheatSheetOpenChange={onCheatSheetOpenChange}
             />
+            {onSeedData && <Button onClick={onSeedData} variant="outline">Seed Data</Button>}
             {location.pathname !== '/dashboard' && (
               <Button asChild>
                 <Link to="/dashboard">Dashboard</Link>

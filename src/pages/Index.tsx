@@ -44,6 +44,7 @@ const Index = () => {
     handleSelectAll,
     handleExportAllNotes,
     handleOpenShortcuts,
+    handleSeedData,
   } = useAppLogic();
 
   return (
@@ -55,6 +56,7 @@ const Index = () => {
         cheatSheetOpen={cheatSheetOpen}
         onCheatSheetOpenChange={setCheatSheetOpen}
         onNavigateUp={currentFolderId ? handleNavigateUp : undefined}
+        onSeedData={handleSeedData}
       />
 
       <main className="flex-grow flex flex-col">

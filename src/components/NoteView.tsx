@@ -10,6 +10,7 @@ import { Tag, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useCustomRenderers } from '@/hooks/useCustomRenderers';
+import MermaidDiagram from './MermaidDiagram';
 
 interface NoteViewProps {
   note: Note | null;
@@ -35,7 +36,13 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
         return <pre>{children}</pre>;
       }
       
-      const codeString = String(children.props.children).replace(/\n$/, '');
+      const codeProps = children.props as { className?: string; children?: React.ReactNode };
+      const language = codeProps.className?.replace('language-', '');
+      const codeString = String(codeProps.children).replace(/\n$/, '');
+
+      if (language === 'mermaid') {
+        return <MermaidDiagram chart={codeString} />;
+      }
 
       const handleCopy = () => {
         navigator.clipboard.writeText(codeString)

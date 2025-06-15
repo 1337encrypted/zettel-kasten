@@ -16,6 +16,7 @@ import ConfirmEmailPage from "./pages/ConfirmEmail";
 import ResetPasswordPage from "./pages/ResetPassword";
 import AdminPage from "./pages/Admin";
 import AdminRoute from "./components/AdminRoute";
+import DocsPage from "./pages/Docs";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/" element={<Home />} />
               <Route path="/u/:userId/*" element={<UserPublicProfile />} />
               <Route path="/auth" element={<AuthPage />} />
+              <Route path="/docs" element={<DocsPage />} />
               <Route path="/confirm-email" element={<ConfirmEmailPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route element={<ProtectedRoute />}>

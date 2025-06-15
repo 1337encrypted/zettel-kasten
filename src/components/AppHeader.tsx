@@ -68,7 +68,10 @@ export const AppHeader = ({
         )}
       </div>
       
-      <div className="w-1/3 flex justify-end">
+      <div className="w-1/3 flex justify-end items-center gap-2">
+        <Button asChild variant="ghost">
+          <Link to="/docs">Docs</Link>
+        </Button>
         <ThemeToggle />
       </div>
       {onCheatSheetOpenChange && <ShortcutCheatSheet open={!!cheatSheetOpen} onOpenChange={onCheatSheetOpenChange} />}

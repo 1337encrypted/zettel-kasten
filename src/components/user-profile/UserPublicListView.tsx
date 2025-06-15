@@ -20,7 +20,7 @@ interface UserPublicListViewProps {
   onNavigateUp: () => void;
   sortOrder: 'asc' | 'desc';
   onSortOrderChange: (order: 'asc' | 'desc') => void;
-  searchQuery: string;
+  searchQuery?: string;
   onSearchQueryChange: (query: string) => void;
 }
 
@@ -35,7 +35,7 @@ const UserPublicListView: React.FC<UserPublicListViewProps> = ({
   onNavigateUp,
   sortOrder,
   onSortOrderChange,
-  searchQuery,
+  searchQuery = '',
   onSearchQueryChange,
 }) => {
   const isMobile = useIsMobile();

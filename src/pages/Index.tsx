@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppLogic } from '@/hooks/useAppLogic';
 
@@ -106,11 +105,9 @@ const Index = () => {
         onCreateFolder={handleCreateFolder}
         onSelectFolder={handleSelectFolderFromCommandMenu}
         onSelectAll={handleSelectAll}
-        onOpenShortcuts={handleOpenShortcuts}
       />
     </div>
   );
 };
 
 export default Index;
-

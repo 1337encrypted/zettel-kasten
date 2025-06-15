@@ -30,6 +30,24 @@ export type Database = {
         }
         Relationships: []
       }
+      documentation: {
+        Row: {
+          content: string
+          id: number
+          updated_at: string | null
+        }
+        Insert: {
+          content?: string
+          id?: number
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          id?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       folders: {
         Row: {
           created_at: string

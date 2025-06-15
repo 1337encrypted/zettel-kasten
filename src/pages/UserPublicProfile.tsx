@@ -50,7 +50,7 @@ const UserPublicProfile = () => {
     <div className="min-h-screen w-full flex flex-col bg-background">
       <HomeHeader
         onBackToList={viewMode === 'preview' ? handleBackToList : undefined}
-        onNavigateUp={currentFolderId ? handleNavigateUp : undefined}
+        onNavigateUp={viewMode === 'list' && currentFolderId ? handleNavigateUp : undefined}
         showHomeButton={isAtProfileRoot}
       />
       <main className="flex-grow container mx-auto px-4 py-8">

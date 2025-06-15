@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from 'react';
 import { Note, Folder } from '@/types';
 import Fuse from 'fuse.js';
@@ -53,10 +54,14 @@ export const useSearchAndSort = ({ notes, folders, currentFolderId }: useSearchA
     return [...notesInFolder].sort((a, b) => {
       if (a.title.toLowerCase() === 'readme') return -1;
       if (b.title.toLowerCase() === 'readme') return 1;
+      
+      const titleA = a.title.toLowerCase();
+      const titleB = b.title.toLowerCase();
+
       if (sortOrder === 'asc') {
-        return a.title.localeCompare(b.title);
+        return titleA.localeCompare(titleB);
       } else {
-        return b.title.localeCompare(a.title);
+        return titleB.localeCompare(titleA);
       }
     });
   }, [notes, currentFolderId, sortOrder, searchQuery, searchResults]);

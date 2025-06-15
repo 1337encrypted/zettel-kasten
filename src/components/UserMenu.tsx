@@ -29,6 +29,7 @@ import { useAvatarHandler } from '@/hooks/useAvatarHandler';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { AdminSettingsDialog } from './AdminSettingsDialog';
 import { ChangePasswordDialog } from './auth/ChangePasswordDialog';
+import { ProfileVisibilityToggle } from './ProfileVisibilityToggle';
 
 const UNTOUCHABLE_USER_ID = '0c90fe7b-b66d-44fa-8a35-3ee7a2c39001';
 
@@ -82,6 +83,7 @@ export const UserMenu = ({
           <DropdownMenuContent align="start">
             <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <ProfileVisibilityToggle />
              <DropdownMenuItem onClick={handleAvatarClick} className="cursor-pointer">
               <Camera className="mr-2 h-4 w-4" />
               <span>Change Avatar</span>

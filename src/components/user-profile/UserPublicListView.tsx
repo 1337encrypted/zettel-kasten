@@ -35,12 +35,11 @@ const UserPublicListView: React.FC<UserPublicListViewProps> = ({
   onNavigateUp,
   sortOrder,
   onSortOrderChange,
-  searchQuery,
+  searchQuery = '',
   onSearchQueryChange,
 }) => {
   const isMobile = useIsMobile();
-  const currentSearchQuery = searchQuery ?? '';
-  const isSearching = !!currentSearchQuery.trim();
+  const isSearching = !!searchQuery.trim();
   const readmeNote = !isSearching ? notesForList.find(note => note.title.toLowerCase() === 'readme') : null;
   const notesToDisplay = readmeNote ? notesForList.filter(n => n.id !== readmeNote.id) : notesForList;
   
@@ -52,7 +51,7 @@ const UserPublicListView: React.FC<UserPublicListViewProps> = ({
             <Input
                 type="text"
                 placeholder={isMobile ? "Search" : "Search by title, content, or tags..."}
-                value={currentSearchQuery}
+                value={searchQuery}
                 onChange={(e) => onSearchQueryChange(e.target.value)}
                 className="pl-10 w-full"
             />

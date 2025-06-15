@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Note } from '@/types';
 import { toast } from "sonner";
@@ -75,7 +74,7 @@ export const useSaveNote = () => {
         if (!data) throw new Error("Note not found after update.");
         toast.success(`Note "${data.title}" updated!`);
         const anyData = data as any;
-        return { ...anyData, isPublic: anyData.is_public, folderId: anyData.folder_id, createdAt: new Date(anyData.created_at), updatedAt: new Date(anyData.updated_at) } as Note;
+        return { ...anyData, userId: anyData.user_id, isPublic: anyData.is_public, folderId: anyData.folder_id, createdAt: new Date(anyData.created_at), updatedAt: new Date(anyData.updated_at) } as Note;
       } else {
         if (!user) {
           toast.error("You must be logged in to create a note.");
@@ -91,7 +90,7 @@ export const useSaveNote = () => {
         if (!data) throw new Error("Could not create note.");
         toast.success(`Note "${data.title}" created!`);
         const anyData = data as any;
-        return { ...anyData, isPublic: anyData.is_public, folderId: anyData.folder_id, createdAt: new Date(anyData.created_at), updatedAt: new Date(anyData.updated_at) } as Note;
+        return { ...anyData, userId: anyData.user_id, isPublic: anyData.is_public, folderId: anyData.folder_id, createdAt: new Date(anyData.created_at), updatedAt: new Date(anyData.updated_at) } as Note;
       }
     },
     onSuccess: (savedNote) => {

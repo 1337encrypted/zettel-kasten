@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Folder } from '@/types';
 import { toast } from "sonner";
@@ -55,7 +54,7 @@ export const useUpdateFolder = () => {
       });
 
       const anyData = data as any;
-      return { ...anyData, isPublic: anyData.is_public, parentId: anyData.parent_id, createdAt: new Date(anyData.created_at) } as Folder;
+      return { ...anyData, userId: anyData.user_id, isPublic: anyData.is_public, parentId: anyData.parent_id, createdAt: new Date(anyData.created_at) } as Folder;
     },
     onSuccess: (savedFolder) => {
         // Invalidate both folders and notes as folder visibility affects notes

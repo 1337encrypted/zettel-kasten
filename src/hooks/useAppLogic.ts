@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Note, Folder } from '@/types';
+import { Folder } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
 import { useFolders } from '@/hooks/useFolders';
 import { useSearchAndSort } from './useSearchAndSort';
@@ -13,35 +14,26 @@ import { useNoteExporter } from './useNoteExporter';
 import { usePathHelpers } from './usePathHelpers';
 import { useUIState } from './useUIState';
 import { useInteractionHandlers } from './useInteractionHandlers';
-import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useUpdateFolder } from './useUpdateFolder';
+import { useProfile } from './useProfile';
+import { useCoreAppState } from './useCoreAppState';
 
 export const useAppLogic = () => {
   const { notes, saveNote, deleteNote, deleteNotesByFolderIds, deleteMultipleNotes } = useNotes();
   const { folders, createFolder, deleteFolderAndDescendants, renameFolder } = useFolders();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const updateFolderMutation = useUpdateFolder();
+  const { handleUpdateFolder, isFolderUpdating } = useUpdateFolder();
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: async () => {
-      if (!user) return null;
-      const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-      if (error) {
-        console.error("Error fetching profile", error);
-        return null;
-      }
-      return data;
-    },
-    enabled: !!user,
-  });
+  const { profile } = useProfile();
 
-  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
-  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const {
+    selectedNote,
+    setSelectedNote,
+    viewMode,
+    setViewMode,
+    currentFolderId,
+    setCurrentFolderId,
+  } = useCoreAppState();
 
   const {
     commandMenuOpen,
@@ -123,14 +115,6 @@ export const useAppLogic = () => {
 
   const { handleExportAllNotes } = useNoteExporter(notes, folders);
 
-  const handleUpdateFolder = async (folderData: Pick<Folder, 'id'> & Partial<Pick<Folder, 'isPublic'>>) => {
-      try {
-          await updateFolderMutation.mutateAsync(folderData);
-      } catch (error) {
-          console.error("Failed to update folder", error);
-      }
-  };
-
   const currentFolder = useMemo(() => {
     return folders.find(f => f.id === currentFolderId) || null;
   }, [currentFolderId, folders]);
@@ -201,6 +185,6 @@ export const useAppLogic = () => {
     profile,
     currentFolder,
     handleUpdateFolder,
-    isFolderUpdating: updateFolderMutation.isPending,
+    isFolderUpdating,
   };
 };

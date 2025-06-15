@@ -18,7 +18,7 @@ export const useUpdateFolder = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  return useMutation({
+  const updateFolderMutation = useMutation({
     mutationFn: async (folderData: Pick<Folder, 'id'> & Partial<Pick<Folder, 'isPublic'>>): Promise<Folder> => {
       if (!user) throw new Error("User not authenticated");
       
@@ -66,4 +66,17 @@ export const useUpdateFolder = () => {
       toast.error(`Failed to update folder: ${error.message}`);
     }
   });
+
+  const handleUpdateFolder = async (folderData: Pick<Folder, 'id'> & Partial<Pick<Folder, 'isPublic'>>) => {
+      try {
+          await updateFolderMutation.mutateAsync(folderData);
+      } catch (error) {
+          console.error("Failed to update folder", error);
+      }
+  };
+
+  return {
+    handleUpdateFolder,
+    isFolderUpdating: updateFolderMutation.isPending,
+  };
 };

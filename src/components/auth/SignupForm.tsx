@@ -28,7 +28,7 @@ export const SignupForm = ({ handleSignup, handleGoogleLogin, loading, email, se
         <CardDescription>Create a new account.</CardDescription>
       </CardHeader>
       <CardContent>
-        <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
+        <Button variant="success" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
           Sign up with Google
         </Button>
         <div className="relative my-4">

@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -47,7 +46,7 @@ export const LoginForm = ({ handleLogin, handleGoogleLogin, loading, email, setE
             </span>
           </div>
         </div>
-        <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
+        <Button variant="success" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
           Sign in with Google
         </Button>
         <div className="mt-4 text-center text-sm">

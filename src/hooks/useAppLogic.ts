@@ -10,6 +10,8 @@ import { useFolderHandlers } from './useFolderHandlers';
 import { useNoteHandlers } from './useNoteHandlers';
 import { useUrlSync } from './useUrlSync';
 import { useNoteExporter } from './useNoteExporter';
+import { usePathHelpers } from './usePathHelpers';
+import { useUIState } from './useUIState';
 
 export const useAppLogic = () => {
   const { notes, saveNote, deleteNote, deleteNotesByFolderIds, deleteMultipleNotes } = useNotes();
@@ -19,27 +21,17 @@ export const useAppLogic = () => {
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'edit' | 'preview'>('list');
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
-  const [commandMenuOpen, setCommandMenuOpen] = useState(false);
-  const [cheatSheetOpen, setCheatSheetOpen] = useState(false);
 
-  const getFolderPath = useCallback((folderId: string | null): string => {
-    if (!folderId) return '/dashboard';
-    
-    let path = '';
-    let currentFolderIdInPath: string | null = folderId;
-    
-    while(currentFolderIdInPath) {
-        const folder = folders.find(f => f.id === currentFolderIdInPath);
-        if (!folder) {
-            console.error("Could not find folder in path construction:", currentFolderIdInPath);
-            return '/dashboard';
-        }
-        path = `/${folder.slug}${path}`;
-        currentFolderIdInPath = folder.parentId;
-    }
-    
-    return `/dashboard${path}`;
-  }, [folders]);
+  const {
+    commandMenuOpen,
+    setCommandMenuOpen,
+    cheatSheetOpen,
+    setCheatSheetOpen,
+    handleOpenShortcuts,
+    handleToggleCommandMenu,
+  } = useUIState();
+
+  const { getFolderPath, getNotePath } = usePathHelpers(folders);
 
   useUrlSync({
     notes,
@@ -75,14 +67,6 @@ export const useAppLogic = () => {
     handleSelectAll,
     resetSelection,
   } = useNoteSelection({ filteredNotes: selectableNotes, deleteMultipleNotes });
-
-  const getNotePath = useCallback((note: Note): string => {
-    const folderPath = getFolderPath(note.folderId);
-    if (folderPath === '/dashboard') {
-        return note.slug ? `/dashboard/${note.slug}`: '/dashboard';
-    }
-    return note.slug ? `${folderPath}/${note.slug}` : folderPath;
-  }, [getFolderPath]);
 
   const {
     handleRenameFolder,
@@ -129,10 +113,6 @@ export const useAppLogic = () => {
     navigate(folderPath === '/dashboard' ? folderPath : `${folderPath}/`);
   }, [resetSelection, currentFolderId, getFolderPath, navigate]);
 
-  const handleOpenShortcuts = useCallback(() => {
-    setCheatSheetOpen(true);
-  }, []);
-
   const handleEscape = useCallback((e: KeyboardEvent) => {
     if (cheatSheetOpen) {
       e.preventDefault();
@@ -149,11 +129,11 @@ export const useAppLogic = () => {
       e.preventDefault();
       handleNavigateUp();
     }
-  }, [selectedNoteIds.length, viewMode, currentFolderId, resetSelection, handleBackToList, handleNavigateUp, cheatSheetOpen]);
+  }, [selectedNoteIds.length, viewMode, currentFolderId, resetSelection, handleBackToList, handleNavigateUp, cheatSheetOpen, setCheatSheetOpen]);
 
   useKeyboardShortcuts({
       onNewNote: handleNewNote,
-      onToggleCommandMenu: () => setCommandMenuOpen(open => !open),
+      onToggleCommandMenu: handleToggleCommandMenu,
       onEscape: handleEscape,
       onSelectAll: handleSelectAll,
       onOpenShortcuts: handleOpenShortcuts,

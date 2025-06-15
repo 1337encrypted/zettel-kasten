@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppLogic } from '@/hooks/useAppLogic';
 
@@ -49,6 +50,11 @@ const Index = () => {
     isFolderUpdating,
   } = useAppLogic();
 
+  const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme');
+  const notesForList = readmeNote
+    ? filteredNotes.filter(note => note.id !== readmeNote.id)
+    : filteredNotes;
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
       <AppHeader
@@ -64,7 +70,7 @@ const Index = () => {
         {viewMode === 'list' ? (
           <ListView
             filteredFolders={filteredFolders}
-            filteredNotes={filteredNotes}
+            filteredNotes={notesForList}
             allNotes={notes}
             currentFolderId={currentFolderId}
             selectedNoteId={selectedNote?.id}
@@ -83,6 +89,7 @@ const Index = () => {
             onToggleNoteSelection={handleToggleNoteSelection}
             onBulkDeleteNotes={handleBulkDeleteNotes}
             onSelectAll={handleSelectAll}
+            readmeNote={readmeNote}
           />
         ) : (
           <DetailView 

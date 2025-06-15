@@ -21,32 +21,15 @@ interface UserProfile {
   updated_at: string | null;
 }
 
-const fetchUsersWithNoteCounts = async () => {
-  const { data: profiles, error: profilesError } = await supabase
-    .from('profiles')
-    .select('id, username, created_at, avatar_url, updated_at');
+const fetchUsersWithNoteCounts = async (): Promise<UserProfile[]> => {
+  const { data, error } = await supabase.rpc('get_users_with_public_note_counts');
   
-  if (profilesError) throw profilesError;
+  if (error) {
+    console.error('Error fetching users with note counts:', error);
+    throw error;
+  }
 
-  const { data: notes, error: notesError } = await supabase
-    .from('notes')
-    .select('user_id');
-
-  if (notesError) throw notesError;
-
-  const noteCounts = (notes || []).reduce((acc, note) => {
-    if (note.user_id) {
-      acc[note.user_id] = (acc[note.user_id] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
-
-  const usersWithCounts: UserProfile[] = (profiles || []).map(profile => ({
-    ...profile,
-    note_count: noteCounts[profile.id] || 0,
-  })).sort((a, b) => b.note_count - a.note_count);
-
-  return usersWithCounts;
+  return (data as any || []) as UserProfile[];
 };
 
 const Home = () => {
@@ -74,7 +57,7 @@ const Home = () => {
           />
         </div>
         {isLoading && <p className="text-center">Loading users...</p>}
-        {error && <p className="text-destructive text-center">Could not load users. For this to work, RLS policies on 'profiles' and 'notes' tables must allow public read access.</p>}
+        {error && <p className="text-destructive text-center">Could not load users. Please try again later.</p>}
         <div className="flex flex-col gap-4 max-w-3xl mx-auto w-full">
           {filteredUsers?.map(user => {
             const uniqueAvatarUrl = user.avatar_url && user.updated_at ? `${user.avatar_url}?t=${new Date(user.updated_at).getTime()}` : user.avatar_url;

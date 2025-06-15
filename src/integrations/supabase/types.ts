@@ -219,6 +219,17 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_users_with_public_note_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          username: string
+          created_at: string
+          avatar_url: string
+          updated_at: string
+          note_count: number
+        }[]
+      }
       is_admin: {
         Args: { p_user_id: string }
         Returns: boolean

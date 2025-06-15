@@ -1,3 +1,4 @@
+
 export type Json =
   | string
   | number
@@ -229,6 +230,17 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+        }[]
+      }
+      get_users_with_public_note_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          username: string | null
+          created_at: string | null
+          avatar_url: string | null
+          updated_at: string | null
+          note_count: number
         }[]
       }
       is_admin: {

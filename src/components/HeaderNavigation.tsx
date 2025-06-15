@@ -20,13 +20,13 @@ export const HeaderNavigation = ({
   const navigate = useNavigate();
   const showNavBackButton = location.pathname !== '/';
 
-  if (onBackToList && viewMode !== 'list') {
+  if (viewMode && viewMode !== 'list' && onBackToList) {
     return (
       <Button onClick={onBackToList} variant="outline" size="icon" aria-label="Back to list">
         <ArrowLeft />
       </Button>
     );
-  } else if (onNavigateUp) {
+  } else if (viewMode === 'list' && onNavigateUp) {
     return (
       <Button onClick={onNavigateUp} variant="outline" size="icon" aria-label="Up a level">
         <ArrowLeft />

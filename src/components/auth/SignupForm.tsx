@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -12,11 +13,13 @@ interface SignupFormProps {
   setEmail: (email: string) => void;
   password: string;
   setPassword: (password: string) => void;
+  confirmPassword: string;
+  setConfirmPassword: (password: string) => void;
   username: string;
   setUsername: (username: string) => void;
 }
 
-export const SignupForm = ({ handleSignup, loading, email, setEmail, password, setPassword, username, setUsername }: SignupFormProps) => {
+export const SignupForm = ({ handleSignup, loading, email, setEmail, password, setPassword, confirmPassword, setConfirmPassword, username, setUsername }: SignupFormProps) => {
   return (
     <Card>
       <CardHeader>
@@ -46,6 +49,10 @@ export const SignupForm = ({ handleSignup, loading, email, setEmail, password, s
           <div className="space-y-2">
             <Label htmlFor="password-signup">Password</Label>
             <PasswordInput id="password-signup" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password-signup">Confirm Password</Label>
+            <PasswordInput id="confirm-password-signup" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Signing up...' : 'Sign Up'}

@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogOut, Trash2, Archive, Keyboard, Camera, Shield, Users, KeyRound, BookOpen, Import } from 'lucide-react';
@@ -31,6 +31,7 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { AdminSettingsDialog } from './AdminSettingsDialog';
 import { ChangePasswordDialog } from './auth/ChangePasswordDialog';
 import { ProfileVisibilityToggle } from './ProfileVisibilityToggle';
+import { useFileImporter } from '@/hooks/useFileImporter';
 
 const UNTOUCHABLE_USER_ID = '0c90fe7b-b66d-44fa-8a35-3ee7a2c39001';
 
@@ -47,7 +48,7 @@ export const UserMenu = ({
   const { fileInputRef, handleAvatarClick, handleAvatarUpload, isUploading } = useAvatarHandler();
   const { isAdmin } = useIsAdmin();
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const importFileInputRef = useRef<HTMLInputElement>(null);
+  const { importFileInputRef, triggerImport, handleFileImport } = useFileImporter();
 
   const handleDeleteAccount = async () => {
     try {
@@ -57,22 +58,6 @@ export const UserMenu = ({
       signOut();
     } catch (error: any) {
       toast.error(`Failed to delete account: ${error.message}`);
-    }
-  };
-
-  const handleImportClick = () => {
-    importFileInputRef.current?.click();
-  };
-
-  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      console.log('Selected files for import:', files);
-      toast.success(`${files.length} file(s) selected for import. See developer console for details.`);
-      // Reset file input value to allow selecting the same file again
-      if (importFileInputRef.current) {
-        importFileInputRef.current.value = '';
-      }
     }
   };
 
@@ -97,6 +82,7 @@ export const UserMenu = ({
         onChange={handleFileImport}
         className="hidden"
         multiple
+        accept=".md,.txt"
       />
       <AlertDialog>
         <DropdownMenu>
@@ -127,7 +113,7 @@ export const UserMenu = ({
                     <span>User Management</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleImportClick} className="cursor-pointer">
+                <DropdownMenuItem onClick={triggerImport} className="cursor-pointer">
                   <Import className="mr-2 h-4 w-4" />
                   <span>Import Files</span>
                 </DropdownMenuItem>

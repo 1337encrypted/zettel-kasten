@@ -20,31 +20,25 @@ export const HeaderNavigation = ({
   const navigate = useNavigate();
   const showNavBackButton = location.pathname !== '/';
 
-  if (viewMode && viewMode !== 'list' && onBackToList) {
+  if (onBackToList && viewMode !== 'list') {
     return (
       <Button onClick={onBackToList} variant="outline" size="icon" aria-label="Back to list">
         <ArrowLeft />
       </Button>
     );
-  }
-
-  if (onNavigateUp) {
+  } else if (onNavigateUp) {
     return (
       <Button onClick={onNavigateUp} variant="outline" size="icon" aria-label="Up a level">
         <ArrowLeft />
       </Button>
     );
-  }
-
-  if (isAtRoot) {
+  } else if (isAtRoot) {
     return (
       <Button onClick={() => navigate('/')} variant="outline" size="icon" aria-label="Go to Homepage">
         <Home />
       </Button>
     );
-  }
-
-  if (showNavBackButton) {
+  } else if (showNavBackButton) {
     return (
       <Button onClick={() => navigate(-1)} variant="outline" size="icon" aria-label="Go back">
         <ArrowLeft />

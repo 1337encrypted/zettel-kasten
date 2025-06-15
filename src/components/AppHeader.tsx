@@ -7,6 +7,7 @@ import { ShortcutCheatSheet } from './ShortcutCheatSheet';
 import { UserMenu } from './UserMenu';
 import { HeaderNavigation } from './HeaderNavigation';
 import { Folder, Profile } from '@/types';
+import { DocsLink } from './DocsLink';
 
 export const AppHeader = ({
   onExportAllNotes,
@@ -50,18 +51,13 @@ export const AppHeader = ({
             onCheatSheetOpenChange={onCheatSheetOpenChange}
           />
         )}
+        <DocsLink />
       </div>
       
       <div className="w-1/3 text-center">
-        {user ? (
-          <Link to="/dashboard" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-            <span className="text-4xl font-bold tracking-wide font-mono">{user.user_metadata.username || 'Zet'}</span>
-          </Link>
-        ) : (
-          <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-            <span className="text-4xl font-bold tracking-wide font-mono">Zet</span>
-          </Link>
-        )}
+        <Link to={user ? '/dashboard' : '/'} className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
+          <span className="text-4xl font-bold tracking-wide font-mono">Zet</span>
+        </Link>
       </div>
       
       <div className="w-1/3 flex justify-end items-center gap-2">

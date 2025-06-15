@@ -9,14 +9,19 @@ import { useNoteEditor } from '@/hooks/useNoteEditor';
 import { Switch } from './ui/switch';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
-
 interface NoteEditorProps {
-  onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string, isPublic?: boolean }) => void;
+  onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & {
+    id?: string;
+    isPublic?: boolean;
+  }) => void;
   selectedNote: Note | null;
   onDelete: (noteId: string) => void;
 }
-
-const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete }) => {
+const NoteEditor: React.FC<NoteEditorProps> = ({
+  onSave,
+  selectedNote,
+  onDelete
+}) => {
   const {
     title,
     setTitle,
@@ -28,12 +33,15 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
     fileInputRef,
     handleClear,
     handleAddImageClick,
-    handleImageUpload,
-  } = useNoteEditor({ onSave: () => {}, selectedNote });
-
-  const { user } = useAuth();
+    handleImageUpload
+  } = useNoteEditor({
+    onSave: () => {},
+    selectedNote
+  });
+  const {
+    user
+  } = useAuth();
   const [isPublic, setIsPublic] = React.useState(false);
-
   React.useEffect(() => {
     if (selectedNote) {
       setIsPublic((selectedNote as any).isPublic || false);
@@ -41,7 +49,6 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
       setIsPublic(false);
     }
   }, [selectedNote]);
-
   const handleSave = () => {
     if (!title.trim()) {
       toast.error('Title is required.');
@@ -53,41 +60,24 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
       title,
       content,
       tags: tagArray,
-      isPublic,
+      isPublic
     });
   };
-  
   const publicLink = React.useMemo(() => {
     if (isPublic && selectedNote && (selectedNote as any).slug && user) {
-        return `${window.location.origin}/u/${user.id}/${(selectedNote as any).slug}`;
+      return `${window.location.origin}/u/${user.id}/${(selectedNote as any).slug}`;
     }
     return null;
   }, [isPublic, selectedNote, user]);
-
-  return (
-    <div className="space-y-4 p-4 border rounded-lg shadow h-full flex flex-col">
+  return <div className="space-y-4 p-4 border rounded-lg shadow h-full flex flex-col">
       <h2 className="text-2xl font-semibold">{selectedNote ? 'Edit Note' : 'Create New Note'}</h2>
       <div>
         <Label htmlFor="note-title" className="text-sm font-medium">Title</Label>
-        <Input
-          id="note-title"
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter note title"
-          className="mt-1"
-        />
+        <Input id="note-title" type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Enter note title" className="mt-1" />
       </div>
       <div>
         <Label htmlFor="note-tags" className="text-sm font-medium">Tags (comma-separated)</Label>
-        <Input
-          id="note-tags"
-          type="text"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          placeholder="e.g. programming, react, thoughts"
-          className="mt-1"
-        />
+        <Input id="note-tags" type="text" value={tags} onChange={e => setTags(e.target.value)} placeholder="e.g. programming, react, thoughts" className="mt-1" />
       </div>
       <div className="flex-grow flex flex-col min-h-0">
         <div className="flex justify-between items-center mb-1">
@@ -97,59 +87,27 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete 
               Add Image
           </Button>
         </div>
-        <Textarea
-          id="note-content"
-          ref={textareaRef}
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Enter note content in Markdown..."
-          className="mt-1 flex-grow min-h-[400px] font-mono text-sm resize-none"
-        />
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleImageUpload}
-          className="hidden"
-          accept="image/png, image/jpeg, image/gif, image/webp"
-        />
+        <Textarea id="note-content" ref={textareaRef} value={content} onChange={e => setContent(e.target.value)} placeholder="Enter note content in Markdown..." className="mt-1 flex-grow min-h-[400px] font-mono text-sm resize-none" />
+        <input type="file" ref={fileInputRef} onChange={handleImageUpload} className="hidden" accept="image/png, image/jpeg, image/gif, image/webp" />
       </div>
       <div className="flex items-center space-x-2">
         <Switch id="is-public" checked={isPublic} onCheckedChange={setIsPublic} />
         <Label htmlFor="is-public">Make this note public</Label>
       </div>
-      {publicLink && (
-        <div className="text-sm text-muted-foreground p-2 bg-secondary rounded-md break-all">
-          <Label className="font-semibold">Public link:</Label>
-          <a href={publicLink} target="_blank" rel="noopener noreferrer" className="text-primary underline ml-2">
-            {publicLink}
-          </a>
-        </div>
-      )}
+      {publicLink}
       <div>
         <Button onClick={handleSave} className="w-full sm:w-auto">
           {selectedNote ? 'Save Changes' : 'Create Note'}
         </Button>
-        {selectedNote && (
-          <>
-            <Button 
-              variant="secondary" 
-              onClick={handleClear} 
-              className="w-full sm:w-auto ml-2"
-            >
+        {selectedNote && <>
+            <Button variant="secondary" onClick={handleClear} className="w-full sm:w-auto ml-2">
               Clear
             </Button>
-            <Button
-              variant="destructive"
-              onClick={() => onDelete(selectedNote.id)}
-              className="w-full sm:w-auto ml-2"
-            >
+            <Button variant="destructive" onClick={() => onDelete(selectedNote.id)} className="w-full sm:w-auto ml-2">
               Delete
             </Button>
-          </>
-        )}
+          </>}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default NoteEditor;

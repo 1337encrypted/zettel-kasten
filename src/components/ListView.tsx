@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Folder, Note } from '@/types';
 import FolderList from '@/components/FolderList';
@@ -55,7 +56,11 @@ export const ListView: React.FC<ListViewProps> = ({
 }) => {
   const isSearching = !!searchQuery.trim();
 
-  const selectableNotes = filteredNotes;
+  const notesForList = readmeNote && !isSearching 
+    ? filteredNotes.filter(n => n.id !== readmeNote.id) 
+    : filteredNotes;
+
+  const selectableNotes = notesForList;
   const allNotesSelected = selectableNotes.length > 0 && selectedNoteIds.length === selectableNotes.length;
 
   return (
@@ -91,7 +96,7 @@ export const ListView: React.FC<ListViewProps> = ({
       )}
       
       <NoteList
-        notes={filteredNotes}
+        notes={notesForList}
         onSelectNote={onSelectNote}
         selectedNoteId={selectedNoteId}
         selectedNoteIds={selectedNoteIds}
@@ -99,12 +104,24 @@ export const ListView: React.FC<ListViewProps> = ({
       />
 
       {readmeNote && !isSearching && (
-        <div className="mt-6">
-          <NoteView 
-            note={readmeNote}
-            allNotes={allNotes}
-            onSelectNote={onSelectNote}
-          />
+        <div
+          className="mt-6"
+          onClick={(e) => {
+            // Prevent navigation if a link inside the preview is clicked
+            if ((e.target as HTMLElement).closest('a')) {
+              return;
+            }
+            onSelectNote(readmeNote);
+          }}
+        >
+          <div className="cursor-pointer border rounded-lg p-4 hover:shadow-md transition-shadow" title="Click to open this note">
+            <h3 className="text-lg font-semibold mb-2 text-muted-foreground">README Preview</h3>
+            <NoteView 
+              note={readmeNote}
+              allNotes={allNotes}
+              onSelectNote={onSelectNote}
+            />
+          </div>
         </div>
       )}
     </div>

@@ -9,6 +9,8 @@ import { DetailView } from '@/components/DetailView';
 import { Toaster } from '@/components/ui/sonner';
 import { CommandMenu } from '@/components/CommandMenu';
 import 'katex/dist/katex.min.css';
+import { useFolderImporter } from '@/hooks/useFileImporter';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 
 const Index = () => {
   const {
@@ -50,6 +52,13 @@ const Index = () => {
     handleUpdateFolder,
     isFolderUpdating,
   } = useAppLogic();
+
+  const { isAdmin } = useIsAdmin();
+  const { 
+    triggerImport: triggerFolderImport, 
+    importFolderInputRef, 
+    handleFolderImport
+  } = useFolderImporter({ currentFolderId });
 
   const readmeNote = React.useMemo(() => {
     // Only show the README preview at the root level (no folder selected).
@@ -119,6 +128,17 @@ const Index = () => {
         onCreateFolder={handleCreateFolder}
         onSelectFolder={handleSelectFolderFromCommandMenu}
         onSelectAll={handleSelectAll}
+        onImportFolder={triggerFolderImport}
+        isAdmin={isAdmin}
+      />
+      <input
+        type="file"
+        ref={importFolderInputRef}
+        onChange={handleFolderImport}
+        style={{ display: 'none' }}
+        // @ts-ignore
+        webkitdirectory=""
+        mozdirectory=""
       />
     </div>
   );

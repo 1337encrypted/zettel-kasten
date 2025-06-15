@@ -43,7 +43,7 @@ export const HomeHeader = ({ onBackToList, onNavigateUp, showHomeButton }: HomeH
             )}
           </div>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Link to={user ? '/dashboard' : '/'} className="text-2xl font-bold">
+            <Link to={user ? '/dashboard' : '/'} className="text-2xl font-bold font-mono">
               Zet
             </Link>
           </div>

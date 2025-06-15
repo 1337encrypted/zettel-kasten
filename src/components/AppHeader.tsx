@@ -53,11 +53,11 @@ export const AppHeader = ({
       <div className="w-1/3 text-center">
         {user ? (
           <Link to="/dashboard" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-            <span className="text-4xl font-bold tracking-wide">{user.user_metadata.username || 'Zet'}</span>
+            <span className="text-4xl font-bold tracking-wide font-mono">{user.user_metadata.username || 'Zet'}</span>
           </Link>
         ) : (
           <Link to="/" className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-            <span className="text-4xl font-bold tracking-wide">Zet</span>
+            <span className="text-4xl font-bold tracking-wide font-mono">Zet</span>
           </Link>
         )}
       </div>

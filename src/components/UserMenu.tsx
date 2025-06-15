@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Trash2, Archive, Home, Keyboard, Camera, Shield, Users, KeyRound } from 'lucide-react';
+import { LogOut, Trash2, Archive, Keyboard, Camera, Shield, Users, KeyRound } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -103,12 +102,6 @@ export const UserMenu = ({
                 </DropdownMenuItem>
               </>
             )}
-            <DropdownMenuItem asChild className="cursor-pointer">
-              <Link to="/">
-                <Home className="mr-2 h-4 w-4" />
-                <span>Homepage</span>
-              </Link>
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onCheatSheetOpenChange?.(true)} className="cursor-pointer" disabled={!onCheatSheetOpenChange}>
               <Keyboard className="mr-2 h-4 w-4" />
               <span>Keyboard Shortcuts</span>

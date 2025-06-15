@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppLogic } from '@/hooks/useAppLogic';
 
@@ -53,6 +54,7 @@ const Index = () => {
         onBackToList={handleBackToList}
         cheatSheetOpen={cheatSheetOpen}
         onCheatSheetOpenChange={setCheatSheetOpen}
+        onNavigateUp={currentFolderId ? handleNavigateUp : undefined}
       />
 
       <main className="flex-grow flex flex-col">

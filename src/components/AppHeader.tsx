@@ -24,6 +24,7 @@ export const AppHeader = ({
 }) => {
   const { user } = useAuth();
   const location = useLocation();
+  const isAtRootOfNotes = !onNavigateUp && (location.pathname === '/dashboard' || location.pathname.startsWith('/u/'));
 
   return (
     <header className="mb-8 flex items-center justify-between relative h-10">
@@ -32,6 +33,7 @@ export const AppHeader = ({
           viewMode={viewMode}
           onBackToList={onBackToList}
           onNavigateUp={onNavigateUp}
+          isAtRoot={isAtRootOfNotes}
         />
         {user ? (
           <>

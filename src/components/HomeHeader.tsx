@@ -26,7 +26,11 @@ export const HomeHeader = () => {
           <div className="ml-auto flex items-center space-x-2 sm:space-x-4">
             <DocsLink />
             <ThemeToggle />
-            {!user && (
+            {user ? (
+              <Button asChild>
+                <Link to="/dashboard">Dashboard</Link>
+              </Button>
+            ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" asChild>
                   <Link to="/auth">Login</Link>

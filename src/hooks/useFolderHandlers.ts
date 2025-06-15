@@ -1,7 +1,6 @@
-
 import { useCallback } from 'react';
 import { Folder } from '@/types';
-import { NavigateOptions, To } from 'react-router-dom';
+import { NavigateOptions, To, useNavigate } from 'react-router-dom';
 
 interface UseFolderHandlersProps {
     folders: Folder[];
@@ -37,7 +36,7 @@ export const useFolderHandlers = ({
 
     const handleSelectFolder = (folderId: string | null) => {
         const path = getFolderPath(folderId);
-        navigate(path);
+        navigate(path === '/dashboard' ? path : `${path}/`);
         resetSelection();
     };
 
@@ -45,7 +44,7 @@ export const useFolderHandlers = ({
         if (!currentFolderId) return;
         const currentFolder = folders.find(f => f.id === currentFolderId);
         const parentPath = getFolderPath(currentFolder?.parentId || null);
-        navigate(parentPath);
+        navigate(parentPath === '/dashboard' ? parentPath : `${parentPath}/`);
         resetSelection();
     }, [currentFolderId, folders, getFolderPath, navigate, resetSelection]);
 
@@ -68,7 +67,7 @@ export const useFolderHandlers = ({
 
             if (currentFolderId && deletedFolderIds?.includes(currentFolderId)) {
                 const parentPath = getFolderPath(parentId);
-                navigate(parentPath);
+                navigate(parentPath === '/dashboard' ? parentPath : `${parentPath}/`);
             }
         } catch (error) {
             console.error("Failed to delete folder and its contents:", error);

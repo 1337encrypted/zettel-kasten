@@ -24,38 +24,80 @@ export const useAppLogic = () => {
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
   const [cheatSheetOpen, setCheatSheetOpen] = useState(false);
 
-  useEffect(() => {
-    if (folders.length === 0 && (location.pathname !== '/dashboard' && location.pathname !== '/dashboard/')) return;
-
-    const path = location.pathname.replace(/^\/dashboard\/?/, '');
-    if (!path) {
-      if (currentFolderId !== null) setCurrentFolderId(null);
-      return;
+  const getFolderPath = useCallback((folderId: string | null): string => {
+    if (!folderId) return '/dashboard';
+    
+    let path = '';
+    let currentFolderIdInPath: string | null = folderId;
+    
+    while(currentFolderIdInPath) {
+        const folder = folders.find(f => f.id === currentFolderIdInPath);
+        if (!folder) {
+            console.error("Could not find folder in path construction:", currentFolderIdInPath);
+            return '/dashboard';
+        }
+        path = `/${folder.slug}${path}`;
+        currentFolderIdInPath = folder.parentId;
     }
     
-    const slugs = path.split('/');
-    let folder: Folder | undefined;
+    return `/dashboard${path}`;
+  }, [folders]);
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/dashboard') && !notes.length && !folders.length && location.pathname.length > '/dashboard/'.length) return;
+
+    const path = location.pathname;
+    if (!path.startsWith('/dashboard')) return;
+
+    const isFolderPath = path.endsWith('/') || path === '/dashboard';
+    const rawSlugs = path.replace(/^\/dashboard\/?/, '').replace(/\/$/, '');
+    const slugs = rawSlugs ? rawSlugs.split('/') : [];
+
     let parentId: string | null = null;
-    let validPath = true;
-
-    for (const slug of slugs) {
-      if (!slug) continue;
-      folder = folders.find(f => f.slug === slug && f.parentId === parentId);
-      if (!folder) {
-        validPath = false;
-        break;
-      }
-      parentId = folder.id;
+    let folderPathIsValid = true;
+    
+    const folderSlugs = isFolderPath ? slugs : slugs.slice(0, -1);
+    const noteSlug = isFolderPath ? undefined : slugs[slugs.length - 1];
+    
+    for (const slug of folderSlugs) {
+        const folder = folders.find(f => f.slug === slug && f.parentId === parentId);
+        if (folder) {
+            parentId = folder.id;
+        } else {
+            folderPathIsValid = false;
+            break;
+        }
+    }
+    
+    if (!folderPathIsValid) {
+        if (folders.length > 0 || notes.length > 0) navigate('/dashboard', { replace: true });
+        return;
     }
 
-    if (validPath) {
-      if (currentFolderId !== parentId) {
+    if (currentFolderId !== parentId) {
         setCurrentFolderId(parentId);
-      }
-    } else if (folders.length > 0) {
-      navigate('/dashboard', { replace: true });
     }
-  }, [location.pathname, folders, navigate, currentFolderId]);
+
+    if (noteSlug) {
+        const note = notes.find(n => n.slug === noteSlug && n.folderId === parentId);
+        if (note) {
+            if (selectedNote?.id !== note.id) {
+                setSelectedNote(note);
+                setViewMode('preview');
+            }
+        } else {
+            if (notes.length > 0 || folders.length > 0) {
+                const folderNavPath = getFolderPath(parentId);
+                navigate(folderNavPath === '/dashboard' ? folderNavPath : `${folderNavPath}/`, { replace: true });
+            }
+        }
+    } else {
+        if(selectedNote) {
+            setSelectedNote(null);
+            if (viewMode !== 'list') setViewMode('list');
+        }
+    }
+  }, [location.pathname, folders, notes, navigate, getFolderPath, currentFolderId, selectedNote, viewMode]);
 
   const {
     sortOrder,
@@ -79,24 +121,13 @@ export const useAppLogic = () => {
     resetSelection,
   } = useNoteSelection({ filteredNotes: selectableNotes, deleteMultipleNotes });
 
-  const getFolderPath = useCallback((folderId: string | null): string => {
-    if (!folderId) return '/dashboard';
-    
-    let path = '';
-    let currentFolderIdInPath: string | null = folderId;
-    
-    while(currentFolderIdInPath) {
-        const folder = folders.find(f => f.id === currentFolderIdInPath);
-        if (!folder) {
-            console.error("Could not find folder in path construction:", currentFolderIdInPath);
-            return '/dashboard';
-        }
-        path = `/${folder.slug}${path}`;
-        currentFolderIdInPath = folder.parentId;
+  const getNotePath = useCallback((note: Note): string => {
+    const folderPath = getFolderPath(note.folderId);
+    if (folderPath === '/dashboard') {
+        return note.slug ? `/dashboard/${note.slug}`: '/dashboard';
     }
-    
-    return `/dashboard${path}`;
-  }, [folders]);
+    return note.slug ? `${folderPath}/${note.slug}` : folderPath;
+  }, [getFolderPath]);
 
   const {
     handleRenameFolder,
@@ -129,6 +160,8 @@ export const useAppLogic = () => {
     resetSelection,
     saveNote,
     deleteNote,
+    navigate,
+    getNotePath,
   });
 
   const handleExportAllNotes = useCallback(() => {
@@ -172,7 +205,9 @@ export const useAppLogic = () => {
     setViewMode('list');
     setSelectedNote(null);
     resetSelection();
-  }, [resetSelection]);
+    const folderPath = getFolderPath(currentFolderId);
+    navigate(folderPath === '/dashboard' ? folderPath : `${folderPath}/`);
+  }, [resetSelection, currentFolderId, getFolderPath, navigate]);
 
   const handleOpenShortcuts = useCallback(() => {
     setCheatSheetOpen(true);

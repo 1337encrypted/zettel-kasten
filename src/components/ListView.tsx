@@ -1,11 +1,10 @@
+
 import React from 'react';
 import { Folder, Note } from '@/types';
 import FolderList from '@/components/FolderList';
 import NoteList from '@/components/NoteList';
 import { ListViewHeader } from './ListViewHeader';
 import { SelectionToolbar } from './SelectionToolbar';
-import { ReadmeDisplay } from './ReadmeDisplay';
-import { useCustomRenderers } from '@/hooks/useCustomRenderers';
 
 interface ListViewProps {
   filteredFolders: Folder[];
@@ -52,13 +51,10 @@ export const ListView: React.FC<ListViewProps> = ({
   onBulkDeleteNotes,
   onSelectAll,
 }) => {
-  const readmeNote = filteredNotes.find(note => note.title.toLowerCase() === 'readme');
   const isSearching = !!searchQuery.trim();
 
   const selectableNotes = filteredNotes;
   const allNotesSelected = selectableNotes.length > 0 && selectedNoteIds.length === selectableNotes.length;
-
-  const customRenderers = useCustomRenderers(allNotes, onSelectNote);
 
   return (
     <div className="space-y-6">
@@ -99,14 +95,6 @@ export const ListView: React.FC<ListViewProps> = ({
         selectedNoteIds={selectedNoteIds}
         onToggleNoteSelection={onToggleNoteSelection}
       />
-      
-      {readmeNote && !isSearching && (
-        <ReadmeDisplay
-          readmeNote={readmeNote}
-          onSelectNote={onSelectNote}
-          customRenderers={customRenderers}
-        />
-      )}
     </div>
   );
 };

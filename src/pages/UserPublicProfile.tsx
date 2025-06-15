@@ -7,6 +7,9 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import UserProfileHeader from '@/components/user-profile/UserProfileHeader';
 import UserPublicListView from '@/components/user-profile/UserPublicListView';
 import { usePublicProfileLogic } from '@/hooks/usePublicProfileLogic';
+import { Button } from '@/components/ui/button';
+import { Copy } from 'lucide-react';
+import { toast } from 'sonner';
 
 const UserPublicProfile = () => {
   const {
@@ -43,6 +46,13 @@ const UserPublicProfile = () => {
     onSelectAll: () => {},
     onOpenShortcuts: () => {},
   });
+
+  const handleCopyId = () => {
+    if (selectedNote) {
+      navigator.clipboard.writeText(selectedNote.id);
+      toast.info("Note ID copied to clipboard.");
+    }
+  };
 
   const isAtProfileRoot = viewMode === 'list' && !currentFolderId;
 
@@ -84,6 +94,13 @@ const UserPublicProfile = () => {
                         onSelectNote={handleSelectNote}
                      />
                   </div>
+                  {selectedNote && (
+                    <div className="flex items-center justify-end mt-4 p-2 border-t sticky bottom-0 bg-background">
+                      <Button variant="outline" size="icon" title="Copy Note ID" onClick={handleCopyId}>
+                          <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
             )}
 

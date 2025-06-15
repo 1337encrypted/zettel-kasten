@@ -33,15 +33,24 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
   const customRenderers = {
     ...customLinkRenderer,
     blockquote: (props: React.ComponentPropsWithoutRef<'blockquote'>) => {
-      // The `node` prop is not part of the official API but is passed by react-markdown
       const { node, children, ...rest } = props as any;
 
-      if (!node?.children?.[0]?.children?.[0]?.value) {
+      const getNodeText = (n: any): string => {
+        if (!n) return '';
+        if (n.type === 'text') return n.value || '';
+        if (n.children && Array.isArray(n.children)) {
+          return n.children.map(getNodeText).join('');
+        }
+        return '';
+      };
+
+      const firstParagraphNode = node?.children?.[0];
+      if (!firstParagraphNode) {
         return <blockquote className="pl-4 my-4 border-l-4" {...rest}>{children}</blockquote>;
       }
 
-      const textValue = node.children[0].children[0].value as string;
-      const match = textValue.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/);
+      const firstParagraphText = getNodeText(firstParagraphNode);
+      const match = firstParagraphText.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/);
 
       if (!match) {
         return <blockquote className="pl-4 my-4 border-l-4" {...rest}>{children}</blockquote>;
@@ -81,26 +90,31 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
       }
       
       const originalChildren = React.Children.toArray(children);
-      const firstPara = originalChildren[0] as React.ReactElement;
-      
-      const paraChildren = React.Children.toArray(firstPara.props.children);
+      let newChildren;
 
-      let newParaChildren;
-      const firstChildOfPara = paraChildren[0];
-
-      if (typeof firstChildOfPara === 'string') {
-        const newText = firstChildOfPara.substring(match[0].length);
-        newParaChildren = [newText, ...paraChildren.slice(1)];
-      } else if (React.isValidElement(firstChildOfPara) && typeof firstChildOfPara.props.children === 'string') {
-        const newText = (firstChildOfPara.props.children as string).substring(match[0].length);
-        const newChild = React.cloneElement(firstChildOfPara as React.ReactElement<any>, { children: newText });
-        newParaChildren = [newChild, ...paraChildren.slice(1)];
+      // Case 1: The admonition is the only thing in the first paragraph.
+      if (firstParagraphText.trim() === match[0].trim()) {
+        newChildren = originalChildren.slice(1);
       } else {
-        return <blockquote className="pl-4 my-4 border-l-4" {...rest}>{children}</blockquote>;
-      }
+        // Case 2: Admonition is inline with content. Try to strip it.
+        const firstPara = originalChildren[0] as React.ReactElement;
+        const paraChildren = React.Children.toArray(firstPara.props.children);
+        let newParaChildren;
+        const firstChildOfPara = paraChildren[0];
 
-      const newFirstPara = React.cloneElement(firstPara as React.ReactElement<any>, { children: newParaChildren });
-      const newChildren = [newFirstPara, ...originalChildren.slice(1)];
+        // This logic handles simple cases where the admonition is in the first text node.
+        if (typeof firstChildOfPara === 'string' && firstChildOfPara.startsWith(match[0])) {
+          const newText = firstChildOfPara.substring(match[0].length);
+          newParaChildren = [newText, ...paraChildren.slice(1)];
+        } else {
+          // Fallback for complex cases: render the content as is, inside the alert.
+          // The [!NOTE] part might still be visible, but the alert box will show.
+          newParaChildren = paraChildren;
+        }
+        
+        const newFirstPara = React.cloneElement(firstPara, { children: newParaChildren });
+        newChildren = [newFirstPara, ...originalChildren.slice(1)];
+      }
       
       return (
         <Alert variant={variant} className={`my-4 not-prose ${extraClasses}`}>

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +14,8 @@ import AuthPage from "./pages/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ConfirmEmailPage from "./pages/ConfirmEmail";
 import ResetPasswordPage from "./pages/ResetPassword";
+import AdminPage from "./pages/Admin";
+import AdminRoute from "./components/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +34,9 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<Index />} />
+              </Route>
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminPage />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

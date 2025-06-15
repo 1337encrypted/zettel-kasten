@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Trash2, Archive, ArrowLeft, Home, Keyboard, Camera, Shield } from 'lucide-react';
+import { LogOut, Trash2, Archive, ArrowLeft, Home, Keyboard, Camera, Shield, Users } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -106,12 +105,20 @@ export const AppHeader = ({
                     <span>Change Avatar</span>
                   </DropdownMenuItem>
                   {isAdmin && (
-                    <AdminSettingsDialog>
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Shield className="mr-2 h-4 w-4" />
-                        <span>Admin Settings</span>
+                    <>
+                      <AdminSettingsDialog>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Admin Settings</span>
+                        </DropdownMenuItem>
+                      </AdminSettingsDialog>
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link to="/admin">
+                          <Users className="mr-2 h-4 w-4" />
+                          <span>User Management</span>
+                        </Link>
                       </DropdownMenuItem>
-                    </AdminSettingsDialog>
+                    </>
                   )}
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link to="/">

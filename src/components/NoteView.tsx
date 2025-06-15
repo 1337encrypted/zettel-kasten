@@ -20,8 +20,9 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
   const notesByTitle = useMemo(() => {
     return allNotes.reduce((acc, note) => {
         if (note.title) {
-            if (!acc[note.title]) { // Take the first one if there are duplicates
-                acc[note.title] = note;
+            const normalizedTitle = note.title.trim().toLowerCase();
+            if (!acc[normalizedTitle]) { // Take the first one if there are duplicates
+                acc[normalizedTitle] = note;
             }
         }
         return acc;
@@ -47,7 +48,8 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
             const match = /\[\[(.+?)\]\]/.exec(part);
             if (match) {
               const noteTitle = match[1];
-              const linkedNote = notesByTitle[noteTitle];
+              const normalizedTitle = noteTitle.trim().toLowerCase();
+              const linkedNote = notesByTitle[normalizedTitle];
               if (linkedNote) {
                 return (
                   <a

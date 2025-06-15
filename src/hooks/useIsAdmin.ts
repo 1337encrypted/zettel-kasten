@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 
 const checkIsAdmin = async (userId: string) => {
-  const { data, error } = await supabase.rpc('is_admin', { user_id: userId });
+  const { data, error } = await supabase.rpc('is_admin', { p_user_id: userId });
   if (error) {
     console.error('Error checking admin status:', error);
     return false;

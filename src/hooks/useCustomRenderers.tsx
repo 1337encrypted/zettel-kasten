@@ -21,7 +21,7 @@ export const useCustomRenderers = (allNotes: Note[], onSelectNote: (note: Note) 
                     return parts.map((part, j) => {
                         const match = /\[\[(.+?)\]\]/.exec(part);
                         if (match) {
-                            const noteId = match[1];
+                            const noteId = match[1].trim();
                             const linkedNote = notesById[noteId];
                             if (linkedNote) {
                                 return (

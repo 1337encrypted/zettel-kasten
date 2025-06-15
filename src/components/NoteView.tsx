@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -85,6 +86,9 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
 
       return <a {...props}>{children}</a>;
     },
+    img: (props: React.ComponentPropsWithoutRef<'img'>) => {
+      return <img {...props} className="max-w-full h-auto rounded-md border" alt={props.alt || ''} />;
+    }
   };
 
   return (

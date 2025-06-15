@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from './ThemeToggle';
 import { DocsLink } from './DocsLink';
-import { ArrowLeft, ArrowUp, Home } from 'lucide-react';
+import { ArrowLeft, Home } from 'lucide-react';
 
 interface HomeHeaderProps {
   onBackToList?: () => void;
@@ -34,8 +34,8 @@ export const HomeHeader = ({ onBackToList, onNavigateUp, showHomeButton }: HomeH
               </Button>
             )}
             {onNavigateUp && (
-              <Button variant="ghost" size="icon" onClick={onNavigateUp} aria-label="Navigate up">
-                <ArrowUp className="h-5 w-5" />
+              <Button variant="ghost" size="icon" onClick={onNavigateUp} aria-label="Up a level">
+                <ArrowLeft className="h-5 w-5" />
               </Button>
             )}
             {user && (

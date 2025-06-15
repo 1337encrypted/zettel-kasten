@@ -39,9 +39,10 @@ export const useSaveNote = () => {
         is_public: !!noteData.isPublic,
       };
 
-      const oldNote = noteData.id ? (queryClient.getQueryData(['notes', user?.id]) as (Note[] | undefined))?.find(n => n.id === noteData.id) as any : null;
+      const allNotes = queryClient.getQueryData(['notes', user?.id]) as Note[] | undefined;
+      const oldNote = noteData.id ? allNotes?.find(n => n.id === noteData.id) : undefined;
 
-      if (!noteData.id || (oldNote && oldNote.title !== noteData.title)) {
+      if (!noteData.id || (oldNote && (oldNote.title !== noteData.title || !oldNote.slug))) {
         const baseSlug = slugify(noteData.title) || 'untitled';
         const uniquePart = uuidv4().split('-')[0];
         noteToSave.slug = `${baseSlug}-${uniquePart}`;

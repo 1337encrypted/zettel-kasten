@@ -249,12 +249,34 @@ export type Database = {
         }
         Returns: boolean
       }
+      search_public_content: {
+        Args: {
+          p_search_term: string
+        }
+        Returns: {
+          result_type: "user" | "note"
+          result_id: string
+          username: string | null
+          user_avatar_url: string | null
+          user_updated_at: string | null
+          note_title: string | null
+          note_slug: string | null
+          note_updated_at: string | null
+          note_tags: string[] | null
+          note_author_id: string | null
+          note_author_username: string | null
+          note_author_avatar_url: string | null
+          note_author_updated_at: string | null
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "user"
+      search_result_type: "user" | "note"
     }
     CompositeTypes: {
       [_ in never]: never
     }
   }
 }
+

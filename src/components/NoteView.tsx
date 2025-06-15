@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
+import rehypeRaw from 'rehype-raw';
 import { Note } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Tag, Link2 } from 'lucide-react';
@@ -89,6 +90,7 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
       )}
       <ReactMarkdown 
         remarkPlugins={[remarkGfm, remarkBreaks]}
+        rehypePlugins={[rehypeRaw]}
         components={customRenderers}
       >
         {note.content}

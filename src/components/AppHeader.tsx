@@ -1,3 +1,4 @@
+
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -64,9 +65,6 @@ export const AppHeader = ({
       </div>
       
       <div className="w-1/3 flex justify-end items-center gap-2">
-        {currentFolder && onUpdateFolder && profile && profile.is_public && typeof isFolderUpdating !== 'undefined' && (
-          
-        )}
         <ThemeToggle />
         {user && !currentFolder && location.pathname !== '/dashboard' && (
           <Button asChild>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
@@ -36,6 +35,16 @@ export const DetailView: React.FC<DetailViewProps> = ({
   const [isPublic, setIsPublic] = React.useState(false);
 
   const isOwner = selectedNote && user && selectedNote.userId === user.id;
+
+  React.useEffect(() => {
+    if (selectedNote && user) {
+      console.log('--- Debugging Note Ownership ---');
+      console.log('Selected Note User ID:', selectedNote.userId);
+      console.log('Current User ID:', user.id);
+      console.log('Are IDs equal?', selectedNote.userId === user.id);
+      console.log('---------------------------------');
+    }
+  }, [selectedNote, user]);
 
   React.useEffect(() => {
     if (selectedNote) {

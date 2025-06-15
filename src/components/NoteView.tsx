@@ -6,7 +6,9 @@ import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
 import { Note } from '@/types';
 import { Badge } from '@/components/ui/badge';
-import { Tag, Link2 } from 'lucide-react';
+import { Tag, Link2, Copy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface NoteViewProps {
   note: Note | null;
@@ -75,6 +77,40 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
   
       return <p>{processedChildren}</p>;
     },
+    pre: ({ children }: { children?: React.ReactNode }) => {
+      if (!children || !React.isValidElement(children)) {
+        return <pre>{children}</pre>;
+      }
+      
+      const codeString = String(children.props.children).replace(/\n$/, '');
+
+      const handleCopy = () => {
+        navigator.clipboard.writeText(codeString)
+          .then(() => {
+            toast.success("Code copied to clipboard!");
+          })
+          .catch(err => {
+            toast.error("Failed to copy code.");
+            console.error('Failed to copy text: ', err);
+          });
+      };
+
+      return (
+        <div className="relative group">
+          <pre>{children}</pre>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCopy}
+            className="absolute top-2 right-2 h-auto px-2 py-1.5 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+            aria-label="Copy code"
+          >
+            <Copy className="h-3 w-3 mr-1" />
+            Copy
+          </Button>
+        </div>
+      );
+    }
   };
 
   return (

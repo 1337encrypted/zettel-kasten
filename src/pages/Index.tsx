@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppLogic } from '@/hooks/useAppLogic';
 
@@ -49,6 +50,12 @@ const Index = () => {
     isFolderUpdating,
   } = useAppLogic();
 
+  const readmeNote = React.useMemo(() => {
+    // Only show the README preview at the root level (no folder selected).
+    if (currentFolderId) return undefined;
+    return filteredNotes.find(note => note.title.toLowerCase() === 'readme' && !note.folderId);
+  }, [filteredNotes, currentFolderId]);
+
   return (
     <div className="min-h-screen w-full flex flex-col bg-background p-4 md:p-8" style={{ fontFamily: "Inter, sans-serif" }}>
       <AppHeader
@@ -83,6 +90,7 @@ const Index = () => {
             onToggleNoteSelection={handleToggleNoteSelection}
             onBulkDeleteNotes={handleBulkDeleteNotes}
             onSelectAll={handleSelectAll}
+            readmeNote={readmeNote}
           />
         ) : (
           <DetailView 

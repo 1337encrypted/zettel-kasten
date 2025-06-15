@@ -17,10 +17,12 @@ interface NoteViewProps {
 }
 
 const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => {
-  const notesBySlug = useMemo(() => {
+  const notesByTitle = useMemo(() => {
     return allNotes.reduce((acc, note) => {
-        if (note.slug) {
-            acc[note.slug] = note;
+        if (note.title) {
+            if (!acc[note.title]) { // Take the first one if there are duplicates
+                acc[note.title] = note;
+            }
         }
         return acc;
     }, {} as Record<string, Note>);
@@ -40,12 +42,12 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
   
       const processedChildren = childrenArray.flatMap((child, i) => {
         if (typeof child === 'string') {
-          const parts = child.split(/(\[\[[a-zA-Z0-9-]+\]\])/g);
+          const parts = child.split(/(\[\[.+?\]\])/g);
           return parts.map((part, j) => {
-            const match = /\[\[([a-zA-Z0-9-]+)\]\]/.exec(part);
+            const match = /\[\[(.+?)\]\]/.exec(part);
             if (match) {
-              const noteSlug = match[1];
-              const linkedNote = notesBySlug[noteSlug];
+              const noteTitle = match[1];
+              const linkedNote = notesByTitle[noteTitle];
               if (linkedNote) {
                 return (
                   <a
@@ -63,8 +65,8 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
                 );
               } else {
                 return (
-                  <span key={`${i}-${j}`} className="text-destructive font-semibold">
-                    [broken link]
+                  <span key={`${i}-${j}`} className="text-muted-foreground italic">
+                    {`[[${noteTitle}]]`}
                   </span>
                 );
               }

@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Folder } from '@/types';
 import { toast } from "@/components/ui/sonner";
@@ -21,6 +22,7 @@ export const useFolders = () => {
       const { data, error } = await supabase
         .from('folders')
         .select('*')
+        .eq('user_id', user!.id)
         .order('created_at', { ascending: false });
       
       if (error) {

@@ -1,4 +1,3 @@
-
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -65,7 +64,7 @@ export const AppHeader = ({
       <div className="w-1/3 flex justify-end items-center gap-2">
         <ThemeToggle />
         {!user && location.pathname !== '/auth' && (
-           <Button asChild variant="outline">
+           <Button asChild>
             <Link to="/auth">Login</Link>
           </Button>
         )}

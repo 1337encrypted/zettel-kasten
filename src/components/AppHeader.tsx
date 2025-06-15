@@ -1,3 +1,4 @@
+
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -34,7 +35,7 @@ export const AppHeader = ({
           onNavigateUp={onNavigateUp}
           isAtRoot={isAtRootOfNotes}
         />
-        {user ? (
+        {user && (
           <>
             <UserMenu
               onExportAllNotes={onExportAllNotes}
@@ -46,12 +47,6 @@ export const AppHeader = ({
               </Button>
             )}
           </>
-        ) : (
-           location.pathname !== '/auth' && (
-             <Button asChild variant="outline">
-              <Link to="/auth">Login</Link>
-            </Button>
-           )
         )}
       </div>
       
@@ -69,6 +64,11 @@ export const AppHeader = ({
       
       <div className="w-1/3 flex justify-end items-center gap-2">
         <ThemeToggle />
+        {!user && location.pathname !== '/auth' && (
+           <Button asChild variant="outline">
+            <Link to="/auth">Login</Link>
+          </Button>
+        )}
       </div>
       {onCheatSheetOpenChange && <ShortcutCheatSheet open={!!cheatSheetOpen} onOpenChange={onCheatSheetOpenChange} />}
     </header>

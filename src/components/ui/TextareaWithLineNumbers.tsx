@@ -20,7 +20,7 @@ const TextareaWithLineNumbers = React.forwardRef<HTMLTextAreaElement, TextareaPr
         };
 
         return (
-            <div className={cn("flex w-full rounded-md border border-input bg-background", className)}>
+            <div className={cn("flex w-full rounded-md border border-input bg-background overflow-hidden", className)}>
                 <div
                     ref={lineNumbersRef}
                     className="p-2 pr-3 text-right text-muted-foreground select-none font-mono text-sm overflow-y-hidden"
@@ -31,16 +31,14 @@ const TextareaWithLineNumbers = React.forwardRef<HTMLTextAreaElement, TextareaPr
                         <div key={lineNumber}>{lineNumber}</div>
                     ))}
                 </div>
-                <div className="flex-grow relative">
-                    <Textarea
-                        ref={ref}
-                        value={value}
-                        onScroll={handleScroll}
-                        className="absolute inset-0 w-full h-full !border-0 !rounded-none !ring-0 !ring-offset-0 p-2 font-mono text-sm resize-none bg-transparent"
-                        style={{ lineHeight: '1.5rem' }}
-                        {...props}
-                    />
-                </div>
+                <Textarea
+                    ref={ref}
+                    value={value}
+                    onScroll={handleScroll}
+                    className="flex-grow !border-0 !rounded-none !ring-0 !ring-offset-0 p-2 font-mono text-sm resize-none bg-transparent"
+                    style={{ lineHeight: '1.5rem' }}
+                    {...props}
+                />
             </div>
         );
     }

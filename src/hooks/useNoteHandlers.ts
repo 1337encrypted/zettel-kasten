@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { Note, Folder, Profile } from '@/types';
 import { NavigateOptions, To } from 'react-router-dom';
@@ -20,6 +21,7 @@ interface UseNoteHandlersProps {
 
 export const useNoteHandlers = ({
     currentFolderId,
+    selectedNote,
     setSelectedNote,
     setViewMode,
     resetSelection,

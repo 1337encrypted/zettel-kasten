@@ -192,6 +192,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_folders_for_user: {
+        Args: { p_user_id: string }
+        Returns: {
+          created_at: string
+          id: string
+          is_public: boolean
+          name: string
+          parent_id: string | null
+          slug: string | null
+          user_id: string
+        }[]
+      }
+      get_public_notes_for_user: {
+        Args: { p_user_id: string }
+        Returns: {
+          content: string | null
+          created_at: string
+          folder_id: string | null
+          id: string
+          is_public: boolean
+          slug: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       is_admin: {
         Args: { p_user_id: string }
         Returns: boolean

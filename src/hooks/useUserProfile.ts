@@ -24,9 +24,7 @@ const fetchUserProfileData = async (userId: string) => {
   if (!profile) throw new Error('User profile not found or is private.');
 
   const { data: notesData, error: notesError } = await supabase
-    .from('notes')
-    .select('*')
-    .eq('user_id', profile.id);
+    .rpc('get_public_notes_for_user', { p_user_id: profile.id });
 
   if (notesError) throw notesError;
 
@@ -43,9 +41,7 @@ const fetchUserProfileData = async (userId: string) => {
   } as Note));
 
   const { data: foldersData, error: foldersError } = await supabase
-    .from('folders')
-    .select('*')
-    .eq('user_id', profile.id);
+    .rpc('get_public_folders_for_user', { p_user_id: profile.id });
 
   if (foldersError) throw foldersError;
 

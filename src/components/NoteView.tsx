@@ -4,6 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { Note } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Tag, Copy } from 'lucide-react';
@@ -110,8 +112,8 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
         </div>
       )}
       <ReactMarkdown 
-        remarkPlugins={[remarkGfm, remarkBreaks]}
-        rehypePlugins={[rehypeRaw]}
+        remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+        rehypePlugins={[rehypeRaw, rehypeKatex]}
         components={customRenderers}
       >
         {note.content}

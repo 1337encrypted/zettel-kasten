@@ -8,6 +8,7 @@ import { ListView } from '@/components/ListView';
 import { DetailView } from '@/components/DetailView';
 import { Toaster } from '@/components/ui/sonner';
 import { CommandMenu } from '@/components/CommandMenu';
+import 'katex/dist/katex.min.css';
 
 const Index = () => {
   const {

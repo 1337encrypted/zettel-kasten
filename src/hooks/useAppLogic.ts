@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Note, Folder } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
@@ -12,6 +13,7 @@ import { useUrlSync } from './useUrlSync';
 import { useNoteExporter } from './useNoteExporter';
 import { usePathHelpers } from './usePathHelpers';
 import { useUIState } from './useUIState';
+import { useInteractionHandlers } from './useInteractionHandlers';
 
 export const useAppLogic = () => {
   const { notes, saveNote, deleteNote, deleteNotesByFolderIds, deleteMultipleNotes } = useNotes();
@@ -105,31 +107,26 @@ export const useAppLogic = () => {
 
   const { handleExportAllNotes } = useNoteExporter(notes, folders);
 
-  const handleBackToList = useCallback(() => {
-    setViewMode('list');
-    setSelectedNote(null);
-    resetSelection();
-    const folderPath = getFolderPath(currentFolderId);
-    navigate(folderPath === '/dashboard' ? folderPath : `${folderPath}/`);
-  }, [resetSelection, currentFolderId, getFolderPath, navigate]);
-
-  const handleEscape = useCallback((e: KeyboardEvent) => {
-    if (cheatSheetOpen) {
-      e.preventDefault();
-      setCheatSheetOpen(false);
-      return;
-    }
-    if (selectedNoteIds.length > 0) {
-      e.preventDefault();
-      resetSelection();
-    } else if (viewMode !== 'list') {
-      e.preventDefault();
-      handleBackToList();
-    } else if (currentFolderId) {
-      e.preventDefault();
-      handleNavigateUp();
-    }
-  }, [selectedNoteIds.length, viewMode, currentFolderId, resetSelection, handleBackToList, handleNavigateUp, cheatSheetOpen, setCheatSheetOpen]);
+  const {
+    handleBackToList,
+    handleEscape,
+    handleToggleView,
+    handleSelectFolderFromCommandMenu,
+  } = useInteractionHandlers({
+    currentFolderId,
+    viewMode,
+    selectedNoteIds,
+    cheatSheetOpen,
+    setViewMode,
+    setSelectedNote,
+    setCheatSheetOpen,
+    setSearchQuery,
+    resetSelection,
+    getFolderPath,
+    handleNavigateUp,
+    handleSelectFolder,
+    navigate,
+  });
 
   useKeyboardShortcuts({
       onNewNote: handleNewNote,
@@ -138,18 +135,6 @@ export const useAppLogic = () => {
       onSelectAll: handleSelectAll,
       onOpenShortcuts: handleOpenShortcuts,
   });
-
-  const handleToggleView = () => {
-    setViewMode(prev => (prev === 'edit' ? 'preview' : 'edit'));
-  };
-
-  const handleSelectFolderFromCommandMenu = (folderId: string) => {
-    handleSelectFolder(folderId);
-    setViewMode('list');
-    setSelectedNote(null);
-    setSearchQuery('');
-    resetSelection();
-  };
 
   return {
     notes,

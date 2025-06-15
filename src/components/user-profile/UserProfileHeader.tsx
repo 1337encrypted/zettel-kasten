@@ -16,7 +16,7 @@ const UserProfileHeader: React.FC<UserProfileHeaderProps> = ({ profile }) => {
             {(profile.username || 'A').charAt(0).toUpperCase()}
         </AvatarFallback>
       </Avatar>
-      <h1 className="text-3xl font-bold">Notes by {profile.username || 'Anonymous'}</h1>
+      <h1 className="text-3xl font-bold">Zettels by {profile.username || 'Anonymous'}</h1>
     </div>
   );
 };

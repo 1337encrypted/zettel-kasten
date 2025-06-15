@@ -1,9 +1,11 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Note } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
+import { useLocation } from 'react-router-dom';
 
 interface UseNoteEditorProps {
   onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => void;
@@ -24,6 +26,7 @@ export const useNoteEditor = ({ onSave, selectedNote }: UseNoteEditorProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const location = useLocation();
 
   const setContent = useCallback((newContent: string) => {
     setContentState(currentState => {
@@ -95,6 +98,7 @@ export const useNoteEditor = ({ onSave, selectedNote }: UseNoteEditorProps) => {
   
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      if (location.pathname !== '/dashboard') return;
       if (e.key === 's' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         handleSave();
@@ -103,10 +107,12 @@ export const useNoteEditor = ({ onSave, selectedNote }: UseNoteEditorProps) => {
 
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
-  }, [handleSave]);
+  }, [handleSave, location.pathname]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+        if (location.pathname !== '/dashboard') return;
+
         const target = e.target as HTMLElement;
         const isEditingContent = target.tagName === 'TEXTAREA' && target.id === 'note-content';
 
@@ -128,7 +134,7 @@ export const useNoteEditor = ({ onSave, selectedNote }: UseNoteEditorProps) => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [undo, redo]);
+  }, [undo, redo, location.pathname]);
 
 
   const handleAddImageClick = () => {

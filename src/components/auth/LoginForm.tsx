@@ -1,9 +1,8 @@
-
 import * as React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PasswordInput } from './PasswordInput';
 
 interface LoginFormProps {
@@ -21,13 +20,12 @@ export const LoginForm = ({ handleLogin, loading, email, setEmail, password, set
     <Card>
       <CardHeader>
         <CardTitle>Login</CardTitle>
-        <CardDescription>Enter your credentials to access your account.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="login-identifier">Email or Username</Label>
-            <Input id="login-identifier" type="text" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="your@email.com or username" />
+            <Input id="login-identifier" type="text" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password-login">Password</Label>

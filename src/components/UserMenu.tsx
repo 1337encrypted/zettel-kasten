@@ -106,12 +106,6 @@ export const UserMenu = ({
               <Keyboard className="mr-2 h-4 w-4" />
               <span>Keyboard Shortcuts</span>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="cursor-pointer">
-              <Link to="/docs">
-                <BookOpen className="mr-2 h-4 w-4" />
-                <span>Docs</span>
-              </Link>
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={onExportAllNotes} className="cursor-pointer" disabled={!onExportAllNotes}>
               <Archive className="mr-2 h-4 w-4" />
               <span>Export All Notes</span>

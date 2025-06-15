@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Note, Folder } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
 import { useFolders } from '@/hooks/useFolders';
@@ -8,6 +8,7 @@ import { useNoteSelection } from './useNoteSelection';
 import { useKeyboardShortcuts } from './useKeyboardShortcuts';
 import { useFolderHandlers } from './useFolderHandlers';
 import { useNoteHandlers } from './useNoteHandlers';
+import { useUrlSync } from './useUrlSync';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { toast } from '@/components/ui/sonner';
@@ -15,7 +16,6 @@ import { toast } from '@/components/ui/sonner';
 export const useAppLogic = () => {
   const { notes, saveNote, deleteNote, deleteNotesByFolderIds, deleteMultipleNotes } = useNotes();
   const { folders, createFolder, deleteFolderAndDescendants, renameFolder } = useFolders();
-  const location = useLocation();
   const navigate = useNavigate();
 
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
@@ -43,61 +43,18 @@ export const useAppLogic = () => {
     return `/dashboard${path}`;
   }, [folders]);
 
-  useEffect(() => {
-    if (location.pathname.startsWith('/dashboard') && !notes.length && !folders.length && location.pathname.length > '/dashboard/'.length) return;
-
-    const path = location.pathname;
-    if (!path.startsWith('/dashboard')) return;
-
-    const isFolderPath = path.endsWith('/') || path === '/dashboard';
-    const rawSlugs = path.replace(/^\/dashboard\/?/, '').replace(/\/$/, '');
-    const slugs = rawSlugs ? rawSlugs.split('/') : [];
-
-    let parentId: string | null = null;
-    let folderPathIsValid = true;
-    
-    const folderSlugs = isFolderPath ? slugs : slugs.slice(0, -1);
-    const noteSlug = isFolderPath ? undefined : slugs[slugs.length - 1];
-    
-    for (const slug of folderSlugs) {
-        const folder = folders.find(f => f.slug === slug && f.parentId === parentId);
-        if (folder) {
-            parentId = folder.id;
-        } else {
-            folderPathIsValid = false;
-            break;
-        }
-    }
-    
-    if (!folderPathIsValid) {
-        if (folders.length > 0 || notes.length > 0) navigate('/dashboard', { replace: true });
-        return;
-    }
-
-    if (currentFolderId !== parentId) {
-        setCurrentFolderId(parentId);
-    }
-
-    if (noteSlug) {
-        const note = notes.find(n => n.slug === noteSlug && n.folderId === parentId);
-        if (note) {
-            if (selectedNote?.id !== note.id) {
-                setSelectedNote(note);
-                setViewMode('preview');
-            }
-        } else {
-            if (notes.length > 0 || folders.length > 0) {
-                const folderNavPath = getFolderPath(parentId);
-                navigate(folderNavPath === '/dashboard' ? folderNavPath : `${folderNavPath}/`, { replace: true });
-            }
-        }
-    } else {
-        if(selectedNote) {
-            setSelectedNote(null);
-            if (viewMode !== 'list') setViewMode('list');
-        }
-    }
-  }, [location.pathname, folders, notes, navigate, getFolderPath, currentFolderId, selectedNote, viewMode]);
+  useUrlSync({
+    notes,
+    folders,
+    getFolderPath,
+    navigate,
+    currentFolderId,
+    selectedNote,
+    viewMode,
+    setCurrentFolderId,
+    setSelectedNote,
+    setViewMode,
+  });
 
   const {
     sortOrder,

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Trash2, Archive, ArrowLeft, Home, Keyboard, Camera } from 'lucide-react';
+import { LogOut, Trash2, Archive, ArrowLeft, Home, Keyboard, Camera, Shield } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +29,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShortcutCheatSheet } from './ShortcutCheatSheet';
 import { ProfileAvatar } from './ProfileAvatar';
 import { useAvatarHandler } from '@/hooks/useAvatarHandler';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { AdminSettingsDialog } from './AdminSettingsDialog';
 
 export const AppHeader = ({
   onExportAllNotes,
@@ -49,6 +51,7 @@ export const AppHeader = ({
   const location = useLocation();
   const navigate = useNavigate();
   const { fileInputRef, handleAvatarClick, handleAvatarUpload, isUploading } = useAvatarHandler();
+  const { isAdmin } = useIsAdmin();
 
   const handleDeleteAccount = async () => {
     try {
@@ -102,6 +105,14 @@ export const AppHeader = ({
                     <Camera className="mr-2 h-4 w-4" />
                     <span>Change Avatar</span>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <AdminSettingsDialog>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Admin Settings</span>
+                      </DropdownMenuItem>
+                    </AdminSettingsDialog>
+                  )}
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link to="/">
                       <Home className="mr-2 h-4 w-4" />

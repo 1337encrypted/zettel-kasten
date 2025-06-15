@@ -14,9 +14,11 @@ interface NoteViewProps {
 }
 
 const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => {
-  const notesById = useMemo(() => {
+  const notesBySlug = useMemo(() => {
     return allNotes.reduce((acc, note) => {
-        acc[note.id] = note;
+        if (note.slug) {
+            acc[note.slug] = note;
+        }
         return acc;
     }, {} as Record<string, Note>);
   }, [allNotes]);
@@ -39,8 +41,8 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
           return parts.map((part, j) => {
             const match = /\[\[([a-zA-Z0-9-]+)\]\]/.exec(part);
             if (match) {
-              const noteId = match[1];
-              const linkedNote = notesById[noteId];
+              const noteSlug = match[1];
+              const linkedNote = notesBySlug[noteSlug];
               if (linkedNote) {
                 return (
                   <a

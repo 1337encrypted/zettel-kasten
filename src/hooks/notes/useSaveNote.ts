@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 // We are not using fromNoteDb anymore as it's in a read-only file.
 import { getFilePathsFromContent } from './noteUtils';
+import { v4 as uuidv4 } from 'uuid';
 
 const slugify = (text: string) => {
   if (!text) return null;
@@ -41,7 +42,9 @@ export const useSaveNote = () => {
       const oldNote = noteData.id ? (queryClient.getQueryData(['notes', user?.id]) as (Note[] | undefined))?.find(n => n.id === noteData.id) as any : null;
 
       if (!noteData.id || (oldNote && oldNote.title !== noteData.title)) {
-        noteToSave.slug = slugify(noteData.title);
+        const baseSlug = slugify(noteData.title) || 'untitled';
+        const uniquePart = uuidv4().split('-')[0];
+        noteToSave.slug = `${baseSlug}-${uniquePart}`;
       }
 
       if (noteData.id) {
@@ -96,7 +99,7 @@ export const useSaveNote = () => {
     },
     onError: (error: any) => {
         if (error.code === '23505') {
-            toast.error(`A note with a similar title already exists, which would create a conflicting link. Please choose a different title.`);
+            toast.error(`A conflicting entry already exists. Please try again.`);
         } else {
             toast.error(error.message);
         }

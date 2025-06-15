@@ -6,12 +6,11 @@ import remarkBreaks from 'remark-breaks';
 import rehypeRaw from 'rehype-raw';
 import { Note } from '@/types';
 import { Badge } from '@/components/ui/badge';
-import { Tag, Copy, AlertTriangle, Info, Lightbulb, CircleHelp, OctagonX } from 'lucide-react';
+import { Tag, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useCustomRenderers } from '@/hooks/useCustomRenderers';
 import MermaidDiagram from './MermaidDiagram';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface NoteViewProps {
   note: Note | null;
@@ -32,100 +31,6 @@ const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => 
 
   const customRenderers = {
     ...customLinkRenderer,
-    blockquote: (props: React.ComponentPropsWithoutRef<'blockquote'>) => {
-      const { node, children, ...rest } = props as any;
-
-      const getNodeText = (n: any): string => {
-        if (!n) return '';
-        if (n.type === 'text') return n.value || '';
-        if (n.children && Array.isArray(n.children)) {
-          return n.children.map(getNodeText).join('');
-        }
-        return '';
-      };
-
-      const firstParagraphNode = node?.children?.[0];
-      if (!firstParagraphNode) {
-        return <blockquote className="pl-4 my-4 border-l-4" {...rest}>{children}</blockquote>;
-      }
-
-      const firstParagraphText = getNodeText(firstParagraphNode);
-      const match = firstParagraphText.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/);
-
-      if (!match) {
-        return <blockquote className="pl-4 my-4 border-l-4" {...rest}>{children}</blockquote>;
-      }
-      
-      const type = match[1].toLowerCase();
-      const title = match[1].charAt(0).toUpperCase() + match[1].slice(1);
-
-      let variant: 'default' | 'destructive' = 'default';
-      let icon: React.ReactNode;
-      let extraClasses = '';
-
-      switch (type) {
-        case 'note':
-          icon = <CircleHelp className="h-5 w-5" />;
-          extraClasses = 'bg-blue-50 border-blue-200 text-blue-900 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-50 [&>svg]:text-blue-500 dark:[&>svg]:text-blue-400';
-          break;
-        case 'tip':
-          icon = <Lightbulb className="h-5 w-5" />;
-          extraClasses = 'bg-green-50 border-green-200 text-green-900 dark:bg-green-950 dark:border-green-800 dark:text-green-50 [&>svg]:text-green-500 dark:[&>svg]:text-green-400';
-          break;
-        case 'important':
-          icon = <Info className="h-5 w-5" />;
-          extraClasses = 'bg-purple-50 border-purple-200 text-purple-900 dark:bg-purple-950 dark:border-purple-800 dark:text-purple-50 [&>svg]:text-purple-500 dark:[&>svg]:text-purple-400';
-          break;
-        case 'warning':
-          icon = <AlertTriangle className="h-5 w-5" />;
-          extraClasses = 'bg-yellow-50 border-yellow-200 text-yellow-900 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-50 [&>svg]:text-yellow-500 dark:[&>svg]:text-yellow-400';
-          break;
-        case 'caution':
-          variant = 'destructive';
-          icon = <OctagonX className="h-5 w-5" />;
-          extraClasses = 'border-red-200 text-red-900 bg-red-50 dark:border-red-800 dark:text-red-50 dark:bg-red-950 [&>svg]:text-red-500 dark:[&>svg]:text-red-400';
-          break;
-        default:
-          return <blockquote className="pl-4 my-4 border-l-4" {...rest}>{children}</blockquote>;
-      }
-      
-      const originalChildren = React.Children.toArray(children);
-      let newChildren;
-
-      // Case 1: The admonition is the only thing in the first paragraph.
-      if (firstParagraphText.trim() === match[0].trim()) {
-        newChildren = originalChildren.slice(1);
-      } else {
-        // Case 2: Admonition is inline with content. Try to strip it.
-        const firstPara = originalChildren[0] as React.ReactElement;
-        const paraChildren = React.Children.toArray(firstPara.props.children);
-        let newParaChildren;
-        const firstChildOfPara = paraChildren[0];
-
-        // This logic handles simple cases where the admonition is in the first text node.
-        if (typeof firstChildOfPara === 'string' && firstChildOfPara.startsWith(match[0])) {
-          const newText = firstChildOfPara.substring(match[0].length);
-          newParaChildren = [newText, ...paraChildren.slice(1)];
-        } else {
-          // Fallback for complex cases: render the content as is, inside the alert.
-          // The [!NOTE] part might still be visible, but the alert box will show.
-          newParaChildren = paraChildren;
-        }
-        
-        const newFirstPara = React.cloneElement(firstPara, { children: newParaChildren });
-        newChildren = [newFirstPara, ...originalChildren.slice(1)];
-      }
-      
-      return (
-        <Alert variant={variant} className={`my-4 not-prose ${extraClasses}`}>
-          {icon}
-          <AlertTitle className="font-bold">{title}</AlertTitle>
-          <AlertDescription asChild>
-            <div>{newChildren}</div>
-          </AlertDescription>
-        </Alert>
-      );
-    },
     pre: ({ children }: { children?: React.ReactNode }) => {
       if (!children || !React.isValidElement(children)) {
         return <pre>{children}</pre>;

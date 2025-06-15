@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,18 +10,21 @@ import { Toaster } from '@/components/ui/sonner';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigationShortcuts } from '@/hooks/useNavigationShortcuts';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface UserProfile {
   id: string;
   username: string | null;
   note_count: number;
   created_at: string | null;
+  avatar_url: string | null;
+  updated_at: string | null;
 }
 
 const fetchUsersWithNoteCounts = async () => {
   const { data: profiles, error: profilesError } = await supabase
     .from('profiles')
-    .select('id, username, created_at');
+    .select('id, username, created_at, avatar_url, updated_at');
   
   if (profilesError) throw profilesError;
 
@@ -74,15 +76,20 @@ const Home = () => {
         {isLoading && <p className="text-center">Loading users...</p>}
         {error && <p className="text-destructive text-center">Could not load users. For this to work, RLS policies on 'profiles' and 'notes' tables must allow public read access.</p>}
         <div className="flex flex-col gap-4 max-w-3xl mx-auto w-full">
-          {filteredUsers?.map(user => (
-            <Link to={`/u/${user.id}`} key={user.id}>
-              <Card className="hover:bg-muted/50 transition-colors w-full">
-                <div className="p-4 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="bg-primary/10 p-3 rounded-full">
-                            <User className="h-6 w-6 text-primary" />
-                        </div>
-                        <div>
+          {filteredUsers?.map(user => {
+            const uniqueAvatarUrl = user.avatar_url && user.updated_at ? `${user.avatar_url}?t=${new Date(user.updated_at).getTime()}` : user.avatar_url;
+            return (
+              <Link to={`/u/${user.id}`} key={user.id}>
+                <Card className="hover:bg-muted/50 transition-colors w-full">
+                  <div className="p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                          <Avatar>
+                              <AvatarImage src={uniqueAvatarUrl || undefined} alt={user.username || 'Anonymous'} />
+                              <AvatarFallback>
+                                  {(user.username || 'A').charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                          </Avatar>
+                          <div>
                             <p className="font-semibold text-lg">{user.username || 'Anonymous'}</p>
                             {user.created_at && (
                                 <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -90,16 +97,17 @@ const Home = () => {
                                     Joined {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
                                 </p>
                             )}
-                        </div>
-                    </div>
-                    <div className="text-right">
+                          </div>
+                      </div>
+                      <div className="text-right">
                          <p className="font-semibold text-lg">{user.note_count}</p>
                          <p className="text-sm text-muted-foreground">{user.note_count === 1 ? 'note' : 'notes'}</p>
-                    </div>
-                </div>
-              </Card>
-            </Link>
-          ))}
+                      </div>
+                  </div>
+                </Card>
+              </Link>
+            )
+          })}
         </div>
       </main>
       <AppFooter />

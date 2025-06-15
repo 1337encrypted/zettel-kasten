@@ -9,6 +9,7 @@ import NoteView from '@/components/NoteView';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Note } from '@/types';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 const UserPublicProfile = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -79,7 +80,13 @@ const UserPublicProfile = () => {
         {error && <p className="text-destructive text-center">{(error as Error).message}</p>}
         {profile && (
           <div>
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center gap-4 mb-8">
+              <Avatar className="h-16 w-16">
+                <AvatarImage src={profile.avatar_url ? `${profile.avatar_url}?t=${new Date(profile.updated_at || Date.now()).getTime()}` : undefined} alt={profile.username || 'Anonymous'} />
+                <AvatarFallback className="text-2xl">
+                    {(profile.username || 'A').charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
               <h1 className="text-3xl font-bold">Notes by {profile.username || 'Anonymous'}</h1>
             </div>
 

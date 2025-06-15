@@ -1,4 +1,3 @@
-
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,7 +6,7 @@ import { Note, Folder } from '@/types';
 const fetchUserProfileData = async (userId: string) => {
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id, username')
+    .select('id, username, avatar_url, updated_at')
     .eq('id', userId)
     .single();
 

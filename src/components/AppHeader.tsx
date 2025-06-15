@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
@@ -27,6 +26,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/sonner';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShortcutCheatSheet } from './ShortcutCheatSheet';
+import { ProfileAvatar } from './ProfileAvatar';
 
 export const AppHeader = ({
   onExportAllNotes,
@@ -81,7 +81,7 @@ export const AppHeader = ({
             <AlertDialog>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline">Account</Button>
+                  <ProfileAvatar />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
                   <DropdownMenuLabel>{user.email}</DropdownMenuLabel>

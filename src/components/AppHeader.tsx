@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { LogOut, Trash2, Archive, ArrowLeft, Home, Keyboard, Camera, Shield, Users } from 'lucide-react';
+import { LogOut, Trash2, Archive, ArrowLeft, Home, Keyboard, Camera, Shield, Users, KeyRound } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +30,7 @@ import { ProfileAvatar } from './ProfileAvatar';
 import { useAvatarHandler } from '@/hooks/useAvatarHandler';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { AdminSettingsDialog } from './AdminSettingsDialog';
+import { ChangePasswordDialog } from './auth/ChangePasswordDialog';
 
 const UNTOUCHABLE_USER_ID = '0c90fe7b-b66d-44fa-8a35-3ee7a2c39001';
 
@@ -54,6 +54,7 @@ export const AppHeader = ({
   const navigate = useNavigate();
   const { fileInputRef, handleAvatarClick, handleAvatarUpload, isUploading } = useAvatarHandler();
   const { isAdmin } = useIsAdmin();
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   const handleDeleteAccount = async () => {
     try {
@@ -139,6 +140,10 @@ export const AppHeader = ({
                     <span>Export All Notes</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={() => setIsChangePasswordOpen(true)} className="cursor-pointer">
+                    <KeyRound className="mr-2 h-4 w-4" />
+                    <span>Change Password</span>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={signOut} className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Logout</span>
@@ -208,6 +213,7 @@ export const AppHeader = ({
         <ThemeToggle />
       </div>
       {onCheatSheetOpenChange && <ShortcutCheatSheet open={!!cheatSheetOpen} onOpenChange={onCheatSheetOpenChange} />}
+      <ChangePasswordDialog open={isChangePasswordOpen} onOpenChange={setIsChangePasswordOpen} />
     </header>
   );
 };

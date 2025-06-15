@@ -44,6 +44,10 @@ const Index = () => {
     handleSelectAll,
     handleExportAllNotes,
     handleOpenShortcuts,
+    profile,
+    currentFolder,
+    handleUpdateFolder,
+    isFolderUpdating,
   } = useAppLogic();
 
   return (
@@ -55,6 +59,10 @@ const Index = () => {
         cheatSheetOpen={cheatSheetOpen}
         onCheatSheetOpenChange={setCheatSheetOpen}
         onNavigateUp={currentFolderId ? handleNavigateUp : undefined}
+        profile={profile}
+        currentFolder={currentFolder}
+        onUpdateFolder={handleUpdateFolder}
+        isFolderUpdating={isFolderUpdating}
       />
 
       <main className="flex-grow flex flex-col">

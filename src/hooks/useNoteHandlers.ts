@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { Note } from '@/types';
+import { Note, Folder, Profile } from '@/types';
 import { NavigateOptions, To } from 'react-router-dom';
 
 type NoteDataToSave = Pick<Note, 'title' | 'content' | 'tags'> & { id?: string, isPublic?: boolean };
@@ -15,6 +15,8 @@ interface UseNoteHandlersProps {
     deleteNote: (noteId: string) => void;
     navigate: (to: To, options?: NavigateOptions) => void;
     getNotePath: (note: Note) => string;
+    folders?: Folder[];
+    profile?: Profile | null;
 }
 
 export const useNoteHandlers = ({
@@ -27,6 +29,8 @@ export const useNoteHandlers = ({
     deleteNote,
     navigate,
     getNotePath,
+    folders,
+    profile,
 }: UseNoteHandlersProps) => {
 
     const handleNewNote = useCallback(() => {
@@ -36,8 +40,23 @@ export const useNoteHandlers = ({
     }, [resetSelection, setSelectedNote, setViewMode]);
     
     const handleSaveNote = useCallback(async (noteData: NoteDataToSave) => {
+        let isPublic = noteData.isPublic ?? false;
+
+        const noteFolderId = noteData.id 
+            ? selectedNote?.folderId 
+            : currentFolderId;
+        
+        const parentFolder = noteFolderId ? folders?.find(f => f.id === noteFolderId) : null;
+
+        if (!profile?.is_public) {
+            isPublic = false;
+        } else if (parentFolder && !parentFolder.isPublic) {
+            isPublic = false;
+        }
+
         const payload = {
             ...noteData,
+            isPublic,
             ...(!noteData.id && { folderId: currentFolderId }),
         };
         try {
@@ -48,7 +67,7 @@ export const useNoteHandlers = ({
         } catch (error) {
             console.error("Failed to save note:", error);
         }
-    }, [currentFolderId, saveNote, setSelectedNote, setViewMode, navigate, getNotePath]);
+    }, [currentFolderId, saveNote, setSelectedNote, setViewMode, navigate, getNotePath, folders, profile, selectedNote]);
     
     const handleSelectNote = (note: Note) => {
         setSelectedNote(note);

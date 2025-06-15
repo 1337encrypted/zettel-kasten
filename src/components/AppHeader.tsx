@@ -6,6 +6,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { ShortcutCheatSheet } from './ShortcutCheatSheet';
 import { UserMenu } from './UserMenu';
 import { HeaderNavigation } from './HeaderNavigation';
+import { FolderVisibilityToggle } from './FolderVisibilityToggle';
+import { Folder, Profile } from '@/types';
 
 export const AppHeader = ({
   onExportAllNotes,
@@ -14,6 +16,10 @@ export const AppHeader = ({
   cheatSheetOpen,
   onCheatSheetOpenChange,
   onNavigateUp,
+  profile,
+  currentFolder,
+  onUpdateFolder,
+  isFolderUpdating,
 }: {
   onExportAllNotes?: () => void;
   viewMode?: 'list' | 'edit' | 'preview';
@@ -21,6 +27,10 @@ export const AppHeader = ({
   cheatSheetOpen?: boolean;
   onCheatSheetOpenChange?: (open: boolean) => void;
   onNavigateUp?: () => void;
+  profile?: Profile | null;
+  currentFolder?: Folder | null;
+  onUpdateFolder?: (folderData: Pick<Folder, 'id'> & Partial<Pick<Folder, 'isPublic'>>) => void;
+  isFolderUpdating?: boolean;
 }) => {
   const { user } = useAuth();
   const location = useLocation();
@@ -56,8 +66,16 @@ export const AppHeader = ({
       </div>
       
       <div className="w-1/3 flex justify-end items-center gap-2">
+        {currentFolder && onUpdateFolder && profile && typeof isFolderUpdating !== 'undefined' && (
+          <FolderVisibilityToggle
+            folder={currentFolder}
+            onUpdate={onUpdateFolder}
+            isProfilePublic={profile.is_public}
+            isUpdating={isFolderUpdating}
+          />
+        )}
         <ThemeToggle />
-        {user && location.pathname !== '/dashboard' && (
+        {user && !currentFolder && location.pathname !== '/dashboard' && (
           <Button asChild>
             <Link to="/dashboard">Dashboard</Link>
           </Button>

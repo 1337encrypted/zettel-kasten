@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppLogic } from '@/hooks/useAppLogic';
 
 import { AppHeader } from '@/components/AppHeader';
@@ -9,8 +9,9 @@ import { DetailView } from '@/components/DetailView';
 import { Toaster } from '@/components/ui/sonner';
 import { CommandMenu } from '@/components/CommandMenu';
 import 'katex/dist/katex.min.css';
-import { useFolderImporter } from '@/hooks/useFileImporter';
+import { useFileImporter, useFolderImporter } from '@/hooks/useFileImporter';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { ImportDialog } from '@/components/ImportDialog';
 
 const Index = () => {
   const {
@@ -59,6 +60,14 @@ const Index = () => {
     importFolderInputRef, 
     handleFolderImport
   } = useFolderImporter({ currentFolderId });
+
+  const {
+    triggerImport: triggerFileImport,
+    importFileInputRef,
+    handleFileImport,
+  } = useFileImporter();
+
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const readmeNote = React.useMemo(() => {
     // Only show the README preview at the root level (no folder selected).
@@ -128,8 +137,22 @@ const Index = () => {
         onCreateFolder={handleCreateFolder}
         onSelectFolder={handleSelectFolderFromCommandMenu}
         onSelectAll={handleSelectAll}
-        onImportFolder={triggerFolderImport}
+        onImport={() => setImportDialogOpen(true)}
         isAdmin={isAdmin}
+      />
+      <ImportDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
+        onImportFiles={triggerFileImport}
+        onImportFolder={triggerFolderImport}
+      />
+      <input
+        type="file"
+        ref={importFileInputRef}
+        onChange={handleFileImport}
+        style={{ display: 'none' }}
+        multiple
+        accept=".md,.txt"
       />
       <input
         type="file"

@@ -10,7 +10,7 @@ import {
   CommandSeparator,
 } from '@/components/ui/command';
 import { Note, Folder } from '@/types';
-import { File, Folder as FolderIcon, Moon, Sun, FilePlus, FolderPlus, CheckSquare, FolderUp } from 'lucide-react';
+import { File, Folder as FolderIcon, Moon, Sun, FilePlus, FolderPlus, CheckSquare, Import } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 interface CommandMenuProps {
@@ -23,7 +23,7 @@ interface CommandMenuProps {
   onCreateFolder: () => void;
   onSelectFolder: (folderId: string) => void;
   onSelectAll: () => void;
-  onImportFolder: () => void;
+  onImport: () => void;
   isAdmin: boolean;
 }
 
@@ -37,7 +37,7 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
   onCreateFolder,
   onSelectFolder,
   onSelectAll,
-  onImportFolder,
+  onImport,
   isAdmin,
 }) => {
   const { setTheme } = useTheme();
@@ -62,9 +62,9 @@ export const CommandMenu: React.FC<CommandMenuProps> = ({
             <span>New Folder</span>
           </CommandItem>
           {isAdmin && (
-            <CommandItem onSelect={() => runCommand(onImportFolder)}>
-              <FolderUp className="mr-2 h-4 w-4" />
-              <span>Import Folder</span>
+            <CommandItem onSelect={() => runCommand(onImport)}>
+              <Import className="mr-2 h-4 w-4" />
+              <span>Import</span>
             </CommandItem>
           )}
           <CommandItem onSelect={() => runCommand(onSelectAll)}>

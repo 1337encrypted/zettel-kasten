@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
@@ -8,6 +9,7 @@ import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useNoteEditor } from '@/hooks/useNoteEditor';
+import { useAuth } from '@/context/AuthContext';
 
 interface DetailViewProps {
   viewMode: 'edit' | 'preview';
@@ -30,7 +32,10 @@ export const DetailView: React.FC<DetailViewProps> = ({
   allNotes,
   onSelectNote,
 }) => {
+  const { user } = useAuth();
   const [isPublic, setIsPublic] = React.useState(false);
+
+  const isOwner = selectedNote && user && selectedNote.userId === user.id;
 
   React.useEffect(() => {
     if (selectedNote) {
@@ -129,7 +134,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
       </div>
       <div className="flex items-center justify-between mt-4 p-2 border-t sticky bottom-0 bg-background">
         <div className="flex items-center gap-2">
-            {selectedNote && viewMode === 'preview' && (
+            {isOwner && viewMode === 'preview' && selectedNote && (
                 <div className="flex items-center space-x-2">
                     <Switch id="is-public-preview" checked={isPublic} onCheckedChange={handlePublicToggle} />
                     <Label htmlFor="is-public-preview">Public</Label>
@@ -137,7 +142,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
             )}
         </div>
         <div className="flex items-center gap-2 justify-end">
-            {selectedNote && (
+            {isOwner && selectedNote && (
             <>
                 {viewMode === 'edit' && (
                     <div className="flex items-center space-x-2">

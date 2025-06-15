@@ -9,7 +9,6 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { Note, Folder } from '@/types';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Link2 } from 'lucide-react';
 
 const UserPublicProfile = () => {
   const params = useParams();
@@ -151,10 +150,6 @@ const UserPublicProfile = () => {
               </Avatar>
               <h1 className="text-3xl font-bold">Notes by {profile.username || 'Anonymous'}</h1>
             </div>
-            <p className="mb-4 text-muted-foreground flex items-center gap-2">
-                <Link2 className="w-4 h-4" />
-                Public profile link: <a href={window.location.href} className="text-primary hover:underline">{window.location.href}</a>
-            </p>
 
             {viewMode === 'list' ? (
               <div>

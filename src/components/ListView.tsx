@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { Folder, Note } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -185,7 +184,10 @@ export const ListView: React.FC<ListViewProps> = ({
         onToggleNoteSelection={onToggleNoteSelection}
       />
       {readmeNote && !isSearching && (
-        <div className="mt-6 p-4 border rounded-lg prose dark:prose-invert max-w-none bg-card text-card-foreground shadow">
+        <div
+          className="mt-6 p-4 border rounded-lg prose dark:prose-invert max-w-none bg-card text-card-foreground shadow cursor-pointer hover:bg-card/95 transition-colors"
+          onClick={() => onSelectNote(readmeNote)}
+        >
           <h2 className="font-bold text-lg mb-2 flex items-center gap-2 not-prose">
             <File className="w-5 h-5 inline-block" />
             README

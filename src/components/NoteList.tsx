@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { Note } from '@/types';
 import { Checkbox } from './ui/checkbox';
@@ -17,9 +16,13 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
   const isLongPress = useRef(false);
 
   const handlePointerDown = (note: Note) => {
-    if (note.title.toLowerCase() === 'readme') return;
+    isLongPress.current = false; // Always reset on pointer down
 
-    isLongPress.current = false;
+    if (note.title.toLowerCase() === 'readme') {
+      // README can't be long-pressed for selection
+      return;
+    }
+
     longPressTimer.current = window.setTimeout(() => {
       onToggleNoteSelection(note.id);
       isLongPress.current = true;
@@ -35,10 +38,10 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
       return;
     }
     
-    if (selectedNoteIds.length > 0) {
-      if (note.title.toLowerCase() !== 'readme') {
-        onToggleNoteSelection(note.id);
-      }
+    // If in selection mode and it's not the README note, toggle selection.
+    // Otherwise, (i.e. not in selection mode, or it IS the README note) select the note.
+    if (selectedNoteIds.length > 0 && note.title.toLowerCase() !== 'readme') {
+      onToggleNoteSelection(note.id);
     } else {
       onSelectNote(note);
     }
@@ -68,7 +71,7 @@ const NoteList: React.FC<NoteListProps> = ({ notes, onSelectNote, selectedNoteId
           >
             <div className="flex items-center gap-4 flex-grow">
               <div className="w-4 h-4 shrink-0 flex items-center justify-center">
-                {selectedNoteIds.length > 0 ? (
+                {selectedNoteIds.length > 0 && note.title.toLowerCase() !== 'readme' ? (
                   <Checkbox
                     checked={selectedNoteIds.includes(note.id)}
                     aria-label={`Select note ${note.title}`}

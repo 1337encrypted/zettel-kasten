@@ -10,6 +10,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          default_readme_content: string
+          default_readme_title: string
+          id: number
+          updated_at: string | null
+        }
+        Insert: {
+          default_readme_content?: string
+          default_readme_title?: string
+          id?: number
+          updated_at?: string | null
+        }
+        Update: {
+          default_readme_content?: string
+          default_readme_title?: string
+          id?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       folders: {
         Row: {
           created_at: string
@@ -118,7 +139,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

@@ -76,18 +76,13 @@ export const useAppLogic = () => {
     filteredNotes,
   } = useSearchAndSort({ notes, folders, currentFolderId });
   
-  const selectableNotes = useMemo(() => 
-    filteredNotes.filter(note => note.title.toLowerCase() !== 'readme'),
-    [filteredNotes]
-  );
-  
   const {
     selectedNoteIds,
     handleToggleNoteSelection,
     handleBulkDeleteNotes,
     handleSelectAll,
     resetSelection,
-  } = useNoteSelection({ filteredNotes: selectableNotes, deleteMultipleNotes });
+  } = useNoteSelection({ filteredNotes, deleteMultipleNotes });
 
   const {
     handleRenameFolder,

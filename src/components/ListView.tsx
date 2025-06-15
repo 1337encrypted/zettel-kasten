@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Folder, Note } from '@/types';
 import FolderList from '@/components/FolderList';
@@ -56,9 +55,8 @@ export const ListView: React.FC<ListViewProps> = ({
 }) => {
   const isSearching = !!searchQuery.trim();
 
-  const notesForList = readmeNote && !isSearching 
-    ? filteredNotes.filter(n => n.id !== readmeNote.id) 
-    : filteredNotes;
+  // The README note should appear in the list like any other note.
+  const notesForList = filteredNotes; 
 
   const selectableNotes = notesForList;
   const allNotesSelected = selectableNotes.length > 0 && selectedNoteIds.length === selectableNotes.length;

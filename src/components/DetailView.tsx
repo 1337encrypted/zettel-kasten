@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
@@ -7,6 +8,7 @@ import { Eye, Pencil, Trash2, Copy } from 'lucide-react';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useNoteEditor } from '@/hooks/useNoteEditor';
 
 interface DetailViewProps {
   viewMode: 'edit' | 'preview';
@@ -39,6 +41,41 @@ export const DetailView: React.FC<DetailViewProps> = ({
     }
   }, [selectedNote]);
 
+  const handleSaveFromEditor = (noteData: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string }) => {
+    onSave({ ...noteData, isPublic });
+  };
+
+  const {
+    title,
+    setTitle,
+    content,
+    setContent,
+    tags,
+    setTags,
+    textareaRef,
+    fileInputRef,
+    handleClear,
+    handleSave: handleSaveFromHook,
+    handleAddImageClick,
+    handleImageUpload,
+  } = useNoteEditor({ onSave: handleSaveFromEditor, selectedNote });
+
+  const previewNote = {
+    ...(selectedNote || {
+      id: 'new-note-preview',
+      createdAt: new Date(),
+      folderId: null,
+      slug: null,
+    }),
+    ...selectedNote,
+    title,
+    content,
+    tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+    updatedAt: new Date(),
+    isPublic,
+  };
+
+
   const handleCopyId = () => {
     if (selectedNote) {
       navigator.clipboard.writeText(selectedNote.id);
@@ -48,15 +85,17 @@ export const DetailView: React.FC<DetailViewProps> = ({
 
   const handlePublicToggle = (checked: boolean) => {
     setIsPublic(checked);
-    if (selectedNote) {
+    if (selectedNote && viewMode === 'preview') {
         onSave({
             id: selectedNote.id,
-            title: selectedNote.title,
-            content: selectedNote.content,
-            tags: selectedNote.tags || [],
+            title: title,
+            content: content,
+            tags: tags.split(',').map(t => t.trim()).filter(Boolean),
             isPublic: checked,
         });
         toast.info(`Note is now ${checked ? 'public' : 'private'}.`);
+    } else if (viewMode === 'edit') {
+        // Just update state, don't save yet.
     }
   };
 
@@ -65,14 +104,25 @@ export const DetailView: React.FC<DetailViewProps> = ({
       <div className="flex-grow">
         {viewMode === 'edit' ? (
           <NoteEditor 
-            onSave={onSave} 
+            onSave={handleSaveFromHook} 
             selectedNote={selectedNote}
             onDelete={onDelete}
             isPublic={isPublic}
+            title={title}
+            setTitle={setTitle}
+            content={content}
+            setContent={setContent}
+            tags={tags}
+            setTags={setTags}
+            textareaRef={textareaRef}
+            fileInputRef={fileInputRef}
+            handleClear={handleClear}
+            handleAddImageClick={handleAddImageClick}
+            handleImageUpload={handleImageUpload}
           />
         ) : (
           <NoteView 
-            note={selectedNote}
+            note={previewNote as Note}
             allNotes={allNotes}
             onSelectNote={onSelectNote}
           />

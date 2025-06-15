@@ -6,46 +6,43 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Note } from '@/types';
 import { ImagePlus } from 'lucide-react';
-import { useNoteEditor } from '@/hooks/useNoteEditor';
 import { toast } from 'sonner';
 
 interface NoteEditorProps {
-  onSave: (note: Pick<Note, 'title' | 'content' | 'tags'> & { id?: string, isPublic?: boolean }) => void;
+  onSave: () => void;
   selectedNote: Note | null;
   onDelete: (noteId: string) => void;
   isPublic: boolean;
+  title: string;
+  setTitle: (value: string) => void;
+  content: string;
+  setContent: (value: string) => void;
+  tags: string;
+  setTags: (value: string) => void;
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  handleClear: () => void;
+  handleAddImageClick: () => void;
+  handleImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete, isPublic }) => {
-  const {
-    title,
-    setTitle,
-    content,
-    setContent,
-    tags,
-    setTags,
-    textareaRef,
-    fileInputRef,
-    handleClear,
-    handleAddImageClick,
-    handleImageUpload,
-  } = useNoteEditor({ onSave: () => {}, selectedNote });
-
-  const handleSave = () => {
-    if (!title.trim()) {
-      toast.error('Title is required.');
-      return;
-    }
-    const tagArray = tags.split(',').map(tag => tag.trim()).filter(Boolean);
-    onSave({
-      id: selectedNote?.id,
-      title,
-      content,
-      tags: tagArray,
-      isPublic,
-    });
-  };
-
+const NoteEditor: React.FC<NoteEditorProps> = ({
+  onSave,
+  selectedNote,
+  onDelete,
+  isPublic,
+  title,
+  setTitle,
+  content,
+  setContent,
+  tags,
+  setTags,
+  textareaRef,
+  fileInputRef,
+  handleClear,
+  handleAddImageClick,
+  handleImageUpload,
+}) => {
   return (
     <div className="space-y-4 p-4 border rounded-lg shadow h-full flex flex-col">
       <h2 className="text-2xl font-semibold">{selectedNote ? 'Edit Note' : 'Create New Note'}</h2>
@@ -96,7 +93,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ onSave, selectedNote, onDelete,
         />
       </div>
       <div>
-        <Button onClick={handleSave} className="w-full sm:w-auto">
+        <Button onClick={onSave} className="w-full sm:w-auto">
           {selectedNote ? 'Save Changes' : 'Create Note'}
         </Button>
         {selectedNote && (

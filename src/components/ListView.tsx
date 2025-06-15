@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Folder, Note } from '@/types';
 import FolderList from '@/components/FolderList';
@@ -81,16 +80,6 @@ export const ListView: React.FC<ListViewProps> = ({
         onRenameFolder={onRenameFolder}
       />
 
-      {readmeNote && !isSearching && (
-        <div className="mb-6">
-          <NoteView 
-            note={readmeNote}
-            allNotes={allNotes}
-            onSelectNote={onSelectNote}
-          />
-        </div>
-      )}
-
       {selectedNoteIds.length > 0 && (
         <SelectionToolbar
           numSelected={selectedNoteIds.length}
@@ -108,6 +97,16 @@ export const ListView: React.FC<ListViewProps> = ({
         selectedNoteIds={selectedNoteIds}
         onToggleNoteSelection={onToggleNoteSelection}
       />
+
+      {readmeNote && !isSearching && (
+        <div className="mt-6">
+          <NoteView 
+            note={readmeNote}
+            allNotes={allNotes}
+            onSelectNote={onSelectNote}
+          />
+        </div>
+      )}
     </div>
   );
 };

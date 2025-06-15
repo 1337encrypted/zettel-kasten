@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import mermaid from 'mermaid';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from 'next-themes';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface MermaidDiagramProps {

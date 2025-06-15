@@ -71,16 +71,6 @@ export const ListView: React.FC<ListViewProps> = ({
         isSearching={isSearching}
       />
 
-      {readmeNote && !isSearching && (
-        <div className="mb-6">
-          <NoteView 
-            note={readmeNote}
-            allNotes={allNotes}
-            onSelectNote={onSelectNote}
-          />
-        </div>
-      )}
-
       <FolderList
         folders={filteredFolders}
         notes={allNotes}
@@ -90,6 +80,16 @@ export const ListView: React.FC<ListViewProps> = ({
         onDeleteFolder={onDeleteFolder}
         onRenameFolder={onRenameFolder}
       />
+
+      {readmeNote && !isSearching && (
+        <div className="mb-6">
+          <NoteView 
+            note={readmeNote}
+            allNotes={allNotes}
+            onSelectNote={onSelectNote}
+          />
+        </div>
+      )}
 
       {selectedNoteIds.length > 0 && (
         <SelectionToolbar

@@ -14,6 +14,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useDebounce } from '@/hooks/useDebounce';
 import { NoteSearchResultCard } from '@/components/search/NoteSearchResultCard';
 import { UserSearchResultCard } from '@/components/search/UserSearchResultCard';
+import { useAuth } from '@/context/AuthContext';
 
 interface UserProfile {
   id: string;
@@ -65,6 +66,7 @@ const searchPublicContent = async (searchTerm: string): Promise<SearchResult[]> 
 
 const Home = () => {
   useNavigationShortcuts();
+  const { user } = useAuth();
   const [search, setSearch] = React.useState('');
   const debouncedSearch = useDebounce(search, 300);
 
@@ -114,32 +116,38 @@ const Home = () => {
               )}
             </>
           ) : (
-            users?.map(user => {
-            const uniqueAvatarUrl = user.avatar_url && user.updated_at ? `${user.avatar_url}?t=${new Date(user.updated_at).getTime()}` : user.avatar_url;
+            users?.map(userProfile => {
+            const uniqueAvatarUrl = userProfile.avatar_url && userProfile.updated_at ? `${userProfile.avatar_url}?t=${new Date(userProfile.updated_at).getTime()}` : userProfile.avatar_url;
+            const isOwnProfile = user?.id === userProfile.id;
+            const linkTo = isOwnProfile ? '/dashboard' : `/u/${userProfile.id}`;
+            
             return (
-              <Link to={`/u/${user.id}`} key={user.id}>
+              <Link to={linkTo} key={userProfile.id}>
                 <Card className="hover:bg-muted/50 transition-colors w-full">
                   <div className="p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4">
                           <Avatar>
-                              <AvatarImage src={uniqueAvatarUrl || undefined} alt={user.username || 'Anonymous'} />
+                              <AvatarImage src={uniqueAvatarUrl || undefined} alt={userProfile.username || 'Anonymous'} />
                               <AvatarFallback>
-                                  {(user.username || 'A').charAt(0).toUpperCase()}
+                                  {(userProfile.username || 'A').charAt(0).toUpperCase()}
                               </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-semibold text-lg">{user.username || 'Anonymous'}</p>
-                            {user.created_at && (
+                            <p className="font-semibold text-lg">
+                              {userProfile.username || 'Anonymous'}
+                              {isOwnProfile && <span className="text-sm text-muted-foreground ml-2">(You)</span>}
+                            </p>
+                            {userProfile.created_at && (
                                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                                     <Clock className="h-4 w-4" />
-                                    Joined {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
+                                    Joined {formatDistanceToNow(new Date(userProfile.created_at), { addSuffix: true })}
                                 </p>
                             )}
                           </div>
                       </div>
                       <div className="text-right">
-                         <p className="font-semibold text-lg">{user.note_count}</p>
-                         <p className="text-sm text-muted-foreground">{user.note_count === 1 ? 'note' : 'notes'}</p>
+                         <p className="font-semibold text-lg">{userProfile.note_count}</p>
+                         <p className="text-sm text-muted-foreground">{userProfile.note_count === 1 ? 'note' : 'notes'}</p>
                       </div>
                   </div>
                 </Card>

@@ -4,10 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Note, Folder } from '@/types';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useSearchAndSort } from '@/hooks/useSearchAndSort';
+import { useAuth } from '@/context/AuthContext';
 
 export const usePublicProfileLogic = () => {
     const params = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
   
     const userId = params.userId;
     const slug = params['*'];
@@ -18,6 +20,9 @@ export const usePublicProfileLogic = () => {
   
     const userProfileQuery = useUserProfile(userId, currentFolderId);
     const { allNotes, allFolders, isLoading, currentFolder } = userProfileQuery;
+
+    // Check if the current user is viewing their own profile
+    const isOwnProfile = user?.id === userId;
   
     const {
       sortOrder,
@@ -117,8 +122,17 @@ export const usePublicProfileLogic = () => {
       } else if (currentFolderId) {
         handleNavigateUp();
       } else {
-        navigate('/');
+        if (isOwnProfile) {
+          // If viewing own profile, redirect to dashboard
+          navigate('/dashboard');
+        } else {
+          navigate('/');
+        }
       }
+    };
+
+    const handleGoToDashboard = () => {
+      navigate('/dashboard');
     };
 
     return {
@@ -137,5 +151,7 @@ export const usePublicProfileLogic = () => {
         setSearchQuery,
         searchedAndSortedFolders,
         searchedAndSortedNotes,
+        isOwnProfile,
+        handleGoToDashboard,
     }
 }

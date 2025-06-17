@@ -45,6 +45,7 @@ const Index = () => {
     handleSelectAll,
     handleExportAllNotes,
     handleOpenShortcuts,
+    handleMoveNotes,
     profile,
     currentFolder,
     handleUpdateFolder,
@@ -74,6 +75,7 @@ const Index = () => {
             filteredFolders={filteredFolders}
             filteredNotes={filteredNotes}
             allNotes={notes}
+            allFolders={folders}
             currentFolderId={currentFolderId}
             selectedNoteId={selectedNote?.id}
             onNewNote={handleNewNote}
@@ -91,6 +93,7 @@ const Index = () => {
             onToggleNoteSelection={handleToggleNoteSelection}
             onBulkDeleteNotes={handleBulkDeleteNotes}
             onSelectAll={handleSelectAll}
+            onMoveNotes={handleMoveNotes}
             readmeNote={readmeNote}
           />
         ) : (

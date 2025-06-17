@@ -1,15 +1,18 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Folder, Note } from '@/types';
 import FolderList from '@/components/FolderList';
 import NoteList from '@/components/NoteList';
 import { ListViewHeader } from './ListViewHeader';
 import { SelectionToolbar } from './SelectionToolbar';
+import { MoveNotesDialog } from './MoveNotesDialog';
 import NoteView from './NoteView';
 
 interface ListViewProps {
   filteredFolders: Folder[];
   filteredNotes: Note[];
   allNotes: Note[];
+  allFolders: Folder[];
   currentFolderId: string | null;
   selectedNoteId: string | null | undefined;
   onNewNote: () => void;
@@ -27,6 +30,7 @@ interface ListViewProps {
   onToggleNoteSelection: (noteId: string) => void;
   onBulkDeleteNotes: () => void;
   onSelectAll: () => void;
+  onMoveNotes: (noteIds: string[], targetFolderId: string | null) => void;
   readmeNote?: Note;
 }
 
@@ -34,6 +38,7 @@ export const ListView: React.FC<ListViewProps> = ({
   filteredFolders,
   filteredNotes,
   allNotes,
+  allFolders,
   currentFolderId,
   selectedNoteId,
   onNewNote,
@@ -51,8 +56,10 @@ export const ListView: React.FC<ListViewProps> = ({
   onToggleNoteSelection,
   onBulkDeleteNotes,
   onSelectAll,
+  onMoveNotes,
   readmeNote,
 }) => {
+  const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const isSearching = !!searchQuery.trim();
 
   // The README note should appear in the list like any other note.
@@ -60,6 +67,15 @@ export const ListView: React.FC<ListViewProps> = ({
 
   const selectableNotes = notesForList;
   const allNotesSelected = selectableNotes.length > 0 && selectedNoteIds.length === selectableNotes.length;
+
+  const handleMoveNotes = () => {
+    setMoveDialogOpen(true);
+  };
+
+  const handleMoveToFolder = async (targetFolderId: string | null) => {
+    await onMoveNotes(selectedNoteIds, targetFolderId);
+    setMoveDialogOpen(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -89,6 +105,7 @@ export const ListView: React.FC<ListViewProps> = ({
           allNotesSelected={allNotesSelected}
           onSelectAll={onSelectAll}
           onBulkDeleteNotes={onBulkDeleteNotes}
+          onMoveNotes={handleMoveNotes}
           canSelectAny={selectableNotes.length > 0}
         />
       )}
@@ -122,6 +139,15 @@ export const ListView: React.FC<ListViewProps> = ({
           </div>
         </div>
       )}
+
+      <MoveNotesDialog
+        open={moveDialogOpen}
+        onOpenChange={setMoveDialogOpen}
+        selectedCount={selectedNoteIds.length}
+        folders={allFolders}
+        currentFolderId={currentFolderId}
+        onMoveToFolder={handleMoveToFolder}
+      />
     </div>
   );
 };

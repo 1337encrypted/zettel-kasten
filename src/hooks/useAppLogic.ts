@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Folder } from '@/types';
 import { useNotes } from '@/hooks/useNotes';
 import { useFolders } from '@/hooks/useFolders';
+import { useNoteMover } from '@/hooks/useNoteMover';
 import { useSearchAndSort } from './useSearchAndSort';
 import { useNoteSelection } from './useNoteSelection';
 import { useKeyboardShortcuts } from './useKeyboardShortcuts';
@@ -21,6 +22,7 @@ import { useCoreAppState } from './useCoreAppState';
 export const useAppLogic = () => {
   const { notes, saveNote, deleteNote, deleteNotesByFolderIds, deleteMultipleNotes } = useNotes();
   const { folders, createFolder, deleteFolderAndDescendants, renameFolder } = useFolders();
+  const { moveNotes } = useNoteMover();
   const navigate = useNavigate();
   const { handleUpdateFolder, isFolderUpdating } = useUpdateFolder();
 
@@ -140,6 +142,11 @@ export const useAppLogic = () => {
     navigate,
   });
 
+  const handleMoveNotes = async (noteIds: string[], targetFolderId: string | null) => {
+    await moveNotes({ noteIds, targetFolderId });
+    resetSelection();
+  };
+
   useKeyboardShortcuts({
       onNewNote: handleNewNote,
       onToggleCommandMenu: handleToggleCommandMenu,
@@ -182,6 +189,7 @@ export const useAppLogic = () => {
     handleSelectAll,
     handleExportAllNotes,
     handleOpenShortcuts,
+    handleMoveNotes,
     profile,
     currentFolder,
     handleUpdateFolder,

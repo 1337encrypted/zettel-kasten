@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Note } from '@/types';
 import NoteEditor from '@/components/NoteEditor';
@@ -9,6 +10,9 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useNoteEditor } from '@/hooks/useNoteEditor';
 import { useAuth } from '@/context/AuthContext';
+import { useFileNavigation } from '@/hooks/useFileNavigation';
+import { useFileNavigationShortcuts } from '@/hooks/useFileNavigationShortcuts';
+import { FileNavigationButtons } from '@/components/FileNavigationButtons';
 
 interface DetailViewProps {
   viewMode: 'edit' | 'preview';
@@ -35,6 +39,29 @@ export const DetailView: React.FC<DetailViewProps> = ({
   const [isPublic, setIsPublic] = React.useState(false);
 
   const isOwner = selectedNote && user && selectedNote.userId === user.id;
+
+  // File navigation logic
+  const {
+    canNavigate,
+    hasPrevious,
+    hasNext,
+    navigateToPrevious,
+    navigateToNext,
+  } = useFileNavigation({
+    currentNote: selectedNote,
+    allNotes,
+    currentFolderId: selectedNote?.folderId || null,
+    onSelectNote,
+  });
+
+  // File navigation shortcuts
+  useFileNavigationShortcuts({
+    hasPrevious,
+    hasNext,
+    onPrevious: navigateToPrevious,
+    onNext: navigateToNext,
+    isPreviewMode: viewMode === 'preview',
+  });
 
   React.useEffect(() => {
     if (selectedNote && user) {
@@ -87,7 +114,6 @@ export const DetailView: React.FC<DetailViewProps> = ({
     updatedAt: new Date(),
     isPublic,
   };
-
 
   const handleCopyId = () => {
     if (selectedNote) {
@@ -158,6 +184,14 @@ export const DetailView: React.FC<DetailViewProps> = ({
                         <Switch id="is-public-edit" checked={isPublic} onCheckedChange={setIsPublic} />
                         <Label htmlFor="is-public-edit">Public</Label>
                     </div>
+                )}
+                {viewMode === 'preview' && canNavigate && (
+                    <FileNavigationButtons
+                        hasPrevious={hasPrevious}
+                        hasNext={hasNext}
+                        onPrevious={navigateToPrevious}
+                        onNext={navigateToNext}
+                    />
                 )}
                 {viewMode === 'preview' && (
                     <Button variant="outline" size="icon" title="Copy Note ID" onClick={handleCopyId}>

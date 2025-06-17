@@ -10,6 +10,9 @@ import { usePublicProfileLogic } from '@/hooks/usePublicProfileLogic';
 import { Button } from '@/components/ui/button';
 import { Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import { useFileNavigation } from '@/hooks/useFileNavigation';
+import { useFileNavigationShortcuts } from '@/hooks/useFileNavigationShortcuts';
+import { FileNavigationButtons } from '@/components/FileNavigationButtons';
 
 const UserPublicProfile = () => {
   const {
@@ -38,6 +41,29 @@ const UserPublicProfile = () => {
     error,
     readmeNote,
   } = userProfileQuery;
+
+  // File navigation logic
+  const {
+    canNavigate,
+    hasPrevious,
+    hasNext,
+    navigateToPrevious,
+    navigateToNext,
+  } = useFileNavigation({
+    currentNote: selectedNote,
+    allNotes,
+    currentFolderId,
+    onSelectNote: handleSelectNote,
+  });
+
+  // File navigation shortcuts (only in preview mode)
+  useFileNavigationShortcuts({
+    hasPrevious,
+    hasNext,
+    onPrevious: navigateToPrevious,
+    onNext: navigateToNext,
+    isPreviewMode: viewMode === 'preview',
+  });
 
   useKeyboardShortcuts({
     onNewNote: () => {},
@@ -95,7 +121,15 @@ const UserPublicProfile = () => {
                      />
                   </div>
                   {selectedNote && (
-                    <div className="flex items-center justify-end mt-4 p-2 border-t sticky bottom-0 bg-background">
+                    <div className="flex items-center justify-end mt-4 p-2 border-t sticky bottom-0 bg-background gap-2">
+                      {canNavigate && (
+                        <FileNavigationButtons
+                          hasPrevious={hasPrevious}
+                          hasNext={hasNext}
+                          onPrevious={navigateToPrevious}
+                          onNext={navigateToNext}
+                        />
+                      )}
                       <Button variant="outline" size="icon" title="Copy Note ID" onClick={handleCopyId}>
                           <Copy className="h-4 w-4" />
                       </Button>

@@ -24,11 +24,13 @@ export const useFileNavigationShortcuts = ({
     const isEditing = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
     if (isEditing) return;
 
+    // Only navigate if there's a previous note available
     if (e.key === 'h' && hasPrevious) {
       e.preventDefault();
       onPrevious();
     }
     
+    // Only navigate if there's a next note available
     if (e.key === 'l' && hasNext) {
       e.preventDefault();
       onNext();

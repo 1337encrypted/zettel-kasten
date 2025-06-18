@@ -35,6 +35,7 @@ export const AppHeader = ({
   const { user } = useAuth();
   const location = useLocation();
   const isAtRootOfNotes = !onNavigateUp && (location.pathname === '/dashboard' || location.pathname.startsWith('/u/'));
+  const isDocsPage = location.pathname === '/docs';
 
   return (
     <header className="mb-8 flex items-center justify-between relative h-10">
@@ -51,12 +52,12 @@ export const AppHeader = ({
             onCheatSheetOpenChange={onCheatSheetOpenChange}
           />
         )}
-        <DocsLink />
+        {!isDocsPage && <DocsLink />}
       </div>
       
       <div className="w-1/3 text-center">
         <Link to={user && user.id ? '/dashboard' : '/'} className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-          <span className="text-4xl font-bold tracking-wide font-mono">Zet</span>
+          <span className="text-4xl sm:text-3xl font-bold tracking-wide font-mono">Zet</span>
         </Link>
       </div>
       

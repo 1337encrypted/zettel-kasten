@@ -35,10 +35,9 @@ export const AppHeader = ({
   const { user } = useAuth();
   const location = useLocation();
   const isAtRootOfNotes = !onNavigateUp && (location.pathname === '/dashboard' || location.pathname.startsWith('/u/'));
-  const isDocsPage = location.pathname === '/docs';
 
   return (
-    <header className="mb-8 flex items-center justify-between relative min-h-[60px] pt-4">
+    <header className="mb-8 flex items-center justify-between relative h-10">
       <div className="w-1/3 flex items-center gap-2">
         <HeaderNavigation
           viewMode={viewMode}
@@ -52,24 +51,24 @@ export const AppHeader = ({
             onCheatSheetOpenChange={onCheatSheetOpenChange}
           />
         )}
-        {!isDocsPage && <DocsLink />}
+        <DocsLink />
       </div>
       
       <div className="w-1/3 text-center">
         <Link to={user && user.id ? '/dashboard' : '/'} className="inline-flex items-center justify-center gap-3 text-foreground hover:text-primary transition-colors">
-          <span className="text-2xl xs:text-3xl sm:text-4xl font-bold tracking-wide font-mono">Zet</span>
+          <span className="text-4xl font-bold tracking-wide font-mono">Zet</span>
         </Link>
       </div>
       
-      <div className="w-1/3 flex justify-end items-center gap-1 sm:gap-2">
+      <div className="w-1/3 flex justify-end items-center gap-2">
         <ThemeToggle />
         {user && user.id && !currentFolder && location.pathname !== '/dashboard' && (
-          <Button asChild size="sm" className="text-xs sm:text-sm">
+          <Button asChild>
             <Link to="/dashboard">Dashboard</Link>
           </Button>
         )}
         {(!user || !user.id) && location.pathname !== '/auth' && (
-           <Button asChild size="sm" className="text-xs sm:text-sm">
+           <Button asChild>
             <Link to="/auth">Login</Link>
           </Button>
         )}

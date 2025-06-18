@@ -31,9 +31,11 @@ export const useUserPresence = () => {
         const onlineUserIds = new Set<string>();
         
         Object.keys(presenceState).forEach(key => {
-          const presences = presenceState[key] as UserPresence[];
-          presences.forEach(presence => {
-            onlineUserIds.add(presence.user_id);
+          const presences = presenceState[key];
+          presences.forEach((presence: any) => {
+            if (presence.user_id) {
+              onlineUserIds.add(presence.user_id);
+            }
           });
         });
         
@@ -41,15 +43,19 @@ export const useUserPresence = () => {
       })
       .on('presence', { event: 'join' }, ({ newPresences }) => {
         const newUserIds = new Set(onlineUsers);
-        (newPresences as UserPresence[]).forEach(presence => {
-          newUserIds.add(presence.user_id);
+        newPresences.forEach((presence: any) => {
+          if (presence.user_id) {
+            newUserIds.add(presence.user_id);
+          }
         });
         setOnlineUsers(newUserIds);
       })
       .on('presence', { event: 'leave' }, ({ leftPresences }) => {
         const remainingUserIds = new Set(onlineUsers);
-        (leftPresences as UserPresence[]).forEach(presence => {
-          remainingUserIds.delete(presence.user_id);
+        leftPresences.forEach((presence: any) => {
+          if (presence.user_id) {
+            remainingUserIds.delete(presence.user_id);
+          }
         });
         setOnlineUsers(remainingUserIds);
       })

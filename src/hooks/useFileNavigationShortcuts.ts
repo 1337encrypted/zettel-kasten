@@ -24,16 +24,22 @@ export const useFileNavigationShortcuts = ({
     const isEditing = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
     if (isEditing) return;
 
-    // Only navigate if there's a previous note available
-    if (e.key === 'h' && hasPrevious) {
-      e.preventDefault();
-      onPrevious();
+    // H key - trigger previous file button functionality (only if button would be visible)
+    if (e.key === 'h' || e.key === 'H') {
+      if (hasPrevious) {
+        e.preventDefault();
+        console.log('H pressed - navigating to previous file');
+        onPrevious();
+      }
     }
     
-    // Only navigate if there's a next note available
-    if (e.key === 'l' && hasNext) {
-      e.preventDefault();
-      onNext();
+    // L key - trigger next file button functionality (only if button would be visible)
+    if (e.key === 'l' || e.key === 'L') {
+      if (hasNext) {
+        e.preventDefault();
+        console.log('L pressed - navigating to next file');
+        onNext();
+      }
     }
   }, [hasPrevious, hasNext, onPrevious, onNext, isPreviewMode]);
 

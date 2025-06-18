@@ -5,7 +5,7 @@ import { HomeHeader } from '@/components/HomeHeader';
 import { AppFooter } from '@/components/AppFooter';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Toggle } from '@/components/ui/toggle';
 import { User, Clock, Grid3X3, List } from 'lucide-react';
 import { Toaster } from '@/components/ui/sonner';
 import { Link } from 'react-router-dom';
@@ -101,24 +101,14 @@ const Home = () => {
             className="flex-1"
           />
           {!debouncedSearch && (
-            <div className="flex gap-1">
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="icon"
-                onClick={() => setViewMode('list')}
-                title="List view"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="icon"
-                onClick={() => setViewMode('grid')}
-                title="Grid view"
-              >
-                <Grid3X3 className="h-4 w-4" />
-              </Button>
-            </div>
+            <Toggle
+              pressed={viewMode === 'grid'}
+              onPressedChange={(pressed) => setViewMode(pressed ? 'grid' : 'list')}
+              aria-label="Toggle view mode"
+              className="px-3"
+            >
+              {viewMode === 'grid' ? <List className="h-4 w-4" /> : <Grid3X3 className="h-4 w-4" />}
+            </Toggle>
           )}
         </div>
         {(isLoadingUsers || isLoadingSearch) && <p className="text-center">Loading...</p>}

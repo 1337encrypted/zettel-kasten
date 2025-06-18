@@ -42,11 +42,11 @@ export const UserGridCard: React.FC<UserGridCardProps> = ({ userProfile, isOnlin
               <div className="absolute -top-1 -right-1 h-5 w-5 bg-green-500 border-2 border-background rounded-full"></div>
             )}
           </div>
-          <div className="space-y-1">
-            <p className="font-semibold text-lg truncate w-full">
+          <div className="space-y-1 w-full">
+            <p className="font-semibold text-lg truncate px-2" title={userProfile.username || 'Anonymous'}>
               {userProfile.username || 'Anonymous'}
-              {isOwnProfile && <span className="text-xs text-muted-foreground block">(You)</span>}
             </p>
+            {isOwnProfile && <span className="text-xs text-muted-foreground block">(You)</span>}
             <p className="text-sm text-muted-foreground">
               {userProfile.note_count} {userProfile.note_count === 1 ? 'note' : 'notes'}
             </p>

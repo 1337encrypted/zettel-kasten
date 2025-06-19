@@ -8,7 +8,7 @@ interface VoiceConversation {
   id: string;
   user_id: string;
   session_id: string;
-  message_type: 'user' | 'assistant';
+  message_type: string;
   content: string;
   audio_url?: string;
   note_references?: string[];

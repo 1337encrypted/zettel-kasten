@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 interface VoiceMessage {
   id: string;
-  message_type: 'user' | 'assistant';
+  message_type: string;
   content: string;
   audio_url?: string;
   note_references?: string[];

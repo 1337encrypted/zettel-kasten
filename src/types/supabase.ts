@@ -87,6 +87,38 @@ export type Database = {
           },
         ]
       }
+      note_embeddings: {
+        Row: {
+          id: string
+          note_id: string
+          embedding: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          note_id: string
+          embedding?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          note_id?: string
+          embedding?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_embeddings_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notes: {
         Row: {
           content: string | null
@@ -196,6 +228,39 @@ export type Database = {
           }
         ]
       }
+      voice_conversations: {
+        Row: {
+          id: string
+          user_id: string
+          session_id: string
+          message_type: string
+          content: string
+          audio_url: string | null
+          note_references: string[] | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          session_id?: string
+          message_type: string
+          content: string
+          audio_url?: string | null
+          note_references?: string[] | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          session_id?: string
+          message_type?: string
+          content?: string
+          audio_url?: string | null
+          note_references?: string[] | null
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -249,6 +314,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      search_notes_by_similarity: {
+        Args: {
+          p_user_id: string
+          p_query_embedding: string
+          p_limit?: number
+        }
+        Returns: {
+          note_id: string
+          title: string
+          content: string
+          tags: string[]
+          similarity: number
+        }[]
+      }
       search_public_content: {
         Args: {
           p_search_term: string
@@ -279,4 +358,3 @@ export type Database = {
     }
   }
 }
-

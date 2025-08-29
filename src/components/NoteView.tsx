@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -21,7 +20,7 @@ interface NoteViewProps {
 }
 
 const NoteView: React.FC<NoteViewProps> = ({ note, allNotes, onSelectNote }) => {
-  const customLinkRenderer = useCustomRenderers(allNotes, onSelectNote);
+  const customLinkRenderer = useCustomRenderers(allNotes, onSelectNote, note);
 
   if (!note) {
     return (

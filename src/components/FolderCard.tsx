@@ -1,6 +1,6 @@
 import React from 'react';
 import { Folder, Note } from '@/types';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Folder as FolderIcon, FileText, Trash2, Pencil } from 'lucide-react';
@@ -36,21 +36,30 @@ export const FolderCard: React.FC<FolderCardProps> = ({
   const notesInFolderCount = notes.filter(note => note.folderId === folder.id).length;
 
   return (
-    <Card className="cursor-pointer transition-all duration-200 hover:shadow-md group">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div 
-            className="flex items-center gap-3 flex-1 min-w-0"
-            onClick={() => onSelectFolder(folder.id)}
-          >
-            <FolderIcon className="text-primary h-5 w-5 shrink-0" />
-            <CardTitle className="text-base font-medium truncate">
-              {folder.name}
-            </CardTitle>
+    <Card 
+      className="cursor-pointer transition-all duration-200 hover:shadow-md hover:bg-accent/50 group"
+      onClick={() => onSelectFolder(folder.id)}
+    >
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <FolderIcon className="text-primary h-4 w-4 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="font-medium text-sm truncate">
+                {folder.name}
+              </div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                <FileText className="h-3 w-3" />
+                <span>
+                  {notesInFolderCount} {notesInFolderCount === 1 ? 'note' : 'notes'}
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+          
+          <div className="flex items-center gap-2 shrink-0">
             {folder.isPublic && (
-              <Badge variant="secondary" className="shrink-0 text-xs">
+              <Badge variant="secondary" className="text-xs h-5 px-2">
                 Public
               </Badge>
             )}
@@ -59,7 +68,7 @@ export const FolderCard: React.FC<FolderCardProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 w-7 p-0"
+                  className="h-6 w-6 p-0"
                   onClick={(e) => {
                     e.stopPropagation();
                     onRenameFolder(folder.id);
@@ -73,7 +82,7 @@ export const FolderCard: React.FC<FolderCardProps> = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-7 w-7 p-0 text-destructive hover:text-destructive"
+                      className="h-6 w-6 p-0 text-destructive hover:text-destructive"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <Trash2 className="h-3 w-3" />
@@ -104,28 +113,7 @@ export const FolderCard: React.FC<FolderCardProps> = ({
             )}
           </div>
         </div>
-      </CardHeader>
-      
-      <CardContent 
-        className="pt-0 pb-3"
-        onClick={() => onSelectFolder(folder.id)}
-      >
-        <div className="flex items-center justify-center py-8">
-          <FolderIcon className="h-16 w-16 text-muted-foreground/30" />
-        </div>
       </CardContent>
-      
-      <CardFooter 
-        className="pt-0 pb-4 flex items-center justify-between"
-        onClick={() => onSelectFolder(folder.id)}
-      >
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <FileText className="h-4 w-4" />
-          <span>
-            {notesInFolderCount} {notesInFolderCount === 1 ? 'note' : 'notes'}
-          </span>
-        </div>
-      </CardFooter>
     </Card>
   );
 };

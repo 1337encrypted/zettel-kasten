@@ -42,8 +42,10 @@ export const useAppLogic = () => {
     setCommandMenuOpen,
     cheatSheetOpen,
     setCheatSheetOpen,
+    listViewMode,
     handleOpenShortcuts,
     handleToggleCommandMenu,
+    handleToggleListViewMode,
   } = useUIState();
 
   const { getFolderPath, getNotePath } = usePathHelpers(folders);
@@ -167,6 +169,7 @@ export const useAppLogic = () => {
     setCommandMenuOpen,
     cheatSheetOpen,
     setCheatSheetOpen,
+    listViewMode,
     selectedNoteIds,
     handleNewNote,
     handleBackToList,
@@ -180,6 +183,7 @@ export const useAppLogic = () => {
     setSortOrder,
     setSearchQuery,
     handleToggleView,
+    handleToggleListViewMode,
     handleSelectFolderFromCommandMenu,
     filteredFolders,
     filteredNotes,

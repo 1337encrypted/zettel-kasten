@@ -23,6 +23,7 @@ const Index = () => {
     setCommandMenuOpen,
     cheatSheetOpen,
     setCheatSheetOpen,
+    listViewMode,
     selectedNoteIds,
     handleNewNote,
     handleSaveNote,
@@ -35,6 +36,7 @@ const Index = () => {
     setSortOrder,
     setSearchQuery,
     handleToggleView,
+    handleToggleListViewMode,
     handleBackToList,
     handleSelectFolderFromCommandMenu,
     filteredFolders,
@@ -95,6 +97,9 @@ const Index = () => {
             onSelectAll={handleSelectAll}
             onMoveNotes={handleMoveNotes}
             readmeNote={readmeNote}
+            listViewMode={listViewMode}
+            onToggleListViewMode={handleToggleListViewMode}
+            profile={profile}
           />
         ) : (
           <DetailView 

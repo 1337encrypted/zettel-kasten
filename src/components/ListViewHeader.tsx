@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { FolderPlus, FilePlus, ArrowUpAZ, ArrowDownAZ, Search } from 'lucide-react';
+import { FolderPlus, FilePlus, ArrowUpAZ, ArrowDownAZ, Search, Grid3x3, List } from 'lucide-react';
+import type { ListViewMode } from '@/hooks/useUIState';
 import { Input } from '@/components/ui/input';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -13,6 +13,8 @@ interface ListViewHeaderProps {
   sortOrder: 'asc' | 'desc';
   onSortOrderChange: (order: 'asc' | 'desc') => void;
   isSearching: boolean;
+  listViewMode: ListViewMode;
+  onToggleListViewMode: () => void;
 }
 
 export const ListViewHeader: React.FC<ListViewHeaderProps> = ({
@@ -23,6 +25,8 @@ export const ListViewHeader: React.FC<ListViewHeaderProps> = ({
   sortOrder,
   onSortOrderChange,
   isSearching,
+  listViewMode,
+  onToggleListViewMode,
 }) => {
   const isMobile = useIsMobile();
 
@@ -46,7 +50,7 @@ export const ListViewHeader: React.FC<ListViewHeaderProps> = ({
               className="pl-10 w-full"
           />
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="icon"
@@ -55,6 +59,14 @@ export const ListViewHeader: React.FC<ListViewHeaderProps> = ({
             title={`Sort by title: ${sortOrder === 'asc' ? 'Ascending' : 'Descending'}. Click to toggle.`}
           >
             {sortOrder === 'asc' ? <ArrowUpAZ className="h-4 w-4" /> : <ArrowDownAZ className="h-4 w-4" />}
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToggleListViewMode}
+            title={`Switch to ${listViewMode === 'list' ? 'card' : 'list'} view`}
+          >
+            {listViewMode === 'list' ? <Grid3x3 className="h-4 w-4" /> : <List className="h-4 w-4" />}
           </Button>
       </div>
     </div>

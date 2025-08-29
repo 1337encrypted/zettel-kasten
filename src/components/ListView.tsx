@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Folder, Note } from '@/types';
 import FolderList from '@/components/FolderList';
@@ -7,6 +6,10 @@ import { ListViewHeader } from './ListViewHeader';
 import { SelectionToolbar } from './SelectionToolbar';
 import { MoveNotesDialog } from './MoveNotesDialog';
 import NoteView from './NoteView';
+import { NoteCard } from './NoteCard';
+import { FolderCard } from './FolderCard';
+import type { ListViewMode } from '@/hooks/useUIState';
+import { Mic } from 'lucide-react';
 
 interface ListViewProps {
   filteredFolders: Folder[];
@@ -32,6 +35,9 @@ interface ListViewProps {
   onSelectAll: () => void;
   onMoveNotes: (noteIds: string[], targetFolderId: string | null) => void;
   readmeNote?: Note;
+  listViewMode: ListViewMode;
+  onToggleListViewMode: () => void;
+  profile?: { username: string | null } | null;
 }
 
 export const ListView: React.FC<ListViewProps> = ({
@@ -58,6 +64,9 @@ export const ListView: React.FC<ListViewProps> = ({
   onSelectAll,
   onMoveNotes,
   readmeNote,
+  listViewMode,
+  onToggleListViewMode,
+  profile,
 }) => {
   const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const isSearching = !!searchQuery.trim();
@@ -87,17 +96,37 @@ export const ListView: React.FC<ListViewProps> = ({
         sortOrder={sortOrder}
         onSortOrderChange={onSortOrderChange}
         isSearching={isSearching}
+        listViewMode={listViewMode}
+        onToggleListViewMode={onToggleListViewMode}
       />
 
-      <FolderList
-        folders={filteredFolders}
-        notes={allNotes}
-        onSelectFolder={onSelectFolder}
-        currentFolderId={currentFolderId}
-        onNavigateUp={onNavigateUp}
-        onDeleteFolder={onDeleteFolder}
-        onRenameFolder={onRenameFolder}
-      />
+      {/* Folders Section */}
+      {filteredFolders.length > 0 && (
+        listViewMode === 'list' ? (
+          <FolderList
+            folders={filteredFolders}
+            notes={allNotes}
+            onSelectFolder={onSelectFolder}
+            currentFolderId={currentFolderId}
+            onNavigateUp={onNavigateUp}
+            onDeleteFolder={onDeleteFolder}
+            onRenameFolder={onRenameFolder}
+          />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredFolders.map((folder) => (
+              <FolderCard
+                key={folder.id}
+                folder={folder}
+                notes={allNotes}
+                onSelectFolder={onSelectFolder}
+                onDeleteFolder={onDeleteFolder}
+                onRenameFolder={onRenameFolder}
+              />
+            ))}
+          </div>
+        )
+      )}
 
       {selectedNoteIds.length > 0 && (
         <SelectionToolbar
@@ -110,13 +139,32 @@ export const ListView: React.FC<ListViewProps> = ({
         />
       )}
       
-      <NoteList
-        notes={notesForList}
-        onSelectNote={onSelectNote}
-        selectedNoteId={selectedNoteId}
-        selectedNoteIds={selectedNoteIds}
-        onToggleNoteSelection={onToggleNoteSelection}
-      />
+      {/* Notes Section */}
+      {notesForList.length > 0 && (
+        listViewMode === 'list' ? (
+          <NoteList
+            notes={notesForList}
+            onSelectNote={onSelectNote}
+            selectedNoteId={selectedNoteId}
+            selectedNoteIds={selectedNoteIds}
+            onToggleNoteSelection={onToggleNoteSelection}
+          />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {notesForList.map((note) => (
+              <NoteCard
+                key={note.id}
+                note={note}
+                onSelectNote={onSelectNote}
+                selectedNoteId={selectedNoteId}
+                selectedNoteIds={selectedNoteIds}
+                onToggleNoteSelection={onToggleNoteSelection}
+                profile={profile}
+              />
+            ))}
+          </div>
+        )
+      )}
 
       {readmeNote && !isSearching && (
         <div
